@@ -1,0 +1,14 @@
+This package was debianized by Samuele Giovanni Tonon <samu@debian.org> on
+Mon, 13 May 2002 15:19:31 +0200.
+
+It was downloaded from http://www.splint.org/download.html
+
+Upstream Authors: 	Massachusetts Institute of Technology University of Virginia.
+			For information on spint: info@splint.org
+			To report a bug: splint-bug@splint.org
+
+Copyright:
+
+A copy of the GNU General Public License, version 2, can be found in
+/usr/share/common-licenses/GPL .
+

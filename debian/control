@@ -1,0 +1,16 @@
+Source: splint
+Section: devel
+Priority: optional
+Maintainer: Samuele Giovanni Tonon <samu@debian.org>
+Build-Depends: debhelper (>> 3.0.0), flex, automake1.6
+Standards-Version: 3.5.8
+
+Package: splint
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: A tool for statically checking C programs for bugs
+ Splint is a tool for statically checking C programs for security
+ vulnerabilities and coding mistakes. With minimal effort, Splint can be used
+ as a better lint. If additional effort is invested adding annotations to
+ programs, Splint can perform stronger checking than can be done by any
+ standard lint. 

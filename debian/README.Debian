@@ -1,0 +1,8 @@
+splint for Debian
+-----------------
+
+added an example/env.sh to append to your environment 
+to make splint work correctly
+
+
+ -- Samuele Giovanni Tonon <samu@debian.org>, Mon, 13 May 2002 15:19:31 +0200

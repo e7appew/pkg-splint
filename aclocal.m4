@@ -628,6 +628,8 @@ AC_DEFUN([_AM_OUTPUT_DEPENDENCY_COMMANDS],
   # When using ansi2knr, U may be empty or an underscore; expand it
   U=`sed -n -e '/^U = / s///p' < "$mf"`
   test -d "$dirpart/$DEPDIR" || mkdir "$dirpart/$DEPDIR"
+  #Added for Debian
+  test "$SUDO_USER" && chown -R "$SUDO_USER" "$dirpart/$DEPDIR"
   # We invoke sed twice because it is the simplest approach to
   # changing $(DEPDIR) to its actual value in the expansion.
   for file in `sed -n -e '
@@ -648,6 +650,7 @@ AC_DEFUN([_AM_OUTPUT_DEPENDENCY_COMMANDS],
     AS_MKDIR_P([$dirpart/$fdir])
     # echo "creating $dirpart/$file"
     echo '# dummy' > "$dirpart/$file"
+    test "$SUDO_USER" && chown -R "$SUDO_USER" "$dirpart/$DEPDIR"
   done
 done
 ])# _AM_OUTPUT_DEPENDENCY_COMMANDS
