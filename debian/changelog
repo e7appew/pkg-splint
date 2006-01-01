@@ -1,3 +1,10 @@
+splint (3.1.1-4.1) unstable; urgency=high
+
+  * Non-maintainer upload.
+  * Update automake build-dep to automake1.9 (Closes: #335144).
+
+ -- Luk Claes <luk@debian.org>  Sun,  1 Jan 2006 18:31:17 +0100
+
 splint (3.1.1-4) unstable; urgency=low
 
   * Added suggest splint in splint-doc control field (Closes: #194228)

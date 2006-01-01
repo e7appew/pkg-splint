@@ -891,7 +891,7 @@
 ^13 13@c@-@0@0@0@0@61#__WCHAR_TYPE__
 *1 (Constant)
 ^14 23$#__USER_LABEL_PREFIX__#__REGISTER_PREFIX__#__TIME__
-^17 5$#S_SPLINT_S#__LCLINT__#__i386
+^17 5$#S_SPLINT_S#__LCLINT__#__i486
 *3 (Variable)
 ^20 378|@1|6@0@0@0@1#stdin#stdout
 *1 (Constant)
