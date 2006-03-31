@@ -1,3 +1,9 @@
+splint (3.1.1-5) unstable; urgency=low
+
+  * added patch to include support to __VA_ARGS__ (Closes: #359894)
+
+ -- Samuele Giovanni Tonon <samu@debian.org>  Fri, 31 Mar 2006 09:59:10 +0200
+
 splint (3.1.1-4.1) unstable; urgency=high
 
   * Non-maintainer upload.
