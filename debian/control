@@ -8,6 +8,7 @@ Standards-Version: 3.5.8
 Package: splint
 Architecture: any
 Depends: ${shlibs:Depends}
+Suggests: splint-doc
 Description: A tool for statically checking C programs for bugs
  Splint is a tool for statically checking C programs for security
  vulnerabilities and coding mistakes. With minimal effort, Splint can be used
