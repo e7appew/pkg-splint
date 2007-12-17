@@ -1,148 +1,103 @@
 #!/usr/bin/make -f
-# Sample debian/rules that uses debhelper.
-# GNU copyright 1997 to 1999 by Joey Hess.
+
+include /usr/share/dpatch/dpatch.make
 
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-# This is the debhelper compatibility version to use.
-export DH_COMPAT=3
+PKG_NAME=splint
+PKG_VERS=3.1.2
+UPSTR_SITE=http://www.$(PKG_NAME).org
+UPSTR_FILE=$(UPSTR_DIR).src.tgz
+UPSTR_DIR=$(PKG_NAME)-$(PKG_VERS)
+ORIG_DFSG_DIR=$(PKG_NAME)-$(PKG_VERS).dfsg
+ORIG_DFSG_TAR=$(PKG_NAME)_$(PKG_VERS).dfsg.orig.tar
 
 # These are used for cross-compiling and for saving the configure script
 # from having to guess our platform (since we know it already)
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
-
-ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -g
-endif
-ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
-	INSTALL_PROGRAM += -s
-endif
-
-patch: patch-stamp
-patch-stamp:
-	test -d debian/patched || install -d debian/patched
-	@echo "Patches applied in the Debian version of ${PACKAGE}:" > $@T
-	@for patch in `cat debian/patches/00list`; do \
-                stamp=debian/patched/$$patch.dpatch; \
-                patch=debian/patches/$$patch.dpatch; \
-                author=`sed -n "s,^## *.*dpatch by *,,p" $$patch`; \
-                test -x $$patch || chmod +x $$patch; \
-		if test -f $$stamp; then \
-                        echo "$$patch already applied."; \
-                        echo -e "\n$$patch ($$author):" >> $@T; \
-                        sed -n 's/^## *DP: */  /p' $$patch >> $@T; \
-                else \
-                        echo -n "applying patch $$patch..."; \
-                        if $$patch -patch >$$stamp.new 2>&1; then \
-                                mv $$stamp.new $$stamp; \
-                                touch $$stamp; \
-                                echo -e "\n$$patch ($$author):" >> $@T; \
-                                sed -n 's/^## *DP: */  /p' $$patch >> $@T; \
-                                echo " ok."; \
-                        else \
-                                echo " failed."; \
-                                exit 1; \
-                        fi; \
-                fi; \
-	done
-	mv -f $@T $@
-
-unpatch:
-	@for patch in `tac debian/patches/00list`; do \
-                stamp=debian/patched/$$patch.dpatch; \
-                patch=debian/patches/$$patch.dpatch; \
-                test -x $$patch || chmod +x $$patch; \
-                if test -f $$stamp; then \
-                        echo -n "reverting patch $$patch..."; \
-                        if $$patch -unpatch 2>&1 >/dev/null; then \
-                                rm -f $$stamp; \
-                                echo " ok."; \
-                        else \
-                                echo " failed."; \
-                                exit 1; \
-                        fi; \
-                fi; \
-	done
-
-	rm -f patch-stamp 
-
-config.status: configure
+config.status: patch configure-stamp
+configure-stamp:
 	dh_testdir
 	# Add here commands to configure the package.
-	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man/ --infodir=\$${prefix}/share/info
-
+ifneq "$(wildcard /usr/share/misc/config.sub)" ""
+	cp -f /usr/share/misc/config.sub config/config.sub
+endif
+ifneq "$(wildcard /usr/share/misc/config.guess)" ""
+	cp -f /usr/share/misc/config.guess config/config.guess
+endif
+	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs"
+	touch configure-stamp
 
 build: build-stamp
 
-build-stamp:  config.status
+build-stamp: patch-stamp config.status
 	dh_testdir
-
-	# Add here commands to compile the package.
 	$(MAKE)
-	#/usr/bin/docbook-to-man debian/splint.sgml > splint.1
+	touch $@
 
-	touch build-stamp
-
-clean:
+clean: clean-patched unpatch
+clean-patched:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp 
-
-	# Add here commands to clean up after the build process.
-	-$(MAKE) distclean
-	-test -r /usr/share/misc/config.sub && \
-	  cp -f /usr/share/misc/config.sub config.sub
-	-test -r /usr/share/misc/config.guess && \
-	  cp -f /usr/share/misc/config.guess config.guess
-
-	dh_clean config.status config.log config.h stamp-h stamp-h1 'config.hin]' config.guess config.sub Makefile bin/splint
+	rm -f build-stamp configure-stamp
+	[ ! -f Makefile ] || $(MAKE) distclean
+	rm -f config/config.sub config/config.guess
+	dh_clean
 
 install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
 	dh_installdirs
-
-	# Add here commands to install the package into debian/splint.
-	$(MAKE) install prefix=$(CURDIR)/debian/splint/usr
-
+	$(MAKE) DESTDIR=$(CURDIR)/debian/splint-data install-data
+	$(MAKE) DESTDIR=$(CURDIR)/debian/splint install-exec
+	install -D -m 0644 $(CURDIR)/debian/lintian $(CURDIR)/debian/splint/usr/share/lintian/overrides/splint
+	install -D -m 0644 $(CURDIR)/debian/linda $(CURDIR)/debian/splint/usr/share/linda/overrides/splint
 
 # Build architecture-independent files here.
 binary-indep: build install
-# We have nothing to do by default.
+	dh_testdir -i
+	dh_testroot -i
+	dh_installchangelogs -i
+	dh_installdocs -i -p splint-doc-html
+	dh_compress -i
+	dh_fixperms -i
+	dh_installdeb -i
+	dh_gencontrol -i
+	dh_md5sums -i
+	dh_builddeb -i
 
 # Build architecture-dependent files here.
 binary-arch: build install
-	dh_testdir
-	dh_testroot
-#	dh_installdebconf	
-	dh_installdocs
-	dh_installexamples
-#	dh_installmenu
-#	dh_installlogrotate
-#	dh_installemacsen
-#	dh_installpam
-#	dh_installmime
-#	dh_installinit
-#	dh_installcron
-	dh_installman
-#	dh_installinfo
-#	dh_undocumented
-	dh_installchangelogs 
-	dh_link
-	dh_strip
-	dh_compress
-	dh_fixperms
-#	dh_makeshlibs
-	dh_installdeb
-#	dh_perl
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
+	dh_testdir -a
+	dh_testroot -a
+	dh_installchangelogs -a doc/changes.html
+	dh_installdocs -a -p splint
+	dh_strip -a
+	dh_compress -a
+	dh_fixperms -a
+	dh_installdeb -a
+	dh_shlibdeps -a
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
+
+get-orig-source:
+	[ ! -x /usr/bin/wget ] || wget $(UPSTR_SITE)/downloads/$(UPSTR_FILE)
+	tar -zxvf $(UPSTR_FILE)
+	mv $(UPSTR_DIR) $(ORIG_DFSG_DIR)
+	rm -f $(ORIG_DFSG_DIR)/doc/manual.pdf
+	[ ! -x /usr/bin/wget ] || wget $(UPSTR_SITE)/faq.html -O $(ORIG_DFSG_DIR)/doc/html/faq.html
+	[ ! -x /usr/bin/wget ] || wget $(UPSTR_SITE)/changes.html -O $(ORIG_DFSG_DIR)/doc/changes.html
+	[ ! -x /usr/bin/wget ] || wget $(UPSTR_SITE)/bugs.html -O $(ORIG_DFSG_DIR)/doc/bugs.html
+	tar -cvf $(ORIG_DFSG_TAR) $(ORIG_DFSG_DIR)
+	gzip --best $(ORIG_DFSG_TAR)
+	rm -rf $(ORIG_DFSG_DIR) $(UPSTR_FILE)
+	@echo "Re-packaged source file: $(ORIG_DFSG_TAR).gz"
+	@ls -l $(ORIG_DFSG_TAR).gz
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install 
+.PHONY: build clean binary-indep binary-arch binary install patch unpatch get-orig-source

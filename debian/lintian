@@ -1,0 +1,2 @@
+# splint(1) is installed by splint-data
+splint: binary-without-manpage usr/bin/splint

@@ -42,14 +42,14 @@ UNITTESTS = \
   help \
   abstptr abstract alias alttypes ansireserved argorder \
   args arraydims arrayinit arraylit blocks break cases cast chararraylit charlit clauses commentchar compdestroy \
-  compoundliterals compoundstmt constannot controldepth csyntax czechnames czechoslovaknames deadparam \
+  compoundliterals compoundstmt condifomit constannot controldepth csyntax czechnames czechoslovaknames deadparam \
   decl divzero enum enumtag exports external fields flags forbody format freearray \
-  funcpointer functionmacro glob globals impabstract info init inparam internal iter keep libs \
+  funcpointer functionmacro glob globals impabstract info init innerarray inparam internal iter keep libs \
   linked lintcomments list longint loopexec looptesteffect \
-  macros macrosef merge mergenull modifies modtest moduncon \
+  macros macrosef malloc merge mergenull modifies modtest moduncon \
   mongoincludes mystrncat noeffect null nullret nullassign numabstract observer oldstyle outglob outparam \
   parentype postnotnull preds prefixes printflike rc refcounts release repexpose \
-  returned sharing shifts sizesigns slovaknames \
+  returned russian sharing shifts sizesigns slovaknames \
   specclauses \
   special stack staticarray strings \
   stringliteral \
@@ -300,12 +300,16 @@ controldepth:
 	-$(SPLINTR) +hints -controlnestdepth 2 controldepth.c -expect 2
 	-$(SPLINTR) +hints -controlnestdepth 1 controldepth.c -expect 2
 
+###
+### 1 extra warning reported for +strict now because of out-of-bounds read
+###
+
 .PHONY: compdestroy
 compdestroy:
 	-$(SPLINTRN) compdestroy.c +checks -exportlocal -exportheader -expect 1
 	-$(SPLINTRN) compdestroy.c +checks -exportlocal -exportheader +strictdestroy -expect 2
 	-$(SPLINTRN) compdestroy.c +checks -exportlocal -exportheader +strictdestroy +strictusereleased -expect 3
-	-$(SPLINTRN) compdestroy.c +strict +partial -exportheader -expect 3
+	-$(SPLINTRN) compdestroy.c +strict +partial -exportheader -expect 4
 
 .PHONY: compoundliterals
 compoundliterals:
@@ -314,6 +318,11 @@ compoundliterals:
 .PHONY: compoundstmt
 compoundstmt:
 	${SPLINTRN} compoundstmt.c -expect 3
+
+.PHONY: condifomit
+condifomit:
+	${SPLINTRN} -gnuextensions condifomit.c -expect 4
+	${SPLINTRN} +gnuextensions condifomit.c -expect 1
 
 .PHONY: constannot
 constannot:
@@ -368,7 +377,7 @@ deadparam:
 .PHONY: decl
 decl:
 	-$(SPLINTR) decl.c -expect 2
-	-$(SPLINTRN) decl.c +strict -exportlocal -expect 5
+	-$(SPLINTRN) decl.c +strict -exportlocal -expect 6
 	-$(SPLINTR) decl2 -expect 4
 
 .PHONY: divzero
@@ -467,6 +476,12 @@ init:
 	-$(SPLINTR) init.c -expect 14
 	-$(SPLINTRN) init.c +checks -exportlocal -exportheadervar -expect 17
 
+### evans 2003-09-16
+.PHONY: innerarray
+innerarray:
+	-$(SPLINTR) innerarray.c -expect 10
+
+
 
 .PHONY: inparam
 inparam:
@@ -555,6 +570,10 @@ macrosef:
 	-$(SPLINTR) macrosef.c +allmacros -expect 3
 	-$(SPLINTR) macrosef.c +allmacros +sefuncon -expect 4
 
+.PHONY: malloc
+malloc:
+	-$(SPLINTRN) malloc.c +bounds -exportlocal -expect 7
+
 .PHONY: merge
 merge:
 	-$(SPLINTRN) merge.c +checks -exportlocal -exportheadervar -exportheader -expect 3
@@ -576,7 +595,7 @@ modtest:
 .PHONY: moduncon
 moduncon:
 	-$(SPLINTR) moduncon.c +moduncon -memchecks -expect 4
-	-$(SPLINTRN) moduncon.c +strict -exportlocal -expect 22
+	-$(SPLINTRN) moduncon.c +strict +impboundsconstraints -exportlocal -expect 22 
 
 .PHONY: mongoincludes
 mongoincludes:
@@ -675,7 +694,7 @@ parentype:
 preds:
 	-$(SPLINTR) +hints preds.c -expect 6
 	-$(SPLINTRN) +hints preds.c -weak -expect 1
-	-$(SPLINTRN) +hints preds.c -strict -exportlocal -exportheader -expect 10
+	-$(SPLINTRN) +hints preds.c -strict +impboundsconstraints -exportlocal -exportheader -expect 10
 
 .PHONY: prefixes
 prefixes:
@@ -733,6 +752,11 @@ repexpose:
 .PHONY: returned
 returned:
 	${SPLINTR} returned.c -expect 1
+
+### russian added 2003-06-07: bug reported in pre-processing non-standard characters.
+.PHONY: russian
+russian:
+	${SPLINTR} russian.c 
 
 .PHONY: sharing
 sharing: 
@@ -1068,6 +1092,7 @@ EXTRA_DIST =  ./abst_t.lcl \
               ./compdestroy.c \
               ./compoundliterals.c ./compoundliterals.expect \
               ./compoundstmt.c ./compoundstmt.expect \
+              ./condifomit.c \
               ./csyntax.c \
               ./constannot.c \
               ./controldepth.c \
@@ -1131,6 +1156,7 @@ EXTRA_DIST =  ./abst_t.lcl \
               ./longconstants.c \
               ./macros.c \
               ./macrosef.c \
+	      ./malloc.c \
               ./merge.c \
               ./modclient.c \
               ./modifies.c \
@@ -1571,4 +1597,4 @@ EXTRA_DIST =  ./abst_t.lcl \
 stringliteral.expect  stringliteral.c \
   numabstract.c sizesigns.c typeof.c   nullassign.expect 
 
-#		sizesigns.c sizesigns.expect 
+#		sizesigns.c sizesigns.expect \

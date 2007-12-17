@@ -822,8 +822,10 @@ int main (int argc, char *argv[])
   **  will be <tmpprefix>.<file>.c)
   */
 
+  /* Why was this here?  It is always a bug... */
+# if 0
   {
-# ifdef WIN32
+# if defined (WIN32) || defined (OS2) && defined (__IBMC__)
     int nfiles = /*@-unrecog@*/ _fcloseall (); /*@=unrecog@*/
 
     if (nfiles != 0) 
@@ -832,6 +834,7 @@ int main (int argc, char *argv[])
       }
 # endif
   }
+# endif
 
   DPRINTF (("Initializing..."));
 
@@ -1087,6 +1090,13 @@ int main (int argc, char *argv[])
 	}
 
       cstring_free (specErrors);
+  
+      if (context_numBugs () > 0) {
+	expsuccess = FALSE;
+	if (!isQuiet) {
+	  llmsg (message ("   %d internal bugs reported", context_numBugs ()));
+	}
+      }
   }
   
   if (context_getFlag (FLG_STATS))
@@ -1094,7 +1104,7 @@ int main (int argc, char *argv[])
       clock_t ttime = clock () - before;
       int specLines = context_getSpecLinesProcessed ();
       cstring specmsg = cstring_undefined;
-
+      
       rstime = clock ();
       
       if (specLines > 0)
@@ -1211,7 +1221,7 @@ llinterrupt (int i)
 		 cstring_toCharsSafe (loc));
 	cstring_free (loc);
 	printCodePoint ();
-	fprintf (g_errorstream, "*** Please report bug to %s\n", SPLINT_MAINTAINER);
+	fprintf (g_errorstream, "*** Please report bug to %s\n*** A useful bug report should include everything we need to reproduce the bug.\n", SPLINT_MAINTAINER);
 	exit (LLGIVEUP);
       }
     default:
@@ -1221,7 +1231,7 @@ llinterrupt (int i)
 	       cstring_toCharsSafe (fileloc_unparse (g_currentloc)));
       /*@=mustfree@*/
       printCodePoint ();
-      fprintf (g_errorstream, "*** Please report bug to %s ***\n", SPLINT_MAINTAINER);
+      fprintf (g_errorstream, "*** Please report bug to %s\n*** A useful bug report should include everything we need to reproduce the bug.", SPLINT_MAINTAINER);
       exit (LLGIVEUP);
     }
 }
@@ -1251,7 +1261,7 @@ cleanupFiles (void)
     }
   else
     {
-# ifdef WIN32
+# if defined (WIN32) || defined (OS2) && defined (__IBMC__)
       int nfiles = /*@-unrecog@*/ _fcloseall (); /*@=unrecog@*/
       
       if (nfiles != 0) 
@@ -1274,7 +1284,7 @@ llexit (int status)
 {
   DPRINTF (("llexit: %d", status));
 
-# ifdef WIN32
+# if defined (WIN32) || defined (OS2) && defined (__IBMC__)
   if (status == LLFAILURE) 
     {
       _fcloseall ();

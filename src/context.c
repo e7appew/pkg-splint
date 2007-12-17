@@ -102,6 +102,7 @@ static struct
   clause inclause;
 
   int numerrors;
+  int numbugs;
 
   filelocStack locstack;
   fileTable ftab;
@@ -843,13 +844,13 @@ context_resetAllFlags (void)
   gc.flags[FLG_NULLINIT] = TRUE;
 
   gc.flags[FLG_STRINGLITTOOLONG] = TRUE;
-
+  gc.flags[FLG_MACROCONSTDIST] = TRUE;
   gc.flags[FLG_LIKELYBOOL] = TRUE;
   gc.flags[FLG_ZEROPTR] = TRUE;
   gc.flags[FLG_NUMLITERAL] = TRUE;
   gc.flags[FLG_DUPLICATEQUALS] = TRUE;
   gc.flags[FLG_SKIPISOHEADERS] = TRUE;
-  gc.flags[FLG_SKIPPOSIXHEADERS] = TRUE;
+  gc.flags[FLG_SKIPPOSIXHEADERS] = FALSE;
   gc.flags[FLG_SYSTEMDIREXPAND] = TRUE;
   gc.flags[FLG_UNRECOGCOMMENTS] = TRUE;
   gc.flags[FLG_UNRECOGFLAGCOMMENTS] = TRUE;
@@ -934,7 +935,7 @@ context_resetAllFlags (void)
   ** On by default for Win32, but not Unix
   */
 
-# ifdef WIN32
+# if defined (WIN32) || defined (OS2)
   gc.flags[FLG_PARENFILEFORMAT] = TRUE;
   gc.flags[FLG_CASEINSENSITIVEFILENAMES] = TRUE;
 # endif
@@ -1059,10 +1060,12 @@ context_setModeAux (cstring s, bool warn)
 	  FLG_NESTEDEXTERN, 
 	  FLG_NUMLITERAL,
 	  FLG_ZEROBOOL,
+
 	  /* memchecks flags */
 	  FLG_NULLDEREF, 
 	  FLG_NULLSTATE, FLG_NULLASSIGN,
  	  FLG_NULLPASS, FLG_NULLRET,        
+	  FLG_ALLOCMISMATCH,
 
 	  FLG_COMPDEF, FLG_COMPMEMPASS, FLG_UNIONDEF,
 	  FLG_RETSTACK,
@@ -1195,6 +1198,7 @@ context_setModeAux (cstring s, bool warn)
 
 	  FLG_NULLSTATE, FLG_NULLDEREF, FLG_NULLASSIGN,
 	  FLG_NULLPASS, FLG_NULLRET,
+	  FLG_ALLOCMISMATCH,
 
 	  FLG_COMPDEF, FLG_COMPMEMPASS, FLG_UNIONDEF, FLG_RETSTACK,	  
 
@@ -1231,7 +1235,7 @@ context_setModeAux (cstring s, bool warn)
 	  FLG_CHECKSTRICTGLOBALS, FLG_IMPCHECKEDSPECGLOBALS,
           FLG_MACROMATCHNAME, FLG_WARNLINTCOMMENTS,
 	  FLG_INCLUDENEST, FLG_ISORESERVED, FLG_CPPNAMES, 
-	  FLG_NOPARAMS, FLG_IFEMPTY, FLG_WHILEEMPTY, FLG_REALCOMPARE,
+	  FLG_NOPARAMS, FLG_IFEMPTY, FLG_WHILEEMPTY, FLG_REALCOMPARE, FLG_REALRELATECOMPARE,
 	  FLG_BOOLOPS, FLG_SHIFTNEGATIVE,
 	  FLG_SHIFTIMPLEMENTATION,
 	  FLG_BUFFEROVERFLOWHIGH, FLG_BUFFEROVERFLOW,
@@ -1311,8 +1315,13 @@ context_setModeAux (cstring s, bool warn)
 	  /* memchecks flags */
 	  FLG_NULLSTATE, FLG_NULLDEREF, FLG_NULLASSIGN,
 	  FLG_NULLPASS, FLG_NULLRET,
-
+	  FLG_ALLOCMISMATCH,
 	  FLG_COMPDEF, FLG_COMPMEMPASS, FLG_UNIONDEF,
+
+	  /* memory checking flags */
+	  FLG_BOUNDSREAD, FLG_BOUNDSWRITE,
+	  FLG_LIKELYBOUNDSREAD, FLG_LIKELYBOUNDSWRITE,
+	  FLG_CHECKPOST, 
 
 	  /* memtrans flags */
 	  FLG_EXPOSETRANS,
@@ -1362,7 +1371,7 @@ context_setModeAux (cstring s, bool warn)
 	  FLG_FOREMPTY, FLG_WHILEEMPTY,
 	  FLG_IFEMPTY, FLG_IFBLOCK,
 	  FLG_ELSEIFCOMPLETE,
-	  FLG_REALCOMPARE, FLG_BOOLOPS,
+	  FLG_REALCOMPARE, FLG_BOOLOPS, FLG_REALRELATECOMPARE,
 	  FLG_SYSTEMDIRERRORS, FLG_UNUSEDSPECIAL,
 
 	  FLG_SHIFTNEGATIVE,
@@ -1570,7 +1579,7 @@ context_enterUnknownMacro (/*@dependent@*/ uentry e)
 
 void context_enterAndClause (exprNode e)
 {
-  
+  DPRINTF (("enter and clause: %s", exprNode_unparse (e)));
   usymtab_trueBranch (guardSet_copy (exprNode_getGuards (e)));
   pushClause (ANDCLAUSE);
 }
@@ -3046,6 +3055,18 @@ context_resetErrors (void)
   gc.numerrors = 0;
 }
 
+void
+context_recordBug (void)
+{
+  gc.numbugs++;
+}
+
+int
+context_numBugs (void)
+{
+  return gc.numbugs;
+}
+
 void context_initMod (void)
    /*@globals undef gc; @*/
 {
@@ -3056,6 +3077,7 @@ void context_initMod (void)
 
   gc.instandardlib = FALSE;
   gc.numerrors = 0;
+  gc.numbugs = 0;
   gc.neednl = FALSE;
   gc.linesprocessed = 0;
   gc.speclinesprocessed = 0;
@@ -4795,27 +4817,23 @@ metaStateInfo context_lookupMetaStateInfo (cstring key)
 
 /*@null@*/ annotationInfo context_lookupAnnotation (cstring annot) 
 {
-  annotationInfo ainfo;
-
-  ainfo = annotationTable_lookup (gc.annotTable, annot);
-
-  return ainfo;
+  return annotationTable_lookup (gc.annotTable, annot);
 }
 
-void context_addAnnotation (annotationInfo ainfo)
+void context_addAnnotation (annotationInfo info)
 {
-  if (annotationTable_contains (gc.annotTable, annotationInfo_getName (ainfo)))
+  if (annotationTable_contains (gc.annotTable, annotationInfo_getName (info)))
     {
       voptgenerror 
 	(FLG_SYNTAX,
-	 message ("Duplicate annotation declaration: %s", annotationInfo_getName (ainfo)),
-	 annotationInfo_getLoc (ainfo));
+	 message ("Duplicate annotation declaration: %s", annotationInfo_getName (info)),
+	 annotationInfo_getLoc (info));
 
-      annotationInfo_free (ainfo);
+      annotationInfo_free (info);
     }
   else
     {
-      annotationTable_insert (gc.annotTable, ainfo);
+      annotationTable_insert (gc.annotTable, info);
     }
 }
 
@@ -4837,7 +4855,7 @@ void context_addMetaState (cstring mname, metaStateInfo msinfo)
     }
 }
 
-valueTable context_createValueTable (sRef s, stateInfo sinfo)
+valueTable context_createValueTable (sRef s, stateInfo info)
 {
   if (metaStateTable_size (gc.stateTable) > 0)
     {
@@ -4858,7 +4876,7 @@ valueTable context_createValueTable (sRef s, stateInfo sinfo)
 		(res,
 		 cstring_copy (metaStateInfo_getName (msi)),
 		 stateValue_createImplicit (metaStateInfo_getDefaultValue (msi, s), 
-					    stateInfo_copy (sinfo)));
+					    stateInfo_copy (info)));
 	    }
 	  else
 	    {
@@ -4867,18 +4885,18 @@ valueTable context_createValueTable (sRef s, stateInfo sinfo)
 	} 
       end_metaStateTable_elements ;
       
-      stateInfo_free (sinfo);
+      stateInfo_free (info);
       DPRINTF (("Value table: %s", valueTable_unparse (res)));
       return res;
     }
   else
     {
-      stateInfo_free (sinfo);
+      stateInfo_free (info);
       return valueTable_undefined;
     }
 }
 
-valueTable context_createGlobalMarkerValueTable (stateInfo sinfo)
+valueTable context_createGlobalMarkerValueTable (stateInfo info)
 {
   if (metaStateTable_size (gc.stateTable) > 0)
     {
@@ -4894,126 +4912,61 @@ valueTable context_createGlobalMarkerValueTable (stateInfo sinfo)
 	  valueTable_insert (res,
 			     cstring_copy (metaStateInfo_getName (msi)),
 			     stateValue_create (metaStateInfo_getDefaultGlobalValue (msi),
-						stateInfo_copy (sinfo)));
+						stateInfo_copy (info)));
 	} 
       end_metaStateTable_elements ;
       
-      stateInfo_free (sinfo);
+      stateInfo_free (info);
       DPRINTF (("Value table: %s", valueTable_unparse (res)));
       return res;
     }
   else
     {
-      stateInfo_free (sinfo);
+      stateInfo_free (info);
       return valueTable_undefined;
     }
 }
 
-
-/*drl 12/30/01 these are some ugly functions that were added to facilitate struct annotations */
-
-
-/*drl added */
-static ctype lastStruct;
-
-ctype context_setLastStruct (/*@returned@*/ ctype s) /*@globals lastStruct@*/
+constraintList context_getImplicitFcnConstraints (uentry ue)
 {
-  lastStruct = s;
-  return s;
-}
+  constraintList ret = constraintList_makeNew ();
+  uentryList params = uentry_getParams (ue);
 
-ctype context_getLastStruct (/*@returned@*/ /*ctype s*/) /*@globals lastStruct@*/
-{
-  return lastStruct;
-}
-
-/*
-** Why is this stuff in context.c?
-*/
-
-/*@unused@*/ static int sInfoNum = 0;
-
-
-struct getUe {
-  /*@unused@*/  uentry ue;
-  /*@unused@*/ sRef s;
-};
-
-struct sInfo {
-  /*@unused@*/ ctype ct;
-  /*@unused@*/ constraintList inv;
- /*@unused@*/ int ngetUe;
- /*@unused@*/ struct getUe * t ;
-};
-
-/* unused: static struct sInfo globalStructInfo; */
-
-/*drl 1/6/2001: I didn't think these functions were solid enough to include in the
-  stable  release of splint.  I coomented them out so that they won't break anything
-  but didn't delete them because they will be fixed and included later
-
-
-*/
-
-/*@-paramuse@*/
-
-void context_setGlobalStructInfo (ctype ct, constraintList list)
-{
-# if 0
-  /* int i;
-  uentryList f;
-
-  f =  ctype_getFields (ct);
-  
-  if (constraintList_isDefined(list) )
+  uentryList_elements (params, el)
     {
-      globalStructInfo.ct = ct;
-      globalStructInfo.inv = list;
-
-      globalStructInfo.ngetUe = 0;
+      DPRINTF (("setImplicitfcnConstraints doing: %s", uentry_unparse(el)));
       
-      /* abstraction violation fix it * /
-      globalStructInfo.t   = dmalloc(f->nelements * sizeof(struct getUe) );
-
-      globalStructInfo.ngetUe = f->nelements;
-
-      i = 0;
-      
-      uentryList_elements(f, ue)
+      if (uentry_isElipsisMarker (el))
 	{
-	  globalStructInfo.t[i].ue = ue;
-	  globalStructInfo.t[i].s = uentry_getSref(ue);
-	  TPRINTF(( message(" setGlobalStructInfo:: adding ue=%s and sRef=%s",
-			    uentry_unparse(ue), sRef_unparse( uentry_getSref(ue) )
-			    )
-		    ));
-	  i++;
+	  ;
 	}
-      end_uentryList_elements;
-    }
-  */
-# endif
+      else
+	{
+	  sRef s = uentry_getSref (el);
+	  
+	  DPRINTF (("Trying: %s", sRef_unparse (s)));
+
+	  if (ctype_isPointer (sRef_getType (s)))
+	    {
+	      constraint c = constraint_makeSRefWriteSafeInt (s, 0);
+	      ret = constraintList_add (ret, c);
+	      
+	      /*drl 10/23/2002 added support for out*/
+	      
+	      if (!uentry_isOut(el))
+		{
+		  c = constraint_makeSRefReadSafeInt (s, 0);
+		  ret = constraintList_add (ret , c);
+		}
+	    }
+	  else
+	    {
+	      DPRINTF (("%s is NOT a pointer", sRef_unparseFull (s)));
+	    }
+	}
+    } end_uentryList_elements;
+
+  DPRINTF (("Returns ==> %s", constraintList_unparse (ret)));
+  return ret;
 }
-
-# if 0
-/*
-
-bool hasInvariants (ctype ct) /*@* /
-{
-  if ( ctype_sameName(globalStructInfo.ct, ct) )
-
-    return TRUE;
-
-  else
-    
-    return FALSE;
-  
-}
-*/
-# endif
-
-/*@=paramuse@*/
-
-
-
 

@@ -92,11 +92,14 @@ constraintList_add (/*@returned@*/ constraintList s, /*@only@*/ constraint el)
 
   /*drl7x */
 
-  if (constraintList_resolve (el, s) )
+  if (constraintList_resolve (el, s))
     {
+      DPRINTF (("Resolved constraint: %s", constraint_unparse (el)));
       constraint_free (el);
       return s;
     }
+
+  DPRINTF (("Adding constraint: %s", constraint_unparse (el)));
   
   if (s->nspace <= 0)
     constraintList_grow (s);
@@ -126,15 +129,15 @@ static void constraintList_freeShallow (/*@only@*/ constraintList c)
 
 /*@only@*/ constraintList constraintList_addList (/*@only@*/ /*@returned@*/ constraintList s, /*@observer@*/ /*@temp@*/ constraintList newList)
 {
-  llassert(constraintList_isDefined(s) );
-  llassert(constraintList_isDefined(newList) );
+  llassert(constraintList_isDefined (s));
+  llassert(constraintList_isDefined (newList));
 
   if (newList == constraintList_undefined)
     return s;
   
   constraintList_elements (newList, elem)
     {
-    s = constraintList_add (s, constraint_copy(elem) );
+      s = constraintList_add (s, constraint_copy(elem));
     }
   end_constraintList_elements;
 
@@ -631,7 +634,6 @@ void constraintList_dump (/*@observer@*/ constraintList c,  FILE *f)
     }
   end_constraintList_elements; ;
 }
-
 
 constraintList constraintList_sort (/*@returned@*/ constraintList ret)
 {

@@ -2236,7 +2236,10 @@ transferChecks_passParam (exprNode fexp, uentry arg, bool isSpec,
 	  sRef_clearDerived (base);
 	  sRef_setDefined (base, exprNode_loc (fexp));
 	  usymtab_clearAlias (base);
-	  sRef_setNullUnknown (base, exprNode_loc (fexp));
+	  /* evans 2004-07-31: Don't change state of constants! */
+	  if (!sRef_isConst (base)) {
+	    sRef_setNullUnknown (base, exprNode_loc (fexp));
+	  }
 	}
     }
 
@@ -2346,7 +2349,7 @@ static void checkStructTransfer (exprNode lhs, sRef slhs, exprNode rhs, sRef srh
   if (ctype_isSU (st) && ctype_isRealSU (sRef_getType (slhs))
       && ctype_match (sRef_getType (slhs), st))
     {
-      if (tt == TT_DOASSIGN && sRef_isStateDefined (srhs))
+      if ((tt == TT_DOASSIGN || tt == TT_FIELDASSIGN) && sRef_isStateDefined (srhs))
 	{
 	  sRef_setDefinedComplete (slhs, loc);
 	}
@@ -2362,47 +2365,52 @@ static void checkStructTransfer (exprNode lhs, sRef slhs, exprNode rhs, sRef srh
 	  if (sRef_isLocalVar (slhs)
 	      && sRef_isFileOrGlobalScope (sRef_getRootBase (srhs)))
 	    {
+	      DPRINTF (("Global scope!"));
 	      sRef_setDependent (slhs, exprNode_loc (lhs));
 	    }
-	  else
+	}
+
+      /*
+      ** evans 2003-07-10: should always copy the fields!
+      */
+
+      if (ctype_isUnion (st))
+	{
+	  sRef_setDefState (slhs, sRef_getDefState (srhs), 
+			    exprNode_loc (lhs));
+	  
+	  sRefSet_realElements (sRef_derivedFields (srhs), sr)
 	    {
-	      if (ctype_isUnion (st))
+	      if (sRef_isField (sr))
 		{
-		  sRef_setDefState (slhs, sRef_getDefState (srhs), 
-				    exprNode_loc (lhs));
-
-		  sRefSet_realElements (sRef_derivedFields (srhs), sr)
-		    {
-		      if (sRef_isField (sr))
-			{
-			  cstring fieldname = sRef_getField (sr);
-			  sRef lfld = sRef_makeField (slhs, fieldname);
-
-			  (void) checkTransfer (rhs, sr, lhs, lfld, 
-						exprNode_undefined,
-						exprNode_loc (lhs), tt);
-			}
-		    } end_sRefSet_realElements ;
-		}
-	      else
-		{
-		  uentryList fields = ctype_getFields (st);
+		  cstring fieldname = sRef_getField (sr);
+		  sRef lfld = sRef_makeField (slhs, fieldname);
 		  
-		  uentryList_elements (fields, field)
-		    {
-		      sRef rfld = sRef_makeField (srhs, uentry_rawName (field));
-		      sRef lfld = sRef_makeField (slhs, uentry_rawName (field));
-		      (void) checkTransfer (rhs, rfld, lhs, lfld, 
-					    exprNode_undefined,
-					    exprNode_loc (lhs), tt);
-		    } end_uentryList_elements ;
+		  (void) checkTransfer (rhs, sr, lhs, lfld, 
+					exprNode_undefined,
+					exprNode_loc (lhs), tt);
 		}
-
-	      if (sRef_isOnly (srhs))
-		{
-		  sRef_setKeptComplete (srhs, loc);
-		}
-	    }
+	    } end_sRefSet_realElements ;
+	}
+      else
+	{
+	  uentryList fields = ctype_getFields (st);
+	  
+	  uentryList_elements (fields, field)
+	    {
+	      sRef rfld = sRef_makeField (srhs, uentry_rawName (field));
+	      sRef lfld = sRef_makeField (slhs, uentry_rawName (field));
+	      DPRINTF (("Transfer field: %s := %s", 
+			sRef_unparse (lfld), sRef_unparse (rfld)));
+	      (void) checkTransfer (rhs, rfld, lhs, lfld, 
+				    exprNode_undefined,
+				    exprNode_loc (lhs), tt);
+	    } end_uentryList_elements ;
+	}
+      
+      if (sRef_isOnly (srhs))
+	{
+	  sRef_setKeptComplete (srhs, loc);
 	}
     }
 }
@@ -2440,6 +2448,8 @@ transferChecks_assign (exprNode lhs, exprNode rhs)
 
   if (ctype_isRealSU (sRef_getType (srhs)))
     {
+      DPRINTF (("Check struct transfer: %s := %s", exprNode_unparse (lhs),
+		exprNode_unparse (rhs)));
       checkStructTransfer (lhs, slhs, rhs, srhs, exprNode_loc (lhs), TT_FIELDASSIGN);
     }
   else
@@ -2496,6 +2506,8 @@ checkTransferNullAux (sRef fref, exprNode fexp, /*@unused@*/ bool ffix,
 {
   alkind tkind = sRef_getAliasKind (tref);
   ctype ttyp = ctype_realType (sRef_getType (tref));
+
+  DPRINTF (("Null transfer: %s => %s", sRef_unparseFull (fref), sRef_unparseFull (tref)));
 
   if (ctype_isUnknown (ttyp))
     {
@@ -2750,6 +2762,8 @@ checkTransferAssignAux (sRef fref, exprNode fexp, /*@unused@*/ bool ffix,
 	    }
 	}
     }
+
+  DPRINTF (("Transfer ==> %s", sRef_unparseFull (tref)));
 }
 
 /*
@@ -3410,6 +3424,12 @@ checkTransferAux (exprNode fexp, /*@exposed@*/ sRef fref, bool ffix,
   bool isfcnpass = (transferType == TT_FCNPASS);
   bool isfcnreturn = (transferType == TT_FCNRETURN);
 
+  DPRINTF (("Check transfer: %s [%s] => %s [%s]",
+	    exprNode_unparse (fexp),
+	    sRef_unparseFull (fref),
+	    exprNode_unparse (texp),
+	    sRef_unparseFull (tref)));
+
   setCodePoint ();
 
   if (!ffix && !tfix)
@@ -3417,6 +3437,7 @@ checkTransferAux (exprNode fexp, /*@exposed@*/ sRef fref, bool ffix,
       setCodePoint ();
       checkTransferNullAux (fref, fexp, ffix, tref, texp, tfix, 
 			    loc, transferType);
+      DPRINTF (("Transfer ==> %s", sRef_unparseFull (fref)));
     }
 
   if (isassign)
@@ -3424,6 +3445,7 @@ checkTransferAux (exprNode fexp, /*@exposed@*/ sRef fref, bool ffix,
       setCodePoint ();
       checkTransferAssignAux (fref, fexp, ffix, tref, texp, tfix,
 			      loc, transferType);
+      DPRINTF (("Transfer ==> %s", sRef_unparseFull (fref)));
     }
 
   /*
@@ -3975,6 +3997,8 @@ checkTransferAux (exprNode fexp, /*@exposed@*/ sRef fref, bool ffix,
       ;
     }
 
+  DPRINTF (("Transfer ==> %s", sRef_unparseFull (fref)));
+  DPRINTF (("Transfer ==> %s", sRef_unparseFull (tref)));
   setCodePoint ();
 }
 
@@ -4445,7 +4469,9 @@ bool transferChecks_canLoseReference (/*@dependent@*/ sRef sr, fileloc loc)
 {
   bool gotone = FALSE;
   sRefSet ab = usymtab_aliasedBy (sr); /* yes, really mean aliasedBy */
-    
+
+  DPRINTF (("Aliased by: %s", sRefSet_unparse (ab)));
+
   /*
   ** if there is a local variable that aliases sr, then there is no
   ** error.  Make the local an only.

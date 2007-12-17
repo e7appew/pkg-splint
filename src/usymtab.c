@@ -2749,6 +2749,10 @@ usymtab_popAndBranch (exprNode pred, /*@unused@*/ exprNode expr)
 	}
     }
 
+  DPRINTF (("Popping and: %s / %s",
+	    guardSet_unparse (utab->guards),
+	    guardSet_unparse (exprNode_getGuards (pred))));
+
   utab->guards = guardSet_levelUnionFree (utab->guards, 
 					  guardSet_invert (exprNode_getGuards (pred)), 
 					  utab->lexlevel);
@@ -3814,6 +3818,10 @@ checkGlobalReturn (uentry glob, sRef orig)
 		    }
 		}
 	      
+	      DPRINTF (("Here: %s / %s",
+			uentry_unparseFull (glob),
+			sRef_unparseFull (sr)));
+
 	      if (ctype_isRealPointer (uentry_getType (glob))
 		  && sRef_possiblyNull (sr)
 		  && !uentry_possiblyNull (glob))
@@ -5036,6 +5044,35 @@ usymtab_lookupQuietNoAlt (usymtab s, cstring k)
 {
   DPRINTF (("Lookup safe: %s", k));
   return (usymtab_lookupAux (utab, k));
+}
+
+/*@dependent@*/ /*@observer@*/ uentry
+  usymtab_lookupSafeScope (cstring k, int lexlevel)
+  /*@globals utab@*/
+{
+  /*
+  ** This is necessary to deal with shadowed variables that are referenced
+  ** through aliases inside the shadowed scope.  It would be better if
+  ** lookup could take an sRef as a parameter.
+  */
+
+  usymtab tab = utab;
+
+  while (tab != GLOBAL_ENV && tab->lexlevel > lexlevel) {
+    uentry ret = usymtab_lookupAux (tab, k);
+    
+    if (uentry_isValid (ret)) {
+      sRef sr = uentry_getSref (ret);
+      
+      if (sRef_isCvar (sr) && sRef_lexLevel (sr) > lexlevel) {
+	tab = usymtab_dropEnv (tab);
+      } else {
+	return ret;
+      }
+    }
+  }
+
+  return uentry_undefined;
 }
 
 uentry

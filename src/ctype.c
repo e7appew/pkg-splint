@@ -354,9 +354,26 @@ ctype ctype_makeFixedArray (ctype c, size_t size)
   return res;
 }
 
+/*
+** In C, array terms appear backwards:
+**
+**        int a[5][7]
+**
+** declares an array of 5 elements, each of which is
+** an array of 7 int's.
+**
+** We represent this as,
+**
+**        array (array (int, 7), 5)
+**
+** Hence, the rightmost declaration is the innermost type.
+*/
+
 ctype ctype_makeInnerFixedArray (ctype c, size_t size)
 {
   ctype res;
+
+  DPRINTF (("makeinnerfixed: %s / %d", ctype_unparse (c), size));
 
   if (ctype_isFixedArray (c))
     {
@@ -364,19 +381,23 @@ ctype ctype_makeInnerFixedArray (ctype c, size_t size)
       size_t osize = ctype_getArraySize (c);
       
       res = ctype_makeFixedArray (ctype_makeInnerFixedArray (cb, size), osize);
+      DPRINTF (("res 1: %s", ctype_unparse (res)));
     }
   else if (ctype_isArray (c))
     {
       ctype cb = ctype_baseArrayPtr (c);
 
       res = ctype_makeArray (ctype_makeInnerFixedArray (cb, size));
+      DPRINTF (("res 2: %s", ctype_unparse (res)));
     }
   else
     {
       res = ctype_makeFixedArray (c, size);
+      DPRINTF (("res 3: %s", ctype_unparse (res)));
     }
 
-  DPRINTF (("Make inner fixed array: %s", ctype_unparse (res)));
+  DPRINTF (("Make inner fixed array: %s / base: %s", 
+	    ctype_unparse (res), ctype_unparse (ctype_baseArrayPtr (res))));
   return res;
 }
 
@@ -392,6 +413,11 @@ ctype ctype_makeInnerArray (ctype c)
       size_t osize = ctype_getArraySize (c);
       
       res = ctype_makeFixedArray (ctype_makeInnerArray (cb), osize);
+    }
+  else if (ctype_isArray (c)) 
+    {
+      ctype cb = ctype_baseArrayPtr (c);
+      res = ctype_makeArray (ctype_makeInnerArray (cb));
     }
   else
     {
@@ -460,7 +486,8 @@ ctype_baseArrayPtr (ctype c)
 
       if (ctype_isBroken (clp))
 	{
-	  llbuglit ("ctype_baseArrayPtr: bogus ctype");
+	  llcontbug (message ("ctype_baseArrayPtr: bogus ctype getting base of: %s", ctype_unparse (c)));
+	  return ctype_unknown;
 	}
 
       return clp;
@@ -1832,7 +1859,19 @@ ctype_isArray (ctype c)
 
 bool ctype_isIncompleteArray (ctype c)
 {
-  return (ctype_isArray (c) && !ctype_isFixedArray (c));
+  if (ctype_isArray (c)) 
+    {
+      if (ctype_isFixedArray (c)) 
+	{
+	  return ctype_isIncompleteArray (ctype_baseArrayPtr (c));
+	}
+      else 
+	{
+	  return TRUE;
+	}
+    }
+
+  return FALSE;
 }
 
 bool
@@ -2838,7 +2877,7 @@ size_t ctype_getArraySize (ctype c)
 
 ctype ctype_biggerType (ctype c1, ctype c2)
 {
-  if (ctbase_isBigger (ctype_getCtbaseSafe (c2), ctype_getCtbaseSafe (c1)) )
+  if (ctbase_isBigger (ctype_getCtbaseSafe (c2), ctype_getCtbaseSafe (c1)))
     {
       return c2;
     }
@@ -2846,4 +2885,9 @@ ctype ctype_biggerType (ctype c1, ctype c2)
     {
       return c1;
     }
+}
+
+int ctype_getSize (ctype c)
+{
+  return ctbase_getSize (ctype_getCtbaseSafe (ctype_realType (c)));
 }

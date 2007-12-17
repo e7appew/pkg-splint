@@ -1,0 +1,148 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 02_manpage.dpatch by Y Giridhar Appaji Nag <giridhar@appaji.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Remove references to lint, invalid header/footer.  Correct typos.
+
+@DPATCH@
+diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
+--- splint-3.1.2.dfsg~/doc/splint.1	2007-12-17 14:43:05.000000000 +0530
++++ splint-3.1.2.dfsg/doc/splint.1	2007-12-17 14:43:33.000000000 +0530
+@@ -1,5 +1,4 @@
+- .\" $Id: splint.1,v 1.2 2003/03/31 18:19:38 drl7x Exp $
+-.TH splint 1 "A tool for statically checking C programs"
++.TH splint 1
+ 
+ .SH NAME
+ splint \- A tool for statically checking C programs
+@@ -9,14 +8,14 @@
+ [options]
+ 
+ .SH DESCRIPTION
+-.BR Splint
++.BR splint
+ is a tool for statically checking C programs for security
+ vulnerabilities and common programming mistakes. With minimal effort,
+-Splint can be used as a better lint(1).If additional effort is invested
+-adding annotations to programs, Splint can perform stronger checks than
+-can be done by any standard lint.  For full documentation, please see
+-http://www.splint.org.  This man page only covers a few of the available
+-options. 
++splint can be used as a better lint. If additional effort is invested
++adding annotations to programs, splint can perform stronger checks than
++can be done by any standard lint.  For full documentation, install the
++splint-doc-html Debian package.  This man page only covers a few of the
++available options. 
+ 
+ .SH OPTIONS
+ 
+@@ -27,7 +26,7 @@
+ .PP
+ .B Initialization
+ 
+-These flags control directories and files used by Splint. They may be used from the
++These flags control directories and files used by splint. They may be used from the
+ command line or in an options file, but may not be used as control comments in the
+ source code. Except where noted. they have the same meaning preceded by \- or +. 
+ 
+@@ -64,7 +63,7 @@
+ .B Pre-processor
+ 
+ These flags are used to define or undefine pre-processor constants.
+-The -I<directory> flag is also passed to the C pre-processor.
++The \-I<directory> flag is also passed to the C pre-processor.
+ 
+ .TP 6
+ .BI \-D " initializer"
+@@ -84,10 +83,10 @@
+ 
+ .TP 6
+ .BI \-load " file"
+-Load state from <file> (created by -dump). The default extension .lcd is added if <file> has no
++Load state from <file> (created by \-dump). The default extension .lcd is added if <file> has no
+ extension. Only one library file may be loaded. 
+ 
+-By default, the standard library is loaded if the -load flag is not used to load a user library. If no user library is
++By default, the standard library is loaded if the \-load flag is not used to load a user library. If no user library is
+ loaded, one of the following flags may be used to select a different standard library. Precede the flag by + to
+ load the described library (or prevent a library from being loaded using nolib). See Apppendix F for
+ information on the provided libraries. 
+@@ -123,7 +122,7 @@
+ .PP
+ .B Output
+ 
+-These flags control what additional information is printed by Splint. Setting +<flag> causes the described
++These flags control what additional information is printed by splint. Setting +<flag> causes the described
+ information to be printed; setting -<flag> prevents it. By default, all these flags are off.
+ 
+ .TP 6
+@@ -139,7 +138,7 @@
+ 
+ .TP 6
+ .B \-showscan 
+-Show file names are they are processed. 
++Show file names as they are processed. 
+ 
+ .TP 6
+ .B \-showalluses 
+@@ -155,7 +154,7 @@
+ 
+ .TP 6
+ .B \-quiet 
+-Suppress herald and error count. (If quiet is not set, Splint prints out a herald with version
++Suppress herald and error count. (If quiet is not set, splint prints out a herald with version
+ information before checking begins, and a line summarizing the total number of errors reported.) 
+ 
+ .TP 6
+@@ -170,14 +169,14 @@
+ .PP
+ .B Expected Errors
+ 
+-Normally, Splint will expect to report no errors. The exit status will be success (0) if no errors are reported,
++Normally, splint will expect to report no errors. The exit status will be success (0) if no errors are reported,
+ and failure if any errors are reported. Flags can be used to set the expected number of reported errors.
+ Because of the provided error suppression mechanisms, these options should probably not be used for final
+ checking real programs but may be useful in developing programs using make.
+ 
+ .TP 6
+ .B \-expect <number> 
+-Exactly <number> code errors are expected. Splint will exit with failure exit status unless
++Exactly <number> code errors are expected. splint will exit with failure exit status unless
+ <number> code errors are detected. 
+ 
+ .TP 6
+@@ -216,7 +215,7 @@
+ 
+ .TP 6
+ .BI \-linelen " number"
+-Set length of maximum message line to <number> characters. Splint will split messages longer
++Set length of maximum message line to <number> characters. splint will split messages longer
+ than <number> characters long into multiple lines. Default: 80 
+ 
+ .PP
+@@ -229,7 +228,7 @@
+ set. 
+ 
+ These are brief descriptions to give a general idea of what each mode does. To see the complete flag settings
+-in each mode, use splint -help modes. A mode flag has the same effect when used with either + or -.
++in each mode, use splint \-help modes. A mode flag has the same effect when used with either + or \-.
+ 
+ .TP 6
+ .B \-weak 
+@@ -258,13 +257,8 @@
+ strict checking. 
+ 
+ .SH AUTHOR
++.PP
+ If you need to get in contact with the authors send email to
+-.UR mailto:info@splint.org
+-.UE
+-
++info@splint.org
+ or visit 
+-.UR http://www.splint.org
+-.UE
+-
+-.SH "SEE ALSO"
+-lint(1)
++<http://www.splint.org>.

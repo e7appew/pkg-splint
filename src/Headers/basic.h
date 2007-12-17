@@ -9,9 +9,13 @@
 
 # ifdef HAVE_CONFIG_H
 # ifdef WIN32
-
+/* BCC32 Contributed by Scott Frazer */
+# ifdef BCC32
+# include "../../bcc32/bcc32_config.h"
+# else
 /* Win32 uses its own hand-generated config file */
 # include "../../winconfig.h"
+# endif 
 # else 
 # include "../../config.h"
 # endif
@@ -22,10 +26,14 @@
 # include <stdlib.h>
 # include <stdio.h>
 
-# ifndef WIN32
+# if !defined (WIN32) &&  !(defined (OS2) && defined (__IBMC__))
 /* Microsoft VC++ still doesn't support ISO C99... */
 # include <stdbool.h>
 # endif
+
+#if defined (OS2) && defined (__IBMC__)
+extern int snprintf (char *str, size_t count, const char *fmt, ...);
+#endif
 
 # include <string.h>
 # include <ctype.h>

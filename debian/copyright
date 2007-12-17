@@ -3,12 +3,38 @@ Mon, 13 May 2002 15:19:31 +0200.
 
 It was downloaded from http://www.splint.org/download.html
 
-Upstream Authors: 	Massachusetts Institute of Technology University of Virginia.
-			For information on spint: info@splint.org
-			To report a bug: splint-bug@splint.org
+Upstream Authors:
+
+    University of Virginia <info@splint.org>
+    Free Software Foundation, Inc.
+    Massachusetts Institute of Technology <info@splint.org>
+    Stephen Toothman <stephen.toothman@cicplan.com>
 
 Copyright:
 
-A copy of the GNU General Public License, version 2, can be found in
-/usr/share/common-licenses/GPL .
+    Copyright (C) 1984-2007 Free Software Foundation, Inc.
+    Copyright (C) 1994-2007 University of Virginia
+    Copyright (C) 1994-2007 Massachusetts Institute of Technology
+    Copyright (C) 2000 Stephen Toothman <stephen.toothman@cicplan.com>
 
+License:
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    with the Debian GNU/Linux distribution in the file
+    /usr/share/common-licenses/GPL; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
+
+The Debian packaging is
+Copyright (C) 2002-2007 Samuele Giovanni Tonon <samu@debian.org>
+Copyright (C) 2007 Y Giridhar Appaji Nag <giridhar@appaji.net>
+and is licensed under the GPL, see `/usr/share/common-licenses/GPL'.

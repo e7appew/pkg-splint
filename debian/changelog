@@ -1,3 +1,46 @@
+splint (3.1.2.dfsg-3) unstable; urgency=low
+
+  * Update patch 02_manpage to fix lintian I: hyphen-used-as-minus-sign
+
+ -- Y Giridhar Appaji Nag <giridhar@appaji.net>  Mon, 17 Dec 2007 14:38:24 +0530
+
+splint (3.1.2.dfsg-2) unstable; urgency=low
+
+  * Remove useless debian/*.dirs files
+  * Correct versionsed dependencies, use '= ${source:Version}'
+  * splint-doc-html suggests as opposed to recommending splint
+  * DFSG source directory in tar file is now .dfsg and not .orig
+
+ -- Y Giridhar Appaji Nag <giridhar@appaji.net>  Mon, 17 Dec 2007 12:39:35 +0530
+
+splint (3.1.2.dfsg-1) unstable; urgency=low
+
+  * Adopted by Y Giridhar Appaji Nag <giridhar@appaji.net> (Closes: #424719)
+  * New upstream release (Closes: #298261)
+    + Fixes K&R / standard C mismatch (Closes: #171437)
+  * debian/:
+    + Switch from DH_COMPAT=3 to debian/compat (5)
+    + Add a debian/watch file
+    + Add lintian/linda overrides for manpage splint(1)
+  * debian/control
+    + Split into splint-data (large arch indep size), splint-doc-html and
+      splint binary packages
+    + Add Homepage: and Vcs-*: fields
+    + Bump up Standards-Version to 3.7.3, updated debian/copyright
+  * debian/copyright
+    + Includes all the correct copyright holders (Closes: #436744)
+  * Use dpatch.
+    + Patch 01_build: 'make clean' fixes to remove the generated bin/* and
+      *.lcs files
+    + Patch 02_manpage: Remove references to lint, invalid header/footer.
+      Correct typos.  Thanks Reynaldo H. Verdejo Pinochet and Justin Pryzby
+      (Closes: #352298, #343564)
+  * Rebuild for ldbl128 transition (Closes: #430328)
+  * Add .dfsg to version (Removed manual.pdf that has MS word sources).  Add
+    {faq,bugs,changes}.html via get-orig-source
+
+ -- Y Giridhar Appaji Nag <giridhar@appaji.net>  Sun, 16 Dec 2007 20:14:46 +0530
+
 splint (3.1.1-6) unstable; urgency=low
 
   * Added Suggests: splint-doc (Closes: #363705)

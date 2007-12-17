@@ -753,6 +753,10 @@ void uentry_checkParams (uentry ue)
 		  
 		  if (ctype_isFixedArray (ct))
 		    {
+		      DPRINTF (("Array: %s / %s",
+				ctype_unparse (ct),
+				ctype_unparse (ctype_baseArrayPtr (ct))));
+
 		      if (ctype_isArray (ctype_baseArrayPtr (ct))
 			  && !ctype_isFixedArray (ctype_baseArrayPtr (ct)))
 			{
@@ -3068,41 +3072,48 @@ uentry_isSpecialFunction (uentry ue)
 /*@notnull@*/ uentry uentry_makeParam (idDecl t, int i)
 {
   ctype ct = idDecl_getCtype (t);
-  ctype base = ct;
   fileloc loc = setLocation ();
   sRef pref = sRef_makeParam (i, ct, stateInfo_makeLoc (loc, SA_CREATED));
   uentry ue = uentry_makeVariableSrefParam (idDecl_observeId (t), ct, loc, pref);
 
   DPRINTF (("Make param: %s", uentry_unparseFull (ue)));
+  DPRINTF (("Base: %s [%d]", ctype_unparse (base), ctype_isFixedArray (base)));
   uentry_reflectQualifiers (ue, idDecl_getQuals (t));
   uentry_implicitParamAnnots (ue);
 
-  /* Parameter type [][] or [x][] is invalid */
+  if (ctype_isArray (ct)) 
+    {
+      /* Parameter type [][] or [x][] is invalid, but [][x] is okay */
+      ctype base = ctype_baseArrayPtr (ct);
 
-  while (ctype_isFixedArray (base)) {
-    base = ctype_baseArrayPtr (base);
-  }
-  
-  if (ctype_isIncompleteArray (base)) {
-    base = ctype_baseArrayPtr (base);
-
-    if (ctype_isArray (base)) {
-      if (!uentry_hasName (ue)) {
-	(void) optgenerror (FLG_INCOMPLETETYPE, 
-			    message ("Unnamed function parameter %d is incomplete type (inner array must have bounds): %s",
-				     i + 1,
-				     ctype_unparse (ct)),
-			    uentry_whereLast (ue));
-      } else {
-	(void) optgenerror (FLG_INCOMPLETETYPE, 
-			    message ("Function parameter %q is incomplete type (inner array must have bounds): %s",
-				     uentry_getName (ue),
-				     ctype_unparse (ct)),
-			    uentry_whereLast (ue));
-      }
+      DPRINTF (("Check array: %s / Base: %s", ctype_unparse (ct),
+		ctype_unparse (base)));
+      
+      if (ctype_isIncompleteArray (base)) 
+	{
+	  if (!uentry_hasName (ue)) 
+	    {
+	      voptgenerror 
+		(FLG_INCOMPLETETYPE, 
+		 message ("Unnamed function parameter %d is incomplete type "
+			  "(inner array must have bounds): %s",
+			  i + 1,
+			  ctype_unparse (ct)),
+		 uentry_whereLast (ue));
+	    } 
+	  else 
+	    {
+	      voptgenerror 
+		(FLG_INCOMPLETETYPE, 
+		 message ("Function parameter %q is incomplete type "
+			  "(inner array must have bounds): %s",
+			  uentry_getName (ue),
+			  ctype_unparse (ct)),
+		 uentry_whereLast (ue));
+	    }
+	}
     }
-  }
-
+  
   DPRINTF (("Param: %s", uentry_unparseFull (ue)));
   return ue;
 }
@@ -3346,7 +3357,6 @@ uentry uentry_makeVariableAux (cstring n, ctype t,
       sRef_setStateFromType (e->sref, rt);
     }
 
-  DPRINTF (("Here we are: %s", sRef_unparseFull (e->sref)));
   e->info->var->defstate = sRef_getDefState (e->sref);  
   e->info->var->nullstate = sRef_getNullState (e->sref);
 
@@ -3366,6 +3376,8 @@ uentry uentry_makeVariableAux (cstring n, ctype t,
       e->info->var->bufinfo = NULL;
     }/* end else */
   /* end modification */
+
+  DPRINTF (("New variable: %s", sRef_unparseFull (e->sref)));
 
   return (e);
 }
@@ -9478,8 +9490,7 @@ uentry_mergeEntries (uentry spec, /*@only@*/ uentry def)
       llassert (uentry_isFunction (spec));
     }
   
-  DPRINTF (("Merge entries: %s / %s",
-	    uentry_unparseFull (spec),
+  DPRINTF (("Merge entries: %s / %s", uentry_unparseFull (spec),
 	    uentry_unparseFull (def)));
 
   uentry_mergeConstraints (spec, def);

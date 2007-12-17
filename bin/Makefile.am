@@ -1,6 +1,6 @@
 ## Note: starting comments with ## means they don't end up in Makefile
 
-AUTOMAKE_OPTIONS = 1.9 foreign no-dependencies
+AUTOMAKE_OPTIONS = 1.6.3 foreign no-dependencies
 
 SUFFIXES = .h .c .o .l .check
 
@@ -12,6 +12,8 @@ bin_PROGRAMS = splint
 .PHONY: all
 
 EXTRA_DIST = splint
+
+DIST_SOURCES =
 
 #chessy hack so it doesn't try to build splint
 splint$(EXEEXT): ;

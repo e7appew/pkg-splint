@@ -248,10 +248,23 @@ static flaglist flags =
     FK_OPS, FK_NONE, modeFlag,
     "realcompare",
     FLG_REALCOMPARE,
-    "dangerous comparison between reals (dangerous because of inexact "
+    "dangerous equality comparison between reals (dangerous because of inexact "
     "floating point representations)",
     "Two real (float, double, or long double) values are compared "
-    "directly using a C primitive. "
+    "directly using == or != primitive. "
+    "This may produce unexpected results since floating point "
+    "representations are inexact. Instead, compare the difference to "
+    "FLT_EPSILON or DBL_EPSILON.",
+    0, 0,
+  },
+  {
+    FK_OPS, FK_NONE, modeFlag,
+    "realrelatecompare",
+    FLG_REALRELATECOMPARE,
+    "possibly dangerous relational comparison between reals (dangerous because of inexact "
+    "floating point representations)",
+    "Two real (float, double, or long double) values are compared "
+    "directly using < or >. "
     "This may produce unexpected results since floating point "
     "representations are inexact. Instead, compare the difference to "
     "FLT_EPSILON or DBL_EPSILON.",
@@ -1641,7 +1654,7 @@ static flaglist flags =
     "casebreak",
     FLG_CASEBREAK,
     "non-empty case in a switch without preceding break",
-    "Execution falls through from the previous case.", 0, 0
+    "Execution falls through from the previous case (use /*@fallthrough@*/ to mark fallthrough cases).", 0, 0
   },
   {
     FK_CONTROL, FK_NONE, modeFlag,
@@ -1919,16 +1932,16 @@ static flaglist flags =
     "Memory read or write may be out of bounds of allocated storage.", 0, 0
   },
   {
-    FK_BOUNDS, FK_MEMORY, plainFlag,
-    "likely-boundsread",
+    FK_BOUNDS, FK_MEMORY, modeFlag,
+    "likelyboundsread",
     FLG_LIKELYBOUNDSREAD,
     "likely out of bounds read",
     "A memory read references memory beyond the allocated storage.",
     0, 0
   },
   {
-    FK_BOUNDS, FK_MEMORY, plainFlag,
-    "likely-boundswrite",
+    FK_BOUNDS, FK_MEMORY, modeFlag,
+    "likelyboundswrite",
     FLG_LIKELYBOUNDSWRITE,
     "likely buffer overflow from an out of bounds write",
     "A memory write may write to an address beyond the allocated buffer.",
@@ -1936,7 +1949,7 @@ static flaglist flags =
   },
   
   {
-    FK_BOUNDS, FK_MEMORY, plainFlag,
+    FK_BOUNDS, FK_MEMORY, modeFlag,
     "boundsread",
     FLG_BOUNDSREAD,
     "possible out of bounds read",
@@ -1944,7 +1957,7 @@ static flaglist flags =
     0, 0
   },
   {
-    FK_BOUNDS, FK_MEMORY, plainFlag,
+    FK_BOUNDS, FK_MEMORY, modeFlag,
     "boundswrite",
     FLG_BOUNDSWRITE,
     "possible buffer overflow from an out of bounds write",
@@ -1980,8 +1993,8 @@ static flaglist flags =
 
   {
     FK_BOUNDS, FK_MEMORY, plainFlag,
-    "implictconstraint",
-    FLG_IMPLICTCONSTRAINT,
+    "impboundsconstraints",
+    FLG_IMPBOUNDSCONSTRAINTS,
     "generate implicit constraints for functions",
     NULL,
     0, 0
@@ -1995,16 +2008,6 @@ static flaglist flags =
     NULL,
     0, 0
   },
-  
-  {
-    FK_BOUNDS, FK_MEMORY, plainFlag,
-    "nullterminated",
-    FLG_NULLTERMINATEDWARNING,
-    "misuse of nullterminated allocation",
-    "A user annotated non-nullterminated buffer is used/referenced as a nullterminated one.",
-    0, 0
-  },
-  
   {
     FK_BOUNDS, FK_DISPLAY, plainFlag,
     "showconstraintparens",
@@ -2030,6 +2033,14 @@ static flaglist flags =
     NULL,
     0, 0
   }, /*drl added flag 4/26/01*/
+
+  { /* evans added 2003-06-08 */
+    FK_BOUNDS, FK_MEMORY, modeFlag,
+    "allocmismatch",
+    FLG_ALLOCMISMATCH,
+    "type conversion involves storage of non-divisble size",
+    NULL, 0, 0
+  },
 
   /*
   ** 10. Extensible Checking 
@@ -2092,6 +2103,15 @@ static flaglist flags =
     0, 0
   },
 
+  {
+    FK_MACROS, FK_PROTOS, plainFlag,
+    "macroconstdistance",
+    FLG_MACROCONSTDIST,
+    "macro constant name does not match nearby name",
+    "Macro constant name does matches name of a previous declaration, but they are not near each other.",
+    0, 0
+  },
+
   /* 11.2 Function-like Macros */
   
   {
@@ -2127,7 +2147,7 @@ static flaglist flags =
   },
   {
     FK_MACROS, FK_CONTROL, modeFlag,
-    "macroreturn",
+    "macroret",
     FLG_MACRORETURN,
     "return statement in macro body",
     "The body of a macro declared as a function uses a return statement. "

@@ -1,17 +1,104 @@
 Source: splint
 Section: devel
 Priority: optional
-Maintainer: Samuele Giovanni Tonon <samu@debian.org>
-Build-Depends: debhelper (>> 3.0.0), flex, automake1.9
-Standards-Version: 3.5.8
+Maintainer: Y Giridhar Appaji Nag <giridhar@appaji.net>
+Build-Depends: debhelper (>= 5), autotools-dev, dpatch, flex
+Standards-Version: 3.7.3
+Homepage: http://www.splint.org/
+Vcs-Svn: svn://svn.debian.org/svn/collab-maint/ext-maint/splint/unstable
+Vcs-Browser: http://svn.debian.org/wsvn/collab-maint/ext-maint/splint/unstable/?op=log
 
 Package: splint
 Architecture: any
-Depends: ${shlibs:Depends}
-Suggests: splint-doc
+Depends: ${shlibs:Depends}, splint-data (= ${source:Version})
+Suggests: splint-doc-html
 Description: A tool for statically checking C programs for bugs
- Splint is a tool for statically checking C programs for security
- vulnerabilities and coding mistakes. With minimal effort, Splint can be used
- as a better lint. If additional effort is invested adding annotations to
- programs, Splint can perform stronger checking than can be done by any
- standard lint. 
+ splint is an annotation-assisted lightweight static checker.  It is a
+ tool for statically checking C programs for security vulnerabilities
+ and coding mistakes.  If additional effort is invested in adding
+ annotations to programs, splint can perform stronger checking.
+ .
+ splint does many of the traditional lint checks including unused
+ declarations, type inconsistencies, use before definition, unreachable
+ code, ignored return values, execution paths with no return, likely
+ infinite loops, and fall through cases.  Problems detected by Splint
+ include:
+ .
+  * Dereferencing a possibly null pointer
+  * Using possibly undefined storage or returning storage that is not
+    properly defined
+  * Type mismatches, with greater precision and flexibility than
+    provided by C compilers
+  * Memory management errors including uses of dangling references and
+    memory leaks
+  * Global variable use/modification that is inconsistent with
+    specified interfaces
+  * Problematic control flow such as likely infinite loops etc.
+  * Buffer overflow vulnerabilities
+  * Dangerous macro implementations or invocations
+  * Violations of customized naming conventions
+
+Package: splint-data
+Architecture: all
+Recommends: splint (= ${source:Version})
+Description: Data files for splint - A static checker for C programs
+ splint is an annotation-assisted lightweight static checker.  It is a
+ tool for statically checking C programs for security vulnerabilities
+ and coding mistakes.  If additional effort is invested in adding
+ annotations to programs, splint can perform stronger checking.
+ .
+ splint does many of the traditional lint checks including unused
+ declarations, type inconsistencies, use before definition, unreachable
+ code, ignored return values, execution paths with no return, likely
+ infinite loops, and fall through cases.  Problems detected by Splint
+ include:
+ .
+  * Dereferencing a possibly null pointer
+  * Using possibly undefined storage or returning storage that is not
+    properly defined
+  * Type mismatches, with greater precision and flexibility than
+    provided by C compilers
+  * Memory management errors including uses of dangling references and
+    memory leaks
+  * Global variable use/modification that is inconsistent with
+    specified interfaces
+  * Problematic control flow such as likely infinite loops etc.
+  * Buffer overflow vulnerabilities
+  * Dangerous macro implementations or invocations
+  * Violations of customized naming conventions
+ .
+ This package contains the data files that are necessary to use splint.
+
+Package: splint-doc-html
+Section: doc
+Architecture: all
+Suggests: splint (= ${source:Version})
+Conflicts: splint-doc
+Replaces: splint-doc
+Description: Documentation for splint - A static checker for C programs
+ splint is an annotation-assisted lightweight static checker.  It is a
+ tool for statically checking C programs for security vulnerabilities
+ and coding mistakes.  If additional effort is invested in adding
+ annotations to programs, splint can perform stronger checking.
+ .
+ splint does many of the traditional lint checks including unused
+ declarations, type inconsistencies, use before definition, unreachable
+ code, ignored return values, execution paths with no return, likely
+ infinite loops, and fall through cases.  Problems detected by Splint
+ include:
+ .
+  * Dereferencing a possibly null pointer
+  * Using possibly undefined storage or returning storage that is not
+    properly defined
+  * Type mismatches, with greater precision and flexibility than
+    provided by C compilers
+  * Memory management errors including uses of dangling references and
+    memory leaks
+  * Global variable use/modification that is inconsistent with
+    specified interfaces
+  * Problematic control flow such as likely infinite loops etc.
+  * Buffer overflow vulnerabilities
+  * Dangerous macro implementations or invocations
+  * Violations of customized naming conventions
+ .
+ This package contains the manual (HTML documentation) for splint.

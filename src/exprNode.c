@@ -1011,6 +1011,7 @@ exprNode exprNode_createId (/*@observer@*/ uentry c)
 	}
 
       e->guards = guardSet_new ();
+
       e->sets = sRefSet_new ();
       e->msets = sRefSet_new ();
       e->uses = sRefSet_new ();
@@ -1930,9 +1931,12 @@ checkScanfArgs (/*@notnull@*/ /*@dependent@*/ exprNode f, uentry fcn,
 			      
 			    case 'i': 
 			    case 'd':
+			      expecttype = ctype_makePointer (ctype_combine (ctype_int, modtype));
+			      /*@switchbreak@*/ break;
+
 			    case 'x':
 			    case 'X': /* unsigned int */
-			      expecttype = ctype_makePointer (ctype_combine (ctype_int, modtype));
+			      expecttype = ctype_makePointer (ctype_combine (ctype_uint, modtype));
 			      /*@switchbreak@*/ break;
 			      
 			    case 'e':
@@ -2591,7 +2595,7 @@ static int
 		      f->guards = guardSet_union (f->guards, a->guards);
 		      
 		      DPRINTF (("match arg: %s / %s", ctype_unparse (ct), ctype_unparse (a->typ)));
-
+		      
 		      if (!(exprNode_matchArgType (ct, a)))
 			{
 			  DPRINTF (("Args mismatch!"));
@@ -5009,8 +5013,8 @@ exprNode_cast (/*@only@*/ lltok tok, /*@only@*/ exprNode e, /*@only@*/ qtype q)
   ret->edata = exprData_makeCast (tok, e, q);
 
   ret->sref = sRef_copy (e->sref);
-  
-  DPRINTF (("Cast 2: -> %s", sRef_unparseFull (ret->sref)));
+
+  DPRINTF (("Cast: -> %s", sRef_unparseFull (ret->sref)));
 
   if (!sRef_isConst (e->sref))
     {
@@ -5366,10 +5370,14 @@ exprNode_makeOp (/*@keep@*/ exprNode e1, /*@keep@*/ exprNode e2,
 
   if (opid == OR_OP)
     {
+      exprNode_produceGuards (e2); 
       ret->guards = guardSet_or (ret->guards, e2->guards);
     }
   else if (opid == AND_OP)
     {
+      exprNode_produceGuards (e2); /* evans 2003-08-13: need to produce guards for expression */
+      /* Shouldn't this have already happened? */
+      DPRINTF (("Anding guards: %s / %s", guardSet_unparse (ret->guards), guardSet_unparse (e2->guards)));
       ret->guards = guardSet_and (ret->guards, e2->guards);
     }
   else
@@ -5594,34 +5602,38 @@ exprNode_makeOp (/*@keep@*/ exprNode e1, /*@keep@*/ exprNode e2,
 	     status */
 	  
 	  if ((sRef_isPossiblyNullTerminated (e2->sref)) || (sRef_isNullTerminated(e2->sref))) {
-	    int val = (int) multiVal_forceInt (e1->val);
-	    
-	    /* Operator : + or += */
-	    if ((lltok_getTok (op) == TPLUS) || (lltok_getTok(op) == ADD_ASSIGN)) {
-	      if (sRef_getSize(e2->sref) >= val) {/* Incrementing the pointer by 
-						     val should not result in a 
-						     size < 0 (size = 0 is ok !) */
+	    if (multiVal_isDefined (e1->val)) 
+	      {
+		int val = (int) multiVal_forceInt (e1->val);
 		
-		sRef_setSize (ret->sref, sRef_getSize(e2->sref) - val);
+		/* Operator : + or += */
+		if ((lltok_getTok (op) == TPLUS) || (lltok_getTok(op) == ADD_ASSIGN)) {
+		  if (sRef_getSize(e2->sref) >= val) {/* Incrementing the pointer by 
+							 val should not result in a 
+							 size < 0 (size = 0 is ok !) */
+		    
+		    sRef_setSize (ret->sref, sRef_getSize(e2->sref) - val);
+		    
+		    if (sRef_getLen(e2->sref) == val) { /* i.e. the character at posn val is \0 */
+		      sRef_setNotNullTerminatedState(ret->sref);
+		      sRef_resetLen (ret->sref);
+		    } else {
+		      sRef_setNullTerminatedState(ret->sref);
+		      sRef_setLen (ret->sref, sRef_getLen(e2->sref) - val);
+		    }
+		  }
+		}
 		
-		if (sRef_getLen(e2->sref) == val) { /* i.e. the character at posn val is \0 */
-		  sRef_setNotNullTerminatedState(ret->sref);
-		  sRef_resetLen (ret->sref);
-		} else {
-		  sRef_setNullTerminatedState(ret->sref);
-		  sRef_setLen (ret->sref, sRef_getLen(e2->sref) - val);
+		/* Operator : - or -= */
+		if ((lltok_getTok (op) == TMINUS) || (lltok_getTok (op) == SUB_ASSIGN)) {
+		  if (sRef_getSize(e2->sref) >= 0) {
+		    sRef_setSize (ret->sref, sRef_getSize(e2->sref) + val);
+		    sRef_setLen (ret->sref, sRef_getLen(e2->sref) + val);
+		  }
 		}
 	      }
-	    }
-	    
-	    /* Operator : - or -= */
-	    if ((lltok_getTok (op) == TMINUS) || (lltok_getTok (op) == SUB_ASSIGN)) {
-	      if (sRef_getSize(e2->sref) >= 0) {
-		sRef_setSize (ret->sref, sRef_getSize(e2->sref) + val);
-		sRef_setLen (ret->sref, sRef_getLen(e2->sref) + val);
-	      }
-	    }
 	  }
+
 	  /* end modifications */
 	  
 	  sRef_setNullError (ret->sref);
@@ -5817,12 +5829,24 @@ exprNode_makeOp (/*@keep@*/ exprNode e1, /*@keep@*/ exprNode e2,
 	    }
 	  else
 	    {
-	      voptgenerror
-		(FLG_REALCOMPARE,
-		 message ("Dangerous comparison involving %s types: %s",
-			  ctype_unparse (rtype),
-			  exprNode_unparse (ret)),
-		 ret->loc);
+	      if (opid == EQ_OP || opid == NE_OP) 
+		{
+		  voptgenerror
+		    (FLG_REALCOMPARE,
+		     message ("Dangerous equality comparison involving %s types: %s",
+			      ctype_unparse (rtype),
+			      exprNode_unparse (ret)),
+		     ret->loc);
+		}
+	      else
+		{
+		  voptgenerror
+		    (FLG_REALRELATECOMPARE,
+		     message ("Possibly dangerous relational comparison involving %s types: %s",
+			      ctype_unparse (rtype),
+			      exprNode_unparse (ret)),
+		     ret->loc);
+		}
 	    }
 	}
       /*@fallthrough@*/
@@ -6446,6 +6470,26 @@ exprNode_cond (/*@keep@*/ exprNode pred, /*@keep@*/ exprNode ifclause,
     }
 
   return (ret);
+}
+
+exprNode
+exprNode_condIfOmit (/*@keep@*/ exprNode pred, 
+		     /*@keep@*/ exprNode elseclause)
+{
+  exprNode ifclause = exprNode_createPartialCopy (pred);
+
+  if (!context_flagOn (FLG_GNUEXTENSIONS, exprNode_loc (pred)))
+    {
+      (void) llgenhinterror 
+	(FLG_SYNTAX,
+	 message ("Conditionals with Omitted Operands is not supported by ISO C99"),
+	 message ("Use +gnuextensions to allow compound statement "
+		  "expressions (and other GNU language extensions) "
+		  "without this warning"),
+	 exprNode_loc (pred));
+    }
+  
+  return exprNode_cond(pred, ifclause, elseclause);
 }
 
 exprNode
@@ -9888,11 +9932,11 @@ exprNode_matchLiteral (ctype expected, exprNode e)
 	    }
 	  else if (multiVal_isChar (m))
 	    {
-	      char val = multiVal_forceChar (m);	  
+	      /*signed? */ char val = multiVal_forceChar (m);	   
 	      
 	      if (ctype_isChar (expected))
 		{
-		  if (ctype_isUnsigned (expected) && ((int)val) < 0)
+		  if (ctype_isUnsigned (expected) && ((int) val) < 0)
 		    {
 		      return FALSE;
 		    }
@@ -10679,8 +10723,20 @@ static ctype
 	  DPRINTF (("No error: [%s] %s / [%s]  %s",
 		    exprNode_unparse (e1), ctype_unparse (tr1),
 		    exprNode_unparse (e2), ctype_unparse (tr2)));
+	  
+	  /*
+	  ** evans 2003-06-15: changed this so if either type is a literal,
+	  **    the other type is used.
+	  **    (Need to look at the ISO C99 rules on this...)
+	  */
 
-	  ret = ctype_biggerType (tr1, tr2);
+	  if (exprNode_isNumLiteral (e1)) {
+	    ret = tr2;
+	  } else if (exprNode_isNumLiteral (e2)) {
+	    ret = tr1;
+	  } else {
+	    ret = ctype_biggerType (tr1, tr2);
+	  }
 	}
       else
 	{
@@ -11504,4 +11560,14 @@ exprNode exprNode_copyConstraints (/*@returned@*/ exprNode dst, exprNode src)
   dst->trueEnsuresConstraints = constraintList_copy (src->trueEnsuresConstraints);
   dst->falseEnsuresConstraints = constraintList_copy (src->falseEnsuresConstraints);
   return dst;
+}
+
+void exprNode_revealState (exprNode e)
+{
+  if (exprNode_isDefined (e)) {
+    llmsg (message ("%s: State of %s: %s", fileloc_unparse (exprNode_loc (e)), 
+		    exprNode_unparse (e), sRef_unparseFull (e->sref)));
+  } else {
+    llmsg (message ("%s: Reveal state undefined", fileloc_unparse (g_currentloc)));
+  }
 }
