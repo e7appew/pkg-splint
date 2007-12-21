@@ -1,3 +1,16 @@
+splint (3.1.2.dfsg-4) unstable; urgency=low
+
+  * splint-doc-html Suggests splint irrespective of the version
+  * Add support for noopt in DEB_BUILD_OPTIONS, add -Wall -g to CFLAGS
+  * Update patch 01_build to echo the actual compilation command
+  * Build-Conflicts: bison, bison++, splint <= v3.1.1-6.  Configure checks for
+    the 'bison' program that is used later and leaves useless files around.
+    Tests fail while building if earlier version of splint is around.
+  * splint-data conflicts and replaces splint <= v3.1.1-6.  Thanks Kevin Locke
+    for the bug report (Closes: #457268)
+
+ -- Y Giridhar Appaji Nag <giridhar@appaji.net>  Fri, 21 Dec 2007 12:58:56 +0530
+
 splint (3.1.2.dfsg-3) unstable; urgency=low
 
   * Update patch 02_manpage to fix lintian I: hyphen-used-as-minus-sign

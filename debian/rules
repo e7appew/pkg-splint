@@ -8,20 +8,27 @@ include /usr/share/dpatch/dpatch.make
 PKG_NAME=splint
 PKG_VERS=3.1.2
 UPSTR_SITE=http://www.$(PKG_NAME).org
-UPSTR_FILE=$(UPSTR_DIR).src.tgz
 UPSTR_DIR=$(PKG_NAME)-$(PKG_VERS)
-ORIG_DFSG_DIR=$(PKG_NAME)-$(PKG_VERS).dfsg
-ORIG_DFSG_TAR=$(PKG_NAME)_$(PKG_VERS).dfsg.orig.tar
+UPSTR_FILE=$(UPSTR_DIR).src.tgz
+DFSG_ORIG_DIR=$(PKG_NAME)-$(PKG_VERS).dfsg
+DFSG_ORIG_TAR=$(PKG_NAME)_$(PKG_VERS).dfsg.orig.tar
 
 # These are used for cross-compiling and for saving the configure script
 # from having to guess our platform (since we know it already)
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
+CFLAGS=-Wall -g
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
 config.status: patch configure-stamp
 configure-stamp:
 	dh_testdir
-	# Add here commands to configure the package.
 ifneq "$(wildcard /usr/share/misc/config.sub)" ""
 	cp -f /usr/share/misc/config.sub config/config.sub
 endif
@@ -86,18 +93,18 @@ binary-arch: build install
 	dh_builddeb -a
 
 get-orig-source:
-	[ ! -x /usr/bin/wget ] || wget $(UPSTR_SITE)/downloads/$(UPSTR_FILE)
-	tar -zxvf $(UPSTR_FILE)
-	mv $(UPSTR_DIR) $(ORIG_DFSG_DIR)
-	rm -f $(ORIG_DFSG_DIR)/doc/manual.pdf
-	[ ! -x /usr/bin/wget ] || wget $(UPSTR_SITE)/faq.html -O $(ORIG_DFSG_DIR)/doc/html/faq.html
-	[ ! -x /usr/bin/wget ] || wget $(UPSTR_SITE)/changes.html -O $(ORIG_DFSG_DIR)/doc/changes.html
-	[ ! -x /usr/bin/wget ] || wget $(UPSTR_SITE)/bugs.html -O $(ORIG_DFSG_DIR)/doc/bugs.html
-	tar -cvf $(ORIG_DFSG_TAR) $(ORIG_DFSG_DIR)
-	gzip --best $(ORIG_DFSG_TAR)
-	rm -rf $(ORIG_DFSG_DIR) $(UPSTR_FILE)
-	@echo "Re-packaged source file: $(ORIG_DFSG_TAR).gz"
-	@ls -l $(ORIG_DFSG_TAR).gz
+	[ ! -x /usr/bin/wget ] || wget -q $(UPSTR_SITE)/downloads/$(UPSTR_FILE)
+	tar -zxf $(UPSTR_FILE)
+	mv $(UPSTR_DIR) $(DFSG_ORIG_DIR)
+	rm -f $(DFSG_ORIG_DIR)/doc/manual.pdf
+	[ ! -x /usr/bin/wget ] || wget -q $(UPSTR_SITE)/faq.html -O $(DFSG_ORIG_DIR)/doc/html/faq.html
+	[ ! -x /usr/bin/wget ] || wget -q $(UPSTR_SITE)/changes.html -O $(DFSG_ORIG_DIR)/doc/changes.html
+	[ ! -x /usr/bin/wget ] || wget -q $(UPSTR_SITE)/bugs.html -O $(DFSG_ORIG_DIR)/doc/bugs.html
+	tar -cf $(DFSG_ORIG_TAR) $(DFSG_ORIG_DIR)
+	gzip --best $(DFSG_ORIG_TAR)
+	rm -rf $(DFSG_ORIG_DIR) $(UPSTR_FILE)
+	@echo "Re-packaged source file: $(DFSG_ORIG_TAR).gz"
+	@ls -l $(DFSG_ORIG_TAR).gz
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install patch unpatch get-orig-source

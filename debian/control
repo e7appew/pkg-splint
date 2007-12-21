@@ -3,6 +3,7 @@ Section: devel
 Priority: optional
 Maintainer: Y Giridhar Appaji Nag <giridhar@appaji.net>
 Build-Depends: debhelper (>= 5), autotools-dev, dpatch, flex
+Build-Conflicts: bison, bison++, splint (<= 3.1.1-6)
 Standards-Version: 3.7.3
 Homepage: http://www.splint.org/
 Vcs-Svn: svn://svn.debian.org/svn/collab-maint/ext-maint/splint/unstable
@@ -41,6 +42,8 @@ Description: A tool for statically checking C programs for bugs
 Package: splint-data
 Architecture: all
 Recommends: splint (= ${source:Version})
+Conflicts: splint (<= 3.1.1-6)
+Replaces: splint (<= 3.1.1-6)
 Description: Data files for splint - A static checker for C programs
  splint is an annotation-assisted lightweight static checker.  It is a
  tool for statically checking C programs for security vulnerabilities
@@ -72,7 +75,7 @@ Description: Data files for splint - A static checker for C programs
 Package: splint-doc-html
 Section: doc
 Architecture: all
-Suggests: splint (= ${source:Version})
+Suggests: splint
 Conflicts: splint-doc
 Replaces: splint-doc
 Description: Documentation for splint - A static checker for C programs
