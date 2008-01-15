@@ -1,3 +1,13 @@
+splint (3.1.2.dfsg-5) unstable; urgency=low
+
+  * debian/copyright
+    + The documentation is licensed under CC-BY-SA 3.0
+    + The software and packaging are licensed under GPLv2 or later.
+  * Patch 03_359894_VA_ARGS.dpatch to support __VA_ARGS__.  Thanks "Bernhard
+    R. Link" <brlink@debian.org> (Closes: #359894)
+
+ -- Y Giridhar Appaji Nag <giridhar@appaji.net>  Tue, 15 Jan 2008 13:11:57 +0530
+
 splint (3.1.2.dfsg-4) unstable; urgency=low
 
   * splint-doc-html Suggests splint irrespective of the version

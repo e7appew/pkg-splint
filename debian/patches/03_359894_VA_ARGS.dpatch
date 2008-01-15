@@ -1,0 +1,81 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 03_359894_VA_ARGS.dpatch by Y Giridhar Appaji Nag <giridhar@appaji.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Support for variadic macros __VA_ARGS__, based on a patch from
+## DP: "Bernhard R. Link" <brlink@debian.org> for #359894
+
+@DPATCH@
+diff -urNad splint-3.1.2.dfsg~/src/cpplib.c splint-3.1.2.dfsg/src/cpplib.c
+--- splint-3.1.2.dfsg~/src/cpplib.c	2007-07-14 03:47:48.000000000 +0530
++++ splint-3.1.2.dfsg/src/cpplib.c	2008-01-15 13:01:49.000000000 +0530
+@@ -2202,6 +2202,13 @@
+ /*@notfunction@*/
+ #define REST_EXTENSION_LENGTH	(sizeof (rest_extension) - 1)
+ 
++/*@-readonlytrans@*/
++static char rest_name[] = "__VA_ARGS__";
++/*:=readonlytrans@*/
++
++/*@notfunction@*/
++#define REST_NAME_LENGTH	(sizeof (rest_name) - 1)
++
+ /* Create a DEFINITION node from a #define directive.  Arguments are
+    as for do_define.  */
+ 
+@@ -2272,28 +2279,38 @@
+ 				  cstring_fromChars (rest_extension)));
+ 	  }
+ 
+-	if (!is_idstart[(int) *bp])
++	if (limit - bp > size_toInt (REST_EXTENSION_LENGTH)
++	    && strncmp (rest_extension, bp, REST_EXTENSION_LENGTH) == 0)
+ 	  {
+-	    cppReader_pedwarnLit (pfile,
+-			    cstring_makeLiteralTemp ("Invalid character in macro parameter name"));
++	    rest_args = 1;
++	    temp->rest_args = 1;
++	    temp->name = rest_name;
++	    temp->length = REST_NAME_LENGTH;
+ 	  }
+-
+-	/* Find the end of the arg name.  */
+-	while (is_idchar[(int) *bp])
++	else
+ 	  {
+-	    bp++;
+-	    /* do we have a "special" rest-args extension here? */
+-	    if (limit - bp > size_toInt (REST_EXTENSION_LENGTH)
+-		&& strncmp (rest_extension, bp, REST_EXTENSION_LENGTH) == 0)
+-	      {
+-		rest_args = 1;
+-		temp->rest_args = 1;
+-		/*@innerbreak@*/ break;
+-	      }
++		if (!is_idstart[(int) *bp])
++		  {
++		    cppReader_pedwarnLit (pfile,
++				    cstring_makeLiteralTemp ("Invalid character in macro parameter name"));
++		  }
++	
++		/* Find the end of the arg name.  */
++		while (is_idchar[(int) *bp])
++		  {
++		    bp++;
++		    /* do we have a "special" rest-args extension here? */
++		    if (limit - bp > size_toInt (REST_EXTENSION_LENGTH)
++			&& strncmp (rest_extension, bp, REST_EXTENSION_LENGTH) == 0)
++		      {
++			rest_args = 1;
++			temp->rest_args = 1;
++			/*@innerbreak@*/ break;
++		      }
++		  }
++		temp->length = size_fromInt (bp - temp->name);
+ 	  }
+ 
+-	temp->length = size_fromInt (bp - temp->name);
+-
+ 	if (rest_args != 0)
+ 	  {
+ 	    bp += REST_EXTENSION_LENGTH;

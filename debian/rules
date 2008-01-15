@@ -10,7 +10,7 @@ PKG_VERS=3.1.2
 UPSTR_SITE=http://www.$(PKG_NAME).org
 UPSTR_DIR=$(PKG_NAME)-$(PKG_VERS)
 UPSTR_FILE=$(UPSTR_DIR).src.tgz
-DFSG_ORIG_DIR=$(PKG_NAME)-$(PKG_VERS).dfsg
+DFSG_ORIG_DIR=$(UPSTR_DIR).dfsg
 DFSG_ORIG_TAR=$(PKG_NAME)_$(PKG_VERS).dfsg.orig.tar
 
 # These are used for cross-compiling and for saving the configure script
@@ -36,7 +36,7 @@ ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 	cp -f /usr/share/misc/config.guess config/config.guess
 endif
 	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs"
-	touch configure-stamp
+	touch $@
 
 build: build-stamp
 
@@ -93,13 +93,13 @@ binary-arch: build install
 	dh_builddeb -a
 
 get-orig-source:
-	[ ! -x /usr/bin/wget ] || wget -q $(UPSTR_SITE)/downloads/$(UPSTR_FILE)
+	wget -q $(UPSTR_SITE)/downloads/$(UPSTR_FILE)
 	tar -zxf $(UPSTR_FILE)
 	mv $(UPSTR_DIR) $(DFSG_ORIG_DIR)
 	rm -f $(DFSG_ORIG_DIR)/doc/manual.pdf
-	[ ! -x /usr/bin/wget ] || wget -q $(UPSTR_SITE)/faq.html -O $(DFSG_ORIG_DIR)/doc/html/faq.html
-	[ ! -x /usr/bin/wget ] || wget -q $(UPSTR_SITE)/changes.html -O $(DFSG_ORIG_DIR)/doc/changes.html
-	[ ! -x /usr/bin/wget ] || wget -q $(UPSTR_SITE)/bugs.html -O $(DFSG_ORIG_DIR)/doc/bugs.html
+	wget -q $(UPSTR_SITE)/faq.html -O $(DFSG_ORIG_DIR)/doc/html/faq.html
+	wget -q $(UPSTR_SITE)/changes.html -O $(DFSG_ORIG_DIR)/doc/changes.html
+	wget -q $(UPSTR_SITE)/bugs.html -O $(DFSG_ORIG_DIR)/doc/bugs.html
 	tar -cf $(DFSG_ORIG_TAR) $(DFSG_ORIG_DIR)
 	gzip --best $(DFSG_ORIG_TAR)
 	rm -rf $(DFSG_ORIG_DIR) $(UPSTR_FILE)
