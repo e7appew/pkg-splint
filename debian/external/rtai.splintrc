@@ -1,0 +1,44 @@
+# From http://groups.google.com/group/comp.arch.embedded/msg/c9a537b340d2d1d3
+# By Rich Walker <rw@shadow.org.uk>
+#
+# CFLAGS :=  -D__USE_GNU=1 -D__USE_MISC=1 -D__USE_BSD=1 -D_GNU_SOURCE=1 -O -Wall -W -DNDEBUG
+# CFLAGS +=  -Wcast-align -Wpointer-arith -Wbad-function-cast -Wsign-compare
+# CFLAGS +=  -Wno-unused -Wundef  -Wmissing-noreturn -Wmissing-format-attribute
+#
+# does pretty well for me.
+#
+# Mind you, I have a .splintrc in every directory as well - typical
+# contents: 
+
+-I/usr/src/linux/include/ -I/usr/src/rtai/include/ -I/usr/lib/gcc-lib/i386-linux/3.2.3/include/ -I/usr/include
+
+-realcompare
+-predboolint
+-boolops
+-exportlocal
+-fcnuse
+-exitarg
+-booltype bool
+-fullinitblock
++charindex
++charint
+-formattype
+-castfcnptr
+-shiftimplementation
+
+-Dsizeof(x)=(size_t)(sizeof(x))
+-D_GNU_SOURCE=1
+-D__GNUC__=3
+-D__GNUC_MINOR__=2
+-D__STDC__
+-D__signed__=
+-D__const__=const
+-D__inline__=inline
+-D__attribute__(x)=
+-D__const=const
+-D__restrict=
+-DKERNEL
+-D__builtin_va_list=int
+
+# (Running splint against kernel sources is ... interesting)
+

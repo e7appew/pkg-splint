@@ -30,11 +30,19 @@ config.status: patch configure-stamp
 configure-stamp:
 	dh_testdir
 ifneq "$(wildcard /usr/share/misc/config.sub)" ""
+	[ ! -f config/config.sub ] || mv -f config/config.sub config/config.sub.ups
 	cp -f /usr/share/misc/config.sub config/config.sub
 endif
 ifneq "$(wildcard /usr/share/misc/config.guess)" ""
+	[ ! -f config/config.guess ] || mv -f config/config.guess config/config.guess.ups
 	cp -f /usr/share/misc/config.guess config/config.guess
 endif
+	[ ! -f lib/posix.lcd ] || mv -f lib/posix.lcd lib/posix.lcd.ups
+	[ ! -f lib/posixstrict.lcd ] || mv -f lib/posixstrict.lcd lib/posixstrict.lcd.ups
+	[ ! -f lib/standard.lcd ] || mv -f lib/standard.lcd lib/standard.lcd.ups
+	[ ! -f lib/standardstrict.lcd ] || mv -f lib/standardstrict.lcd lib/standardstrict.lcd.ups
+	[ ! -f lib/unix.lcd ] || mv -f lib/unix.lcd lib/unix.lcd.ups
+	[ ! -f lib/unixstrict.lcd ] || mv -f lib/unixstrict.lcd lib/unixstrict.lcd.ups
 	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs"
 	touch $@
 
@@ -51,18 +59,23 @@ clean-patched:
 	dh_testroot
 	rm -f build-stamp configure-stamp
 	[ ! -f Makefile ] || $(MAKE) distclean
-	rm -f config/config.sub config/config.guess
+	[ ! -f lib/unixstrict.lcd.ups ] || mv -f lib/unixstrict.lcd.ups lib/unixstrict.lcd
+	[ ! -f lib/unix.lcd.ups ] || mv -f lib/unix.lcd.ups lib/unix.lcd
+	[ ! -f lib/standardstrict.lcd.ups ] || mv -f lib/standardstrict.lcd.ups lib/standardstrict.lcd
+	[ ! -f lib/standard.lcd.ups ] || mv -f lib/standard.lcd.ups lib/standard.lcd
+	[ ! -f lib/posixstrict.lcd.ups ] || mv -f lib/posixstrict.lcd.ups lib/posixstrict.lcd
+	[ ! -f lib/posix.lcd.ups ] || mv -f lib/posix.lcd.ups lib/posix.lcd
+	[ ! -f config/config.guess.ups ] || mv -f config/config.guess.ups config/config.guess
+	[ ! -f config/config.sub.ups ] || mv -f config/config.sub.ups config/config.sub
 	dh_clean
 
 install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	dh_installdirs
 	$(MAKE) DESTDIR=$(CURDIR)/debian/splint-data install-data
 	$(MAKE) DESTDIR=$(CURDIR)/debian/splint install-exec
-	install -D -m 0644 $(CURDIR)/debian/lintian $(CURDIR)/debian/splint/usr/share/lintian/overrides/splint
-	install -D -m 0644 $(CURDIR)/debian/linda $(CURDIR)/debian/splint/usr/share/linda/overrides/splint
+	dh_install
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -83,6 +96,7 @@ binary-arch: build install
 	dh_testroot -a
 	dh_installchangelogs -a doc/changes.html
 	dh_installdocs -a -p splint
+	dh_installexamples
 	dh_strip -a
 	dh_compress -a
 	dh_fixperms -a

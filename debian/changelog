@@ -1,3 +1,15 @@
+splint (3.1.2.dfsg-6) unstable; urgency=low
+
+  * Add a few working .splintrc example files to the splint binary package
+  * Patch 04_bug_report to set the bug reporting location and maintainer email
+    to Debian rather than upstream.
+  * Save and restore files deleted in clean target, to keep the tree identical
+    before and after clean.
+  * Use dh_install for installing lintian and linda overrides.  This looks
+    cleaner than doing it in debian/rules via the 'install' program.
+
+ -- Y Giridhar Appaji Nag <giridhar@appaji.net>  Sun, 03 Feb 2008 21:22:19 +0530
+
 splint (3.1.2.dfsg-5) unstable; urgency=low
 
   * debian/copyright

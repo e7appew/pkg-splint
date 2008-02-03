@@ -1,0 +1,3 @@
+debian/external/dbacl.splintrc
+debian/external/rtai.splintrc
+debian/external/splint.splintrc

@@ -1,0 +1,46 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 04_bug_report.dpatch by Y Giridhar Appaji Nag <giridhar@appaji.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Change the bug reporting ID to submit@bugs.debian.org
+
+@DPATCH@
+diff -urNad splint-3.1.2.dfsg~/configure splint-3.1.2.dfsg/configure
+--- splint-3.1.2.dfsg~/configure	2008-01-27 01:50:54.000000000 +0530
++++ splint-3.1.2.dfsg/configure	2008-01-27 01:51:00.000000000 +0530
+@@ -271,7 +271,7 @@
+ PACKAGE_TARNAME='splint'
+ PACKAGE_VERSION='3.1.2'
+ PACKAGE_STRING='Splint 3.1.2'
+-PACKAGE_BUGREPORT='splint-bug@splint.org'
++PACKAGE_BUGREPORT='submit@bugs.debian.org (via reportbug)'
+ 
+ ac_unique_file="src/lclinit.c"
+ ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE CPP LEX LEXLIB LEX_OUTPUT_ROOT LN_S BISON GREP DIFF CAT RM MV CP SED LCLOBJ LIBOBJS LTLIBOBJS'
+diff -urNad splint-3.1.2.dfsg~/src/Headers/version.h splint-3.1.2.dfsg/src/Headers/version.h
+--- splint-3.1.2.dfsg~/src/Headers/version.h	2008-01-27 01:50:54.000000000 +0530
++++ splint-3.1.2.dfsg/src/Headers/version.h	2008-01-27 01:51:10.000000000 +0530
+@@ -17,7 +17,10 @@
+ # define SPLINT_LIBVERSION 3.018
+ 
+ /*@constant observer char *SPLINT_MAINTAINER; @*/
+-# define SPLINT_MAINTAINER "splint-bug@splint.org"
++# define SPLINT_MAINTAINER "submit@bugs.debian.org (via reportbug)"
++
++/*@constant observer char *SPLINT_DEBIAN_MAINTAINER; @*/
++# define SPLINT_DEBIAN_MAINTAINER "splint@packages.debian.org"
+ 
+ # else
+ # error "Multiple include"
+diff -urNad splint-3.1.2.dfsg~/src/help.c splint-3.1.2.dfsg/src/help.c
+--- splint-3.1.2.dfsg~/src/help.c	2008-01-27 01:50:54.000000000 +0530
++++ splint-3.1.2.dfsg/src/help.c	2008-01-27 01:51:00.000000000 +0530
+@@ -274,7 +274,7 @@
+ static void
+ printMaintainer (void)
+ {
+-  llmsg (message ("Maintainer: %s", cstring_makeLiteralTemp (SPLINT_MAINTAINER)));
++  llmsg (message ("Maintainer: %s", cstring_makeLiteralTemp (SPLINT_DEBIAN_MAINTAINER)));
+   llmsglit (LCL_COMPILE);
+ }
+ 
