@@ -1,3 +1,15 @@
+splint (3.1.2.dfsg-7) unstable; urgency=low
+
+  * Add DM-Upload-Allowed: yes
+  * Remove linda overrides file
+  * Update 02_manpage to fix new lintian I: hyphen-used-as-minus-sign that
+    appeared magically
+  * Much improved packages descriptions
+  * Add linux-2.4.23.txt from Brian Quinlan <brian.quinlan@iolfree.ie>
+    explaining how to run splint on Linux drivers.
+
+ -- Y Giridhar Appaji Nag <giridhar@appaji.net>  Thu, 10 Apr 2008 15:02:45 +0530
+
 splint (3.1.2.dfsg-6) unstable; urgency=low
 
   * Add a few working .splintrc example files to the splint binary package

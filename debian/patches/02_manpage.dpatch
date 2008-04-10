@@ -6,8 +6,8 @@
 
 @DPATCH@
 diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
---- splint-3.1.2.dfsg~/doc/splint.1	2007-12-17 14:43:05.000000000 +0530
-+++ splint-3.1.2.dfsg/doc/splint.1	2007-12-17 14:43:33.000000000 +0530
+--- splint-3.1.2.dfsg~/doc/splint.1	2008-03-06 12:01:08.000000000 +0530
++++ splint-3.1.2.dfsg/doc/splint.1	2008-03-06 12:03:18.000000000 +0530
 @@ -1,5 +1,4 @@
 - .\" $Id: splint.1,v 1.2 2003/03/31 18:19:38 drl7x Exp $
 -.TH splint 1 "A tool for statically checking C programs"
@@ -45,7 +45,21 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  command line or in an options file, but may not be used as control comments in the
  source code. Except where noted. they have the same meaning preceded by \- or +. 
  
-@@ -64,7 +63,7 @@
+@@ -52,19 +51,19 @@
+ .TP 6
+ .B \-nof 
+ Prevents the default options files (./.splintrc and ~/.splintrc) from being loaded. (Setting
+--nof overrides +nof, causing the options files to be loaded normally.) 
++\-nof overrides +nof, causing the options files to be loaded normally.) 
+ 
+ .TP 6
+ .BI \-systemdirs " directories"
+ Set directories for system files (default is "/usr/include"). Separate directories with colons (e.g.,
+ "/usr/include:/usr/local/lib"). Flag settings propagate to files in a system directory. If
+--systemdirerrors is set, no errors are reported for files in system directories. 
++\-systemdirerrors is set, no errors are reported for files in system directories. 
+ 
+ .PP
  .B Pre-processor
  
  These flags are used to define or undefine pre-processor constants.

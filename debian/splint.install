@@ -1,2 +1,1 @@
 debian/overrides/lintian/splint usr/share/lintian/overrides
-debian/overrides/linda/splint usr/share/linda/overrides
