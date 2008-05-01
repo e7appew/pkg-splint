@@ -15,6 +15,8 @@ Copyright:
     Copyright (C) 1984-2007, Free Software Foundation, Inc.
     Copyright (C) 1994-2007, University of Virginia
     Copyright (C) 1994-2007, Massachusetts Institute of Technology
+    Copyright (C) 2005, Brian Quinlan <brian.quinlan@iolfree.ie>
+    Copyright (C) 2004, Rich Walker <rw@shadow.org.uk>
     Copyright (C) 2000, Stephen Toothman <stephen.toothman@cicplan.com>
 
 License:
@@ -34,8 +36,9 @@ License:
     /usr/share/common-licenses/GPL-2; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
 
-  The documentation under the doc/ directory is licensed under the
-  Creative Commons Attribution-ShareAlike 3.0 Unported license.
+  debian/external/linux-2.4.23.txt debian/external/rtai.splintrc and the
+  documentation under the doc/ directory are licensed under the Creative
+  Commons Attribution-ShareAlike 3.0 Unported license.
 
     Creative Commons Legal Code
     
@@ -384,6 +387,68 @@ License:
           granted under this License, such additional rights are deemed to
           be included in the License; this License is not intended to
           restrict the license of any rights under applicable law.
+
+    ---------------------------------------
+    Licensing debian/external/rtai.splintrc
+    ---------------------------------------
+
+    From: Rich Walker <rw@shadow.org.uk>
+    To: Y Giridhar Appaji Nag <giridhar@appaji.net>
+    In-Reply-To: <20080426091851.GA17081@loktak.appaji.net> (Y. Giridhar Appaji Nag's message of "Sat\, 26 Apr 2008 14\:48\:52 +0530")
+    User-Agent: Gnus/5.11 (Gnus v5.11) Emacs/22.1 (gnu/linux)
+    References: <20080426091851.GA17081@loktak.appaji.net>
+    Date: Sat, 26 Apr 2008 10:27:46 +0100
+    Message-ID: <m31w4tx8x9.fsf@shadow.org.uk>
+    
+    Y. Giridhar Appaji Nag <giridhar@appaji.net> wrote:
+    > Otherwise if you are OK, can you tell me what license you would allow
+    > re-distribution of the above under?  One of public domain, GPLv2+
+    > (under which the splint software itself is licensed) or CC-BY-SA 3.0
+    > (under which splint documentation is licensed) would be convinient :)
+    
+    I hereby release that code under CC-BY-SA 3.0.
+    
+    cheers, Rich.
+
+    ------------------------------------------
+    Licensing debian/external/linux-2.4.23.txt
+    ------------------------------------------
+    
+    From: Brian Quinlan <brian.quinlan@iolfree.ie>
+    To: Y Giridhar Appaji Nag <giridhar@appaji.net>
+    Date: Wed, 30 Apr 2008 13:56:39 +0100
+    Subject: [Fwd: RE: [Fwd: would like to use your post for .splintrc example]]
+    X-Mailer: Evolution 2.12.1
+    Message-Id: <1209560200.22708.106.camel@russell.home>
+
+    Hi Giridhar,
+    I sent Ray Bulger (founder/CEO of Duolog) an email asking to license the
+    post using CC-BY-SA 3.0. He on behalf of Duolog is okay with this, as am
+    I.
+
+    Please use the CC-BY-SA 3.0 license to license this post.
+
+    Bye,
+    Brian
+
+    -------- Forwarded Message --------
+    From: Y Giridhar Appaji Nag <giridhar@appaji.net>
+    To: Brian Quinlan <brian.quinlan@iolfree.ie>
+    Subject: would like to use your post for .splintrc example
+    Date: Sat, 26 Apr 2008 14:50:02 +0530
+
+    Hi Brian,
+
+    I want to add your mailing list post [1] about splint against kernel
+    sources as an example of a .splintrc file to the splint debian package.
+
+    [1] http://www.cs.virginia.edu/pipermail/splint-discuss/2005-January/000531.html
+
+    Can you please tell me if you have any objections to me doing this?
+    Otherwise if you are OK, can you tell me what license you would allow
+    re-distribution of the above under?  One of public domain, GPLv2+ (under
+    which the splint software itself is licensed) or CC-BY-SA 3.0 (under
+    which splint documentation is licensed) would be convinient :)
 
 The Debian packaging is
 Copyright (C) 2002-2007, Samuele Giovanni Tonon <samu@debian.org>

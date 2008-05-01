@@ -1,3 +1,20 @@
+splint (3.1.2.dfsg-9) unstable; urgency=low
+
+  * Add lintian overrides for typo in debian/copyright.  The license emails
+    have a typo that I would like to retain as is.
+
+ -- Y Giridhar Appaji Nag <giridhar@appaji.net>  Thu, 01 May 2008 11:37:12 +0530
+
+splint (3.1.2.dfsg-8) unstable; urgency=low
+
+  * Use '<<' versioning rather than '<=' for Conflicts/Replaces.
+  * Update 02_manpage to indicate that 'usestderr' is obsolete.  Thanks Chris
+    Adams <chris@improbable.org> for the bug report (Closes: #476567)
+  * List example .splintrc Copyright holders in debian/copyright
+  * linux-2.4.23.txt and rtai.splintrc are licensed under CC-BY-SA 3.0
+
+ -- Y Giridhar Appaji Nag <giridhar@appaji.net>  Thu, 01 May 2008 10:12:53 +0530
+
 splint (3.1.2.dfsg-7) unstable; urgency=low
 
   * Add DM-Upload-Allowed: yes

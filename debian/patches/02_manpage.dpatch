@@ -6,8 +6,8 @@
 
 @DPATCH@
 diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
---- splint-3.1.2.dfsg~/doc/splint.1	2008-03-06 12:01:08.000000000 +0530
-+++ splint-3.1.2.dfsg/doc/splint.1	2008-03-06 12:03:18.000000000 +0530
+--- splint-3.1.2.dfsg~/doc/splint.1	2008-03-06 12:09:29.000000000 +0530
++++ splint-3.1.2.dfsg/doc/splint.1	2008-04-17 23:10:08.000000000 +0530
 @@ -1,5 +1,4 @@
 - .\" $Id: splint.1,v 1.2 2003/03/31 18:19:38 drl7x Exp $
 -.TH splint 1 "A tool for statically checking C programs"
@@ -81,7 +81,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  loaded, one of the following flags may be used to select a different standard library. Precede the flag by + to
  load the described library (or prevent a library from being loaded using nolib). See Apppendix F for
  information on the provided libraries. 
-@@ -123,7 +122,7 @@
+@@ -123,12 +122,14 @@
  .PP
  .B Output
  
@@ -90,7 +90,15 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  information to be printed; setting -<flag> prevents it. By default, all these flags are off.
  
  .TP 6
-@@ -139,7 +138,7 @@
+ .B \-usestderr 
+-Send error messages to standard error (instead of standard out). 
++Send error messages to standard error (instead of standard out).  This flag
++has been replaced by more precise flags for controlling the warning, status
++message and fatal error streams independently.  See the output of splint +usestderr
+ 
+ .TP 6
+ .B \-showsummary 
+@@ -139,7 +140,7 @@
  
  .TP 6
  .B \-showscan 
@@ -99,7 +107,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  
  .TP 6
  .B \-showalluses 
-@@ -155,7 +154,7 @@
+@@ -155,7 +156,7 @@
  
  .TP 6
  .B \-quiet 
@@ -108,7 +116,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  information before checking begins, and a line summarizing the total number of errors reported.) 
  
  .TP 6
-@@ -170,14 +169,14 @@
+@@ -170,14 +171,14 @@
  .PP
  .B Expected Errors
  
@@ -125,7 +133,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  <number> code errors are detected. 
  
  .TP 6
-@@ -216,7 +215,7 @@
+@@ -216,7 +217,7 @@
  
  .TP 6
  .BI \-linelen " number"
@@ -134,7 +142,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  than <number> characters long into multiple lines. Default: 80 
  
  .PP
-@@ -229,7 +228,7 @@
+@@ -229,7 +230,7 @@
  set. 
  
  These are brief descriptions to give a general idea of what each mode does. To see the complete flag settings
@@ -143,7 +151,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  
  .TP 6
  .B \-weak 
-@@ -258,13 +257,8 @@
+@@ -258,13 +259,8 @@
  strict checking. 
  
  .SH AUTHOR
