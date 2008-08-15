@@ -1,0 +1,102 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 05_html_docs_css.dpatch by Y Giridhar Appaji Nag <giridhar@appaji.net>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Remove google trackers and adjust css to look like online splint docs
+
+@DPATCH@
+diff -urNad splint-3.1.2.dfsg1~/doc/bugs.html splint-3.1.2.dfsg1/doc/bugs.html
+--- splint-3.1.2.dfsg1~/doc/bugs.html	2008-08-15 17:11:09.000000000 +0530
++++ splint-3.1.2.dfsg1/doc/bugs.html	2008-08-15 17:28:46.000000000 +0530
+@@ -640,16 +640,6 @@
+ </tr>
+ </table>
+ 
+-<script type="text/javascript">
+-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+-</script>
+-<script type="text/javascript">
+-var pageTracker = _gat._getTracker("UA-3775212-3");
+-pageTracker._initData();
+-pageTracker._trackPageview();
+-</script>
+-
+ </body>
+ </html>
+ 
+diff -urNad splint-3.1.2.dfsg1~/doc/changes.html splint-3.1.2.dfsg1/doc/changes.html
+--- splint-3.1.2.dfsg1~/doc/changes.html	2008-08-15 17:11:08.000000000 +0530
++++ splint-3.1.2.dfsg1/doc/changes.html	2008-08-15 17:28:55.000000000 +0530
+@@ -781,16 +781,6 @@
+ </tr>
+ </table>
+ 
+-<script type="text/javascript">
+-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+-</script>
+-<script type="text/javascript">
+-var pageTracker = _gat._getTracker("UA-3775212-3");
+-pageTracker._initData();
+-pageTracker._trackPageview();
+-</script>
+-
+ </body>
+ </html>
+ 
+diff -urNad splint-3.1.2.dfsg1~/doc/html/faq.html splint-3.1.2.dfsg1/doc/html/faq.html
+--- splint-3.1.2.dfsg1~/doc/html/faq.html	2008-08-15 17:11:06.000000000 +0530
++++ splint-3.1.2.dfsg1/doc/html/faq.html	2008-08-15 17:29:27.000000000 +0530
+@@ -4,7 +4,7 @@
+   <head>
+     <meta name="generator"
+     content="HTML Tidy for Linux/x86 (vers 1st November 2002), see www.w3.org" />
+-    <link rel="stylesheet" type="text/css" href="http://www.splint.org/splint.css"
++    <link rel="stylesheet" type="text/css" href="splint.css"
+     title="style1" />
+     <title>Splint FAQ</title>
+   </head>
+@@ -579,16 +579,6 @@
+ </tr>
+ </table>
+ 
+-<script type="text/javascript">
+-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+-</script>
+-<script type="text/javascript">
+-var pageTracker = _gat._getTracker("UA-3775212-3");
+-pageTracker._initData();
+-pageTracker._trackPageview();
+-</script>
+-
+ </body>
+ </html>
+ 
+diff -urNad splint-3.1.2.dfsg1~/doc/html/manual.css splint-3.1.2.dfsg1/doc/html/manual.css
+--- splint-3.1.2.dfsg1~/doc/html/manual.css	2003-03-24 13:20:59.000000000 +0530
++++ splint-3.1.2.dfsg1/doc/html/manual.css	2008-08-15 17:27:59.000000000 +0530
+@@ -10,8 +10,8 @@
+ A:link { color: blue }
+ A:visited { color: darkblue }
+ A:active { color: green }
+-body { margin-left: 0%; margin-right: 0%; margin-top: 0%; margin-bottom:
+-0% }
++body { margin-left: 1%; margin-right: 1%; margin-top: 1%; margin-bottom:
++1% }
+ h4 { margin-left: 0%; margin-right: 0% }
+ h3 { margin-left: 0%; margin-right: 0% }
+ h2 { margin-left: 0%; margin-right: 0% }
+diff -urNad splint-3.1.2.dfsg1~/doc/html/manual.htm splint-3.1.2.dfsg1/doc/html/manual.htm
+--- splint-3.1.2.dfsg1~/doc/html/manual.htm	2003-04-29 03:34:49.000000000 +0530
++++ splint-3.1.2.dfsg1/doc/html/manual.htm	2008-08-15 17:29:36.000000000 +0530
+@@ -4,7 +4,7 @@
+ "HTML Tidy for Solaris (vers 1st March 2003), see www.w3.org"
+       name="generator">
+ <link rel="stylesheet" type="text/css" href=
+-"../manual.css" title="style1">
++"manual.css" title="style1">
+ <title>Splint Manual</title>
+ <style type="text/css">
+ <!--

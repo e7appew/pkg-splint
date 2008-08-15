@@ -1,3 +1,12 @@
+splint (3.1.2.dfsg1-1) unstable; urgency=low
+
+  * Add missing-image-files in the manual to orig tarball via get-orig-source
+  * Update Standards-Version to 3.8.0, no changes required.
+  * Patch 05_html_docs_css to remove google trackers in docs and to adjust CSS
+    to make the manual look like they are on splint.org (Closes: #466907)
+
+ -- Y Giridhar Appaji Nag <giridhar@appaji.net>  Fri, 15 Aug 2008 17:31:13 +0530
+
 splint (3.1.2.dfsg-9) unstable; urgency=low
 
   * Add lintian overrides for typo in debian/copyright.  The license emails
