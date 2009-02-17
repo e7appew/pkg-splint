@@ -1,3 +1,13 @@
+splint (3.1.2.dfsg1-2) unstable; urgency=low
+
+  * Add README.source to be compliant with policy 3.8.0
+  * Update Maintainer to official Debian ID
+  * Remove DM-Upload-Allowed: yes
+  * Update to debian/compat 6 and use dh_lintian instead of dh_installing
+    override files.
+
+ -- Y Giridhar Appaji Nag <appaji@debian.org>  Tue, 17 Feb 2009 20:56:18 +0530
+
 splint (3.1.2.dfsg1-1) unstable; urgency=low
 
   * Add missing-image-files in the manual to orig tarball via get-orig-source

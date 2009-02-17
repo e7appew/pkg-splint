@@ -77,6 +77,7 @@ install: build
 	$(MAKE) DESTDIR=$(CURDIR)/debian/splint-data install-data
 	$(MAKE) DESTDIR=$(CURDIR)/debian/splint install-exec
 	dh_install
+	dh_lintian
 
 # Build architecture-independent files here.
 binary-indep: build install
