@@ -2,10 +2,18 @@
 ##
 ## Remove google trackers and adjust css to look like online splint docs
 
-diff -urNad splint-3.1.2.dfsg1~/doc/bugs.html splint-3.1.2.dfsg1/doc/bugs.html
---- splint-3.1.2.dfsg1~/doc/bugs.html	2008-08-15 17:11:09.000000000 +0530
-+++ splint-3.1.2.dfsg1/doc/bugs.html	2008-08-15 17:28:46.000000000 +0530
-@@ -640,16 +640,6 @@
+--- a/doc/bugs.html
++++ b/doc/bugs.html
+@@ -622,7 +622,7 @@ href="http://www.splint.org/bugs.html">R
+ Bugs</a> -
+ <a
+ href="http://www.splint.org/lists.html">Mailing
+-Lists</a> &nbsp;&nbsp;<IMG src="http://sourceforge.net/sflogo.php?group_id=9538" width="0" height="0" alt="">
++Lists</a> 
+ 
+ &nbsp;&nbsp;
+ <a
+@@ -640,16 +640,6 @@ href="http://www.splint.org/credits.html
  </tr>
  </table>
  
@@ -22,10 +30,18 @@ diff -urNad splint-3.1.2.dfsg1~/doc/bugs.html splint-3.1.2.dfsg1/doc/bugs.html
  </body>
  </html>
  
-diff -urNad splint-3.1.2.dfsg1~/doc/changes.html splint-3.1.2.dfsg1/doc/changes.html
---- splint-3.1.2.dfsg1~/doc/changes.html	2008-08-15 17:11:08.000000000 +0530
-+++ splint-3.1.2.dfsg1/doc/changes.html	2008-08-15 17:28:55.000000000 +0530
-@@ -781,16 +781,6 @@
+--- a/doc/changes.html
++++ b/doc/changes.html
+@@ -763,7 +763,7 @@ href="http://www.splint.org/bugs.html">R
+ Bugs</a> -
+ <a
+ href="http://www.splint.org/lists.html">Mailing
+-Lists</a> &nbsp;&nbsp;<IMG src="http://sourceforge.net/sflogo.php?group_id=9538" width="0" height="0" alt="">
++Lists</a> 
+ 
+ &nbsp;&nbsp;
+ <a
+@@ -781,16 +781,6 @@ href="http://www.splint.org/credits.html
  </tr>
  </table>
  
@@ -42,9 +58,8 @@ diff -urNad splint-3.1.2.dfsg1~/doc/changes.html splint-3.1.2.dfsg1/doc/changes.
  </body>
  </html>
  
-diff -urNad splint-3.1.2.dfsg1~/doc/html/faq.html splint-3.1.2.dfsg1/doc/html/faq.html
---- splint-3.1.2.dfsg1~/doc/html/faq.html	2008-08-15 17:11:06.000000000 +0530
-+++ splint-3.1.2.dfsg1/doc/html/faq.html	2008-08-15 17:29:27.000000000 +0530
+--- a/doc/html/faq.html
++++ b/doc/html/faq.html
 @@ -4,7 +4,7 @@
    <head>
      <meta name="generator"
@@ -54,7 +69,16 @@ diff -urNad splint-3.1.2.dfsg1~/doc/html/faq.html splint-3.1.2.dfsg1/doc/html/fa
      title="style1" />
      <title>Splint FAQ</title>
    </head>
-@@ -579,16 +579,6 @@
+@@ -561,7 +561,7 @@ href="http://www.splint.org/bugs.html">R
+ Bugs</a> -
+ <a
+ href="http://www.splint.org/lists.html">Mailing
+-Lists</a> &nbsp;&nbsp;<IMG src="http://sourceforge.net/sflogo.php?group_id=9538" width="0" height="0" alt="">
++Lists</a> 
+ 
+ &nbsp;&nbsp;
+ <a
+@@ -579,16 +579,6 @@ href="http://www.splint.org/credits.html
  </tr>
  </table>
  
@@ -71,10 +95,9 @@ diff -urNad splint-3.1.2.dfsg1~/doc/html/faq.html splint-3.1.2.dfsg1/doc/html/fa
  </body>
  </html>
  
-diff -urNad splint-3.1.2.dfsg1~/doc/html/manual.css splint-3.1.2.dfsg1/doc/html/manual.css
---- splint-3.1.2.dfsg1~/doc/html/manual.css	2003-03-24 13:20:59.000000000 +0530
-+++ splint-3.1.2.dfsg1/doc/html/manual.css	2008-08-15 17:27:59.000000000 +0530
-@@ -10,8 +10,8 @@
+--- a/doc/html/manual.css
++++ b/doc/html/manual.css
+@@ -10,8 +10,8 @@ title { font-family: Ariel, helvetica, s
  A:link { color: blue }
  A:visited { color: darkblue }
  A:active { color: green }
@@ -85,9 +108,8 @@ diff -urNad splint-3.1.2.dfsg1~/doc/html/manual.css splint-3.1.2.dfsg1/doc/html/
  h4 { margin-left: 0%; margin-right: 0% }
  h3 { margin-left: 0%; margin-right: 0% }
  h2 { margin-left: 0%; margin-right: 0% }
-diff -urNad splint-3.1.2.dfsg1~/doc/html/manual.htm splint-3.1.2.dfsg1/doc/html/manual.htm
---- splint-3.1.2.dfsg1~/doc/html/manual.htm	2003-04-29 03:34:49.000000000 +0530
-+++ splint-3.1.2.dfsg1/doc/html/manual.htm	2008-08-15 17:29:36.000000000 +0530
+--- a/doc/html/manual.htm
++++ b/doc/html/manual.htm
 @@ -4,7 +4,7 @@
  "HTML Tidy for Solaris (vers 1st March 2003), see www.w3.org"
        name="generator">
