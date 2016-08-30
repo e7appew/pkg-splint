@@ -110,32 +110,35 @@ constraint makeConstraintParse3 (constraintExpr l, lltok relOp, constraintExpr r
 
 constraint constraint_copy (/*@temp@*/ /*@observer@*/ constraint c)
 {
-  constraint ret;
-
-  llassert (constraint_isDefined (c));
-
-  ret = constraint_makeNew ();
-  ret->lexpr = constraintExpr_copy (c->lexpr);
-  ret->ar = c->ar;
-  ret->expr =  constraintExpr_copy (c->expr);
-  ret->post = c->post;
-  /*@-assignexpose@*/
-  ret->generatingExpr = c->generatingExpr;
-  /*@=assignexpose@*/
-  
-  if (c->orig != NULL)
-    ret->orig = constraint_copy (c->orig);
+  if (!constraint_isDefined (c))
+    {
+      return constraint_undefined;
+    }
   else
-    ret->orig = NULL;
-
-  if (c->or != NULL)
-    ret->or = constraint_copy (c->or);
-  else
-    ret->or = NULL;
-
-  ret->fcnPre = c->fcnPre;
-  
-  return ret;
+    {
+      constraint ret = constraint_makeNew ();
+      ret->lexpr = constraintExpr_copy (c->lexpr);
+      ret->ar = c->ar;
+      ret->expr =  constraintExpr_copy (c->expr);
+      ret->post = c->post;
+      /*@-assignexpose@*/
+      ret->generatingExpr = c->generatingExpr;
+      /*@=assignexpose@*/
+      
+      if (c->orig != NULL)
+	ret->orig = constraint_copy (c->orig);
+      else
+	ret->orig = NULL;
+      
+      if (c->or != NULL)
+	ret->or = constraint_copy (c->or);
+      else
+	ret->or = NULL;
+      
+      ret->fcnPre = c->fcnPre;
+      
+      return ret;
+    }
 }
 
 /*like copy except it doesn't allocate memory for the constraint*/
@@ -203,8 +206,10 @@ static /*@notnull@*/  /*@special@*/ constraint constraint_makeNew (void)
 
 constraint constraint_addGeneratingExpr (/*@returned@*/ constraint c, /*@exposed@*/ exprNode e)
 {
-  
-  llassert (constraint_isDefined (c) );
+  if (!constraint_isDefined (c)) 
+    {
+      return c;
+    }
   
   if (c->generatingExpr == NULL)
     {
@@ -261,7 +266,7 @@ fileloc constraint_getFileloc (constraint c)
   if (exprNode_isDefined (c->generatingExpr))
     return (fileloc_copy (exprNode_loc (c->generatingExpr)));
   
-  return (constraintExpr_getFileloc (c->lexpr));
+  return (constraintExpr_loc (c->lexpr));
 }
 
 static bool checkForMaxSet (constraint c)
@@ -391,14 +396,20 @@ static constraint
 constraint_makeEnsuresOpConstraintExpr (/*@only@*/ constraintExpr c1, /*@only@*/ constraintExpr c2, 
 					fileloc sequencePoint, arithType ar)
 {
-  constraint ret = constraint_makeNew ();
-  llassert (constraintExpr_isDefined (c1) && constraintExpr_isDefined (c2));
-  ret->lexpr = c1;
-  ret->ar = ar;
-  ret->post = TRUE;
-  ret->expr = c2;
-  ret->lexpr = constraintExpr_setFileloc (ret->lexpr, sequencePoint);
-  return ret;
+  if (constraintExpr_isDefined (c1) && constraintExpr_isDefined (c2))
+    {
+      constraint ret = constraint_makeNew ();
+      ret->lexpr = c1;
+      ret->ar = ar;
+      ret->post = TRUE;
+      ret->expr = c2;
+      ret->lexpr = constraintExpr_setFileloc (ret->lexpr, sequencePoint);
+      return ret;
+    } 
+  else
+    {
+      return constraint_undefined;
+    }
 }
 
 static constraint 
@@ -546,25 +557,22 @@ constraint constraint_makeMaxSetSideEffectPostIncrement (exprNode e, fileloc seq
 
 void constraint_free (/*@only@*/ constraint c)
 {
-  llassert (constraint_isDefined (c));
+  if (constraint_isDefined (c))
+    {
+      constraint_free (c->orig);
+      c->orig = NULL;
 
+      constraint_free (c->or);
+      c->or = NULL;
 
-  if (constraint_isDefined (c->orig))
-    constraint_free (c->orig);
-  if ( constraint_isDefined (c->or))
-    constraint_free (c->or);
+      constraintExpr_free (c->lexpr);
+      c->lexpr = NULL;
 
-  
-  constraintExpr_free (c->lexpr);
-  constraintExpr_free (c->expr);
-
-  c->orig = NULL;
-  c->or = NULL;
-  c->lexpr = NULL;
-  c->expr  = NULL;
-
-  free (c);
-  
+      constraintExpr_free (c->expr);
+      c->expr  = NULL;
+      
+      free (c);
+    }
 }
 
 cstring arithType_print (arithType ar) /*@*/
@@ -575,22 +583,22 @@ cstring arithType_print (arithType ar) /*@*/
     case LT:
       st = cstring_makeLiteral ("<");
       break;
-    case	LTE:
+    case LTE:
       st = cstring_makeLiteral ("<=");
       break;
-    case 	GT:
+    case GT:
       st = cstring_makeLiteral (">");
       break;
-    case 	GTE:
+    case GTE:
       st = cstring_makeLiteral (">=");
       break;
-    case	EQ:
+    case EQ:
       st = cstring_makeLiteral ("==");
       break;
-    case	NONNEGATIVE:
+    case NONNEGATIVE:
       st = cstring_makeLiteral ("NONNEGATIVE");
       break;
-    case	POSITIVE:
+    case POSITIVE:
       st = cstring_makeLiteral ("POSITIVE");
       break;
     default:
@@ -606,28 +614,25 @@ void constraint_printErrorPostCondition (constraint c, fileloc loc)
   fileloc errorLoc, temp;
   
   string = constraint_unparseDetailedPostCondition (c);
-
   errorLoc = loc;
-
   loc = NULL;
 
   temp = constraint_getFileloc (c);
-
     
-  if (context_getFlag (FLG_BOUNDSCOMPACTERRORMESSAGES ) )
+  if (context_getFlag (FLG_BOUNDSCOMPACTERRORMESSAGES))
     {
-      string = cstring_replaceChar(string, '\n', ' ');
+      string = cstring_replaceChar (string, '\n', ' ');
     }
   
   if (fileloc_isDefined (temp))
     {
       errorLoc = temp;
-      voptgenerror (  FLG_CHECKPOST, string, errorLoc);
+      voptgenerror (FLG_CHECKPOST, string, errorLoc);
       fileloc_free (temp);
     }
   else
     {
-      voptgenerror (  FLG_CHECKPOST, string, errorLoc);
+      voptgenerror (FLG_CHECKPOST, string, errorLoc);
     }
 }
 
@@ -642,7 +647,6 @@ cstring constraint_printLocation (/*@observer@*/ /*@temp@*/ constraint c) /*@*/
   errorLoc = constraint_getFileloc (c);
 
   ret = message ("constraint: %q @ %q", string, fileloc_unparse (errorLoc));
-
   fileloc_free (errorLoc);
   return ret;
 
@@ -656,7 +660,6 @@ void constraint_printError (constraint c, fileloc loc)
   fileloc errorLoc, temp;
 
   bool isLikely;
-
     
   llassert (constraint_isDefined (c) );
  
@@ -680,13 +683,14 @@ void constraint_printError (constraint c, fileloc loc)
   else
     {
       llassert (FALSE);
-      DPRINTF (("constraint %s had undefined fileloc %s", constraint_unparse (c), fileloc_unparse (temp)));
+      DPRINTF (("constraint %s had undefined fileloc %s", 
+		constraint_unparse (c), fileloc_unparse (temp)));
       fileloc_free (temp);
       errorLoc = fileloc_copy (errorLoc);
     }
 
   
-  if (context_getFlag (FLG_BOUNDSCOMPACTERRORMESSAGES ) )
+  if (context_getFlag (FLG_BOUNDSCOMPACTERRORMESSAGES))
     {
       string = cstring_replaceChar(string, '\n', ' ');
     }
@@ -694,7 +698,7 @@ void constraint_printError (constraint c, fileloc loc)
   /*drl added 12/19/2002 print
     a different error fro "likely" bounds-errors*/
   
-  isLikely = constraint_isConstantOnly(c);
+  isLikely = constraint_isConstantOnly (c);
 
   if (isLikely)
     {
@@ -762,7 +766,7 @@ static cstring constraint_unparseDeep (constraint c)
       else
 	{
 	  st = cstring_concatFree (st, message ("derived from: %q",
-					       constraint_unparseDeep (c->orig)));
+						constraint_unparseDeep (c->orig)));
 	}
     }
 
@@ -807,7 +811,7 @@ cstring  constraint_unparseDetailed (constraint c)
   cstring genExpr;
   bool isLikely;
    
-  llassert (constraint_isDefined (c) );
+  llassert (constraint_isDefined (c));
    
   if (!c->post)
     {
@@ -818,17 +822,17 @@ cstring  constraint_unparseDetailed (constraint c)
       st = message ("Block Post condition:\nThis function block has the post condition %q", constraint_unparseDeep (c));
     }
 
-  isLikely = constraint_isConstantOnly(c);
+  isLikely = constraint_isConstantOnly (c);
 
   if (isLikely)
     {
       if (constraint_hasMaxSet (c))
 	{
-	  temp = cstring_makeLiteral ("Likely out-of-bounds store:\n");
+	  temp = cstring_makeLiteral ("Likely out-of-bounds store: ");
 	}
       else
 	{
-	  temp = cstring_makeLiteral ("Likely out-of-bounds read:\n");
+	  temp = cstring_makeLiteral ("Likely out-of-bounds read: ");
 	}
     }
   else
@@ -836,11 +840,11 @@ cstring  constraint_unparseDetailed (constraint c)
       
       if (constraint_hasMaxSet (c))
 	{
-	  temp = cstring_makeLiteral ("Possible out-of-bounds store:\n");
+	  temp = cstring_makeLiteral ("Possible out-of-bounds store: ");
 	}
       else
 	{
-	  temp = cstring_makeLiteral ("Possible out-of-bounds read:\n");
+	  temp = cstring_makeLiteral ("Possible out-of-bounds read: ");
 	}
     }
   
@@ -858,7 +862,7 @@ cstring  constraint_unparseDetailed (constraint c)
   return st;
 }
 
-/*@only@*/ cstring  constraint_unparse (constraint c) /*@*/
+/*@only@*/ cstring constraint_unparse (constraint c) /*@*/
 {
   cstring st = cstring_undefined;
   cstring type = cstring_undefined;
@@ -988,41 +992,43 @@ constraint constraint_doFixResult (constraint postcondition, /*@dependent@*/ exp
 
 constraint constraint_preserveOrig (/*@returned@*/ constraint c) /*@modifies c @*/
 {
-  DPRINTF (("Doing constraint_preserverOrig for %q", constraint_printDetailed (c)));
-  llassert (constraint_isDefined (c));
-
-  if (c->orig == constraint_undefined)
+  if (constraint_isDefined (c))
     {
-      c->orig = constraint_copy (c);
-    }
-  else if (c->orig->fcnPre)
-    {
-      constraint temp = c->orig;
+      DPRINTF (("Doing constraint_preserverOrig for %q", constraint_printDetailed (c)));
       
-      /* avoid infinite loop */
-      c->orig = NULL;
-      c->orig = constraint_copy (c);
-      /*drl 03/2/2003 if c != NULL then the copy of c will != null*/
-      llassert (constraint_isDefined (c->orig) );
-
-      if (c->orig->orig == NULL)
+      if (c->orig == constraint_undefined)
 	{
-	  c->orig->orig = temp;
-	  temp = NULL;
+	  c->orig = constraint_copy (c);
+	}
+      else if (c->orig->fcnPre)
+	{
+	  constraint temp = c->orig;
+	  
+	  /* avoid infinite loop */
+	  c->orig = NULL;
+	  c->orig = constraint_copy (c);
+	  /*drl 03/2/2003 if c != NULL then the copy of c will != null*/
+	  llassert (constraint_isDefined (c->orig) );
+	  
+	  if (c->orig->orig == NULL)
+	    {
+	      c->orig->orig = temp;
+	      temp = NULL;
+	    }
+	  else
+	    {
+	      llcontbug ((message ("Expected c->orig->orig to be null")));
+	      constraint_free (c->orig->orig);
+	      c->orig->orig = temp;
+	      temp = NULL;
+	    }
 	}
       else
 	{
-	  llcontbug ((message ("Expected c->orig->orig to be null")));
-	  constraint_free (c->orig->orig);
-	  c->orig->orig = temp;
-	  temp = NULL;
+	  DPRINTF (("Not changing constraint"));
 	}
     }
-  else
-    {
-      DPRINTF (("Not changing constraint"));
-    }
-  
+
   DPRINTF ((message ("After Doing constraint_preserverOrig for %q ", constraint_unparseDetailed (c))));
   return c;
 }

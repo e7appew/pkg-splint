@@ -98,7 +98,7 @@
 ** Size of hash table for file names.
 */
 
-/*@constant int FTHASHSIZE; @*/
+/*@constant unsigned long FTHASHSIZE; @*/
 # define FTHASHSIZE 273
 
 /*
@@ -116,7 +116,7 @@
 /*@constant int CGLOBBASESIZE; @*/
 # define CGLOBBASESIZE 1024
 
-/*@constant int CGLOBHASHSIZE; @*/
+/*@constant unsigned long CGLOBHASHSIZE; @*/
 # define CGLOBHASHSIZE 1795
 
 /*@constant int LLHASHSIZE; @*/

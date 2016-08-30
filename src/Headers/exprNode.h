@@ -160,7 +160,7 @@ struct s_exprNode
   fileloc loc;
   /*@relnull@*/ exprData edata;
   cstring etext;
-  /*@notnull@*/   constraintList requiresConstraints;
+  /*@notnull@*/ constraintList requiresConstraints;
   /*@notnull@*/ constraintList ensuresConstraints;
   
   /*
@@ -216,6 +216,8 @@ extern /*@exposed@*/ multiVal exprNode_getValue (exprNode p_e) /*@*/ ;
 extern long exprNode_getLongValue (exprNode p_e) /*@*/ ;
 
 extern /*@observer@*/ cstring exprNode_unparseFirst (exprNode p_e) /*@*/ ;
+extern void exprNode_revealState (exprNode p_e) /*@modifies g_messagestream@*/ ;
+
 extern /*@observer@*/ guardSet exprNode_getForGuards (exprNode p_pred) /*@*/ ;
 extern bool exprNode_loopMustExec (exprNode p_forPred) /*@*/ ;
 
@@ -235,6 +237,11 @@ extern /*@observer@*/ exprNode exprNode_makeMustExit (void) /*@*/ ;
 extern exprNode 
   exprNode_cond (/*@keep@*/ exprNode p_pred, /*@keep@*/ exprNode p_ifclause, 
 		 /*@keep@*/ exprNode p_elseclause) /*@*/ ;
+
+extern exprNode 
+exprNode_condIfOmit (/*@keep@*/ exprNode p_pred, 
+		     /*@keep@*/ exprNode p_elseclause) /*@*/ ;
+
 extern exprNode exprNode_makeError(void) /*@*/ ;
 
 extern exprNode exprNode_makeInitBlock (lltok p_brace, /*@only@*/ exprNodeList p_inits) /*@*/ ;

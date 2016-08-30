@@ -458,7 +458,14 @@ ctbase_typeId (ctbase c)
     {
       if (ctbase_isConj (c)) 
 	{
-	  return ctbase_typeId (ctype_getCtbase (ctbase_getConjA (c)));
+	  if (ctype_isUA (ctbase_getConjA (c))) {
+	    return ctbase_typeId (ctype_getCtbase (ctbase_getConjA (c)));
+	  } else if (ctype_isUA (ctbase_getConjB (c))) {
+	    return ctbase_typeId (ctype_getCtbase (ctbase_getConjB (c)));
+	  } else {
+	    llcontbug (message ("ctbase_typeId: bad call: %q", ctbase_unparse (c)));
+	    return typeId_invalid;
+	  }
 	}
       else
 	{
@@ -501,11 +508,67 @@ ctbase_unparse (ctbase c)
 	  return (message ("%t *", c->contents.base));
 	}
     case CT_FIXEDARRAY:
-      return (message ("%t [%d]", 
-		       c->contents.farray->base, 
-		       (int) c->contents.farray->size));
+      /*
+      ** C prints out array declarations backwards, if
+      ** base is an array need to print out in reverse order.
+      */
+
+      if (ctype_isArray (c->contents.farray->base)) 
+	{
+	  ctype base = c->contents.farray->base;
+	  cstring res = message ("[%d]", (int) c->contents.farray->size);
+
+	  while (ctype_isArray (base)) 
+	    {
+	      if (ctype_isFixedArray (base)) 
+		{
+		  res = message ("%q[%d]", 
+				 res, (int) ctype_getArraySize (base));
+		}
+	      else
+		{
+		  res = message ("%q[]", res);
+		}
+
+	      base = ctype_baseArrayPtr (base);
+	    }
+
+	  return (message ("%t %q", base, res));
+	} 
+      else 
+	{
+	  return (message ("%t [%d]", 
+			   c->contents.farray->base, 
+			   (int) c->contents.farray->size));
+	}
     case CT_ARRAY:
-      return (message ("%t []", c->contents.base));
+      if (ctype_isArray (c->contents.base)) 
+	{
+	  ctype base = c->contents.base;
+	  cstring res = cstring_makeLiteral ("[]");
+
+	  while (ctype_isArray (base)) 
+	    {
+	      if (ctype_isFixedArray (base)) 
+		{
+		  res = message ("%q[%d]", 
+				 res, (int) ctype_getArraySize (base));
+		}
+	      else
+		{
+		  res = message ("%q[]", res);
+		}
+
+	      base = ctype_baseArrayPtr (base);
+	    }
+
+	  return (message ("%t %q", base, res));
+
+	}
+      else
+	{
+	  return (message ("%t []", c->contents.base));
+	}
     case CT_FCN:
       return (message ("[function (%q) returns %t]",
 		       uentryList_unparseParams (c->contents.fcn->params),
@@ -2626,4 +2689,55 @@ bool ctbase_isBigger (ctbase ct1, ctbase ct2)
     {
       return FALSE;
     }
+}
+
+int ctbase_getSize (ctbase ct)
+{
+  if (ct == NULL) 
+    {
+      return 0;
+    }
+  
+  switch (ct->type) 
+    {
+    case CT_UNKNOWN:
+    case CT_BOOL:
+    case CT_PRIM:
+      {
+	cprim cp = ct->contents.prim;
+	int nbits = cprim_getExpectedBits (cp);
+	return nbits;
+      }
+    case CT_USER:
+    case CT_ABST:
+    case CT_NUMABST:
+    case CT_EXPFCN:
+      {
+	return 0;
+      }
+    case CT_PTR:
+      {
+	/* Malloc returns void *, but they are bytes.  Normal void * is pointer size. */
+	if (ctype_isVoid (ct->contents.base)) 
+	  {
+	    return 8;
+	  }
+	else
+	  {
+	    return ctype_getSize (ct->contents.base);
+	  }
+      }
+    case CT_FIXEDARRAY: 
+    case CT_ARRAY:
+    case CT_FCN:
+    case CT_STRUCT:
+    case CT_UNION:
+    case CT_ENUM:
+    case CT_CONJ:
+      break;
+      BADDEFAULT;
+    }
+
+  return 0;
+      
 }

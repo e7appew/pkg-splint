@@ -165,6 +165,9 @@ extern void yyerror (char *);
 /* additional tokens introduced by splint pre-processor. */
 %token <tok> LLMACRO LLMACROITER LLMACROEND TENDMACRO
 
+/* For debugging purposes */
+%token <tok> QDREVEALSTATE
+
 /* break comments: */
 %token <tok> QSWITCHBREAK QLOOPBREAK QINNERBREAK QSAFEBREAK
 %token <tok> QINNERCONTINUE
@@ -218,7 +221,7 @@ extern void yyerror (char *);
 %type <entry> endIter 
 
 %type <funcclauselist> functionClauses functionClausesPlain
-%type <funcclause> functionClause functionClause functionClausePlain
+%type <funcclause> functionClause functionClausePlain
 
 %type <globsclause> globalsClause globalsClausePlain
 %type <modsclause> modifiesClause modifiesClausePlain nomodsClause
@@ -302,7 +305,7 @@ extern void yyerror (char *);
 %type <expr> orIterExpr conditionalIterExpr assignIterExpr iterArgExpr
 %type <expr> expr optExpr constantExpr
 %type <expr> init macroBody iterBody endBody partialIterStmt iterSelectionStmt
-%type <expr> stmt stmtList fcnBody iterStmt iterDefStmt iterDefStmtList
+%type <expr> stmt stmtList fcnBody iterStmt iterDefStmt iterDefStmtList debugStmt
 %type <expr> labeledStmt caseStmt defaultStmt 
 %type <expr> compoundStmt compoundStmtAux compoundStmtRest compoundStmtAuxErr
 %type <expr> expressionStmt selectionStmt iterationStmt jumpStmt iterDefIterationStmt 
@@ -409,14 +412,14 @@ namedDeclBase
      $$ = idDecl_replaceCtype ($1, ct);
 
      /*drl 7/25/01 added*/
-     setImplictfcnConstraints();
+     setImplicitfcnConstraints();
 
      DPRINTF((message("namedDeclBase PushType TLPAREN TRPAREN...:\n adding implict constraints to functionClause List: %s",
 		      functionClauseList_unparse($6)
 		      )
 	      ));
      
-     fcl = functionClauseList_setImplictConstraints($6);
+     fcl = functionClauseList_setImplicitConstraints($6);
 
      idDecl_addClauses ($$, fcl);
 
@@ -434,7 +437,7 @@ namedDeclBase
    functionClauses
    {
      functionClauseList fcl;
-     setImplictfcnConstraints ();
+     setImplicitfcnConstraints ();
      clearCurrentParams ();
      $$ = idDecl_replaceCtype ($1, ctype_makeFunction (idDecl_getCtype ($1), $4));
 
@@ -443,7 +446,7 @@ namedDeclBase
 		      )
 	      )) ;
      
-     fcl = functionClauseList_setImplictConstraints($7);
+     fcl = functionClauseList_setImplicitConstraints($7);
 
      idDecl_addClauses ($$, fcl);
 
@@ -1058,6 +1061,11 @@ orExpr
 
 conditionalExpr 
  : orExpr 
+ | orExpr TQUEST 
+   { /* GCC extension: conditional with empty if */
+     exprNode_produceGuards ($1); context_enterTrueClause ($1); } TCOLON 
+   { context_enterFalseClause ($1); } conditionalExpr
+   { $$ = exprNode_condIfOmit ($1, $6); context_exitClause ($1, exprNode_undefined, $6); }
  | orExpr TQUEST { exprNode_produceGuards ($1); context_enterTrueClause ($1); } expr TCOLON 
    { context_enterFalseClause ($1); } conditionalExpr
    { $$ = exprNode_cond ($1, $4, $7); context_exitClause ($1, $4, $7); }
@@ -1472,7 +1480,7 @@ suSpc
    structDeclList  DeleteStructInnerScope { sRef_clearGlobalScopeSafe (); }
    TRBRACE 
    optStructInvariant 
-   { ctype ct; ct = declareStruct ($3, $8); context_setGlobalStructInfo(ct, $12); $$ = ct; } 
+   { ctype ct; ct = declareStruct ($3, $8); /* context_setGlobalStructInfo(ct, $12); */ $$ = ct; } 
  | NotType CUNION  newId IsType TLBRACE { sRef_setGlobalScopeSafe (); } 
    CreateStructInnerScope 
    structDeclList DeleteStructInnerScope { sRef_clearGlobalScopeSafe (); } 
@@ -1700,8 +1708,12 @@ stmt
  | iterationStmt 
  | iterStmt
  | jumpStmt 
+ | debugStmt
 ;
 
+debugStmt
+ : QDREVEALSTATE TLPAREN expr TRPAREN { exprNode_revealState ($3); $$ = exprNode_undefined; }
+;
 
 iterBody
  : iterDefStmtList { $$ = $1; }
@@ -1791,6 +1803,7 @@ stmtErr
  | iterationStmtErr
  | TLPAREN stmtErr TRPAREN { $$ = exprNode_addParens ($1, $2); }
  | jumpStmt 
+ | debugStmt
  | error { $$ = exprNode_makeError (); }
 ;
 
@@ -2102,6 +2115,9 @@ orIterExpr
 
 conditionalIterExpr 
  : orIterExpr 
+ | orExpr TQUEST { context_enterTrueClause ($1); } 
+   TCOLON { context_enterFalseClause ($1); } conditionalExpr
+   { $$ = exprNode_condIfOmit ($1, $6); }
  | orExpr TQUEST { context_enterTrueClause ($1); } 
    expr TCOLON { context_enterFalseClause ($1); } conditionalExpr
    { $$ = exprNode_cond ($1, $4, $7); }

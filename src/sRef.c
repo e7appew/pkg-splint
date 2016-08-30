@@ -951,7 +951,9 @@ sRef_updateSref (sRef s)
 	uentry ue = sRef_getUentry (s);
 
 	/* must be raw name!  (need the marker) */
-	ue = usymtab_lookupSafe (uentry_rawName (ue));
+	/* Must be in the correct scope! */
+
+	ue = usymtab_lookupSafeScope (uentry_rawName (ue), sRef_lexLevel (s));
 	
 	if (uentry_isUndefined (ue))
 	  {
@@ -5514,6 +5516,7 @@ void sRef_setNullStateN (sRef s, nstate n)
     {
       sRef_checkMutable (s);
       s->nullstate = n;
+      DPRINTF (("Set null state ==> %s", sRef_unparseFull (s)));
       sRef_resetAliasKind (s);
     }
 }
@@ -5876,6 +5879,8 @@ sRef sRef_copy (sRef s)
       t->info = sinfo_copy (s);
       t->defstate = s->defstate;
       t->nullstate = s->nullstate;
+      DPRINTF (("Set null state==> %s", sRef_unparseFull (t)));
+
  
       /* start modifications */
       t->bufinfo.bufstate = s->bufinfo.bufstate;
@@ -7250,6 +7255,7 @@ sRef_copyState (sRef s1, sRef s2)
       s1->expinfo = stateInfo_update (s1->expinfo, s2->expinfo);
 
       s1->nullstate = s2->nullstate;
+      DPRINTF (("Set null state==> %s", sRef_unparseFull (s1)));
       s1->nullinfo = stateInfo_update (s1->nullinfo, s2->nullinfo);
 
       valueTable_free (s1->state);  
@@ -8427,7 +8433,7 @@ sRef_aliasSetComplete (void (predf) (sRef, fileloc), sRef s, fileloc loc)
   
   aliases = usymtab_allAliases (s);
 
-  DPRINTF (("All aliases: %s", sRefSet_unparseFull (aliases)));
+  DPRINTF (("All aliases: %s --> %s", sRef_unparseFull (s), sRefSet_unparseFull (aliases)));
 
   (*predf)(s, loc);
 
@@ -8435,7 +8441,9 @@ sRef_aliasSetComplete (void (predf) (sRef, fileloc), sRef s, fileloc loc)
     {
       if (sRef_isReasonable (current))
 	{
+	  DPRINTF (("Update: %s", sRef_unparseFull (current)));
 	  current = sRef_updateSref (current);
+	  DPRINTF (("Updated ==> %s", sRef_unparseFull (current)));
 	  ((*predf)(current, loc));
 	  DPRINTF (("Killed: %s", sRef_unparseFull (current)));
 	}
@@ -9534,6 +9542,7 @@ static void sRef_updateNullState (/*@notnull@*/ sRef res, /*@notnull@*/ sRef oth
      /*@modifies res@*/
 {
   res->nullstate = other->nullstate;
+  DPRINTF (("update null state==> %s", sRef_unparseFull (res)));
   res->nullinfo = stateInfo_update (res->nullinfo, other->nullinfo);
   sRef_resetAliasKind (res);
 }
@@ -9595,6 +9604,7 @@ void sRef_combineNullState (/*@notnull@*/ sRef res, /*@notnull@*/ sRef other)
     }
 
   res->nullstate = nn;
+  DPRINTF (("update null state==> %s", sRef_unparseFull (res)));
   sRef_resetAliasKind (res);
 }
 

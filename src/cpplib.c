@@ -70,7 +70,11 @@ Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # include <fcntl.h>
 # if defined (WIN32) || defined (OS2) && defined (__IBMC__)
 # include <io.h>
+/* SMF */
+# ifndef BCC32
 # include <sys/utime.h>		/* for __DATE__ and __TIME__ */
+# endif
+
 # include <time.h>
 # else
 # ifndef VMS
@@ -238,6 +242,10 @@ static int cpp_peekN (cppReader *p_pfile, int p_n) /*@*/ ;
 # define cppBuffer_get(BUFFER) \
   ((BUFFER)->cur < (BUFFER)->rlimit ? *(BUFFER)->cur++ : EOF)
 
+/*@function static int cppBuffer_reachedEOF (sef cppBuffer *p_b) modifies nothing; @*/
+# define cppBuffer_reachedEOF(b) \
+  ((b)->cur < (b)->rlimit ? FALSE : TRUE)
+
 /* Append string STR (of length N) to PFILE's output buffer.  Make space. */
 /*@function static void cppReader_puts (sef cppReader *p_file, char *p_str, sef size_t p_n)
                      modifies *p_file; @*/
@@ -295,6 +303,9 @@ static void cppBuffer_forward (cppBuffer *p_buf, int p_n) /*@modifies *p_buf@*/ 
 /*@function static int cppReader_getC (cppReader *p_pfile) modifies *p_pfile; @*/
 # define cppReader_getC(pfile)   (cppBuffer_get (cppReader_getBufferSafe (pfile)))
 
+/*@function static int cppReader_reachedEOF (sef cppReader *p_pfile) modifies *p_pfile; @*/
+# define cppReader_reachedEOF(pfile)   (cppBuffer_reachedEOF (cppReader_getBufferSafe (pfile)))
+
 /*@function static int cppReader_peekC (cppReader *) modifies nothing;@*/
 # define cppReader_peekC(pfile)  (cpplib_bufPeek (cppReader_getBufferSafe (pfile)))
 
@@ -349,6 +360,8 @@ static void cppReader_scanBuffer (cppReader *p_pfile);
 
 # if defined (WIN32) || defined (OS2) && defined (__IBMC__)
 
+/* SMF */
+# ifndef BCC32
 /*
 ** WIN32 (at least the VC++ include files) does not define mode_t.
 */
@@ -356,6 +369,7 @@ static void cppReader_scanBuffer (cppReader *p_pfile);
 /*@-incondefs@*/ /*@-czechtypes@*/
 typedef unsigned int mode_t;
 /*@=incondefs@*/ /*@=czechtypes@*/
+# endif
 
 # endif
 
@@ -956,6 +970,9 @@ cppOptions_init (cppOptions *opts)
   opts->warn_comments = 0;
   opts->warnings_are_errors = 0;
 
+  /* Added 2003-07-10: */
+  opts->traditional = FALSE;
+  opts->c89 = TRUE;
   initialize_char_syntax (opts);
 }
 
@@ -1546,6 +1563,7 @@ collect_expansion (cppReader *pfile, char *buf, char *limit,
   defn->predefined = NULL;
 
   exp_p = defn->expansion = (char *) defn + sizeof (*defn);
+  *defn->expansion = '\0'; /* convince splint it is initialized */
 
   defn->line = 0;
   defn->rest_args = NULL;
@@ -1813,7 +1831,7 @@ collect_expansion (cppReader *pfile, char *buf, char *limit,
       llfatalbug (cstring_makeLiteral ("Maximum definition size exceeded."));
     }
 
-  return defn;
+  return defn; /* Spurious warning here */
 }
 
 /*
@@ -1877,7 +1895,6 @@ collect_expansionLoc (fileloc loc, char *buf, char *limit,
   defn->pattern = NULL;
   defn->nargs = nargs;
   defn->predefined = NULL;
-
   exp_p = defn->expansion = (char *) defn + sizeof (*defn);
 
   defn->line = 0;
@@ -2159,8 +2176,10 @@ collect_expansionLoc (fileloc loc, char *buf, char *limit,
     {
       llfatalbug (cstring_makeLiteral ("Maximum definition size exceeded."));
     }
-
-  return defn;
+  
+  /*@-compdef@*/ /* defn->expansion defined? */
+  return defn; 
+  /*@=compdef@*/
 }
 
 /*
@@ -2828,7 +2847,7 @@ do_defineAux (cppReader *pfile, struct directive *keyword,
       else if (hp->type == T_CONST)
 	ok = !CPPOPTIONS (pfile)->done_initializing;
       else {
-	BADBRANCH;
+	ok = FALSE; /* Redefining anything else is bad. */
       }
 
       /* Print the warning if it's not ok.  */
@@ -3719,17 +3738,10 @@ initialize_builtins (cppReader *pfile)
   cpplib_installBuiltin ("__REGISTER_PREFIX__", ctype_string, -1, T_REGISTER_PREFIX_TYPE, 0, NULL, -1);
   cpplib_installBuiltin ("__TIME__", ctype_string, -1, T_TIME, 0, NULL, -1);
 
-  /*
-  ** No, don't define __STDC__
-  **
-
   if (!cppReader_isTraditional (pfile))
     {
       cpplib_installBuiltin ("__STDC__", ctype_int, -1, T_CONST, STDC_VALUE, NULL, -1);
     }
-
-  **
-  */
 
 # ifdef WIN32
     cpplib_installBuiltin ("_WIN32", ctype_int, -1, T_CONST, STDC_VALUE, NULL, -1);
@@ -3748,7 +3760,9 @@ initialize_builtins (cppReader *pfile)
   /*drl 1/9/2001/ try to define the right symbol for the architecture
     We use autoconf to determine the target cpu 
    */
+# ifndef S_SPLINT_S
   cpplib_installBuiltin ("__" TARGET_CPU, ctype_int, -1, T_CONST, 2, NULL, -1);
+# endif
 
   /*drl 1/2/2002  set some flags based on uname
     I'd like to be able to do this with autoconf macro instead...
@@ -6110,14 +6124,18 @@ get_next:
 				      &start_line, &start_column);
 	  old_written = cpplib_getWritten (pfile);
 	string:
-	  DPRINTF (("Put char: %c", c));
+	  DPRINTF (("Reading string: %c", c));
 	  cppReader_putChar (pfile, c);
 	  while (TRUE)
 	    {
-	      int cc = cppReader_getC (pfile);
-	      DPRINTF (("cc: %c", c));
-	      if (cc == EOF)
+	      /* evans-2003-06-07
+	      ** Because of ISO8859-1 characters in string literals, we need a special test here.
+	      */
+
+	      if (cppReader_reachedEOF (pfile)) 
 		{
+		  
+		  DPRINTF (("Matches EOF!"));
 		  if (cppBuffer_isMacro (CPPBUFFER (pfile)))
 		    {
 		      /* try harder: this string crosses a macro expansion
@@ -6131,13 +6149,14 @@ get_next:
 		      CPPBUFFER (pfile) = next_buf;
 		      continue;
 		    }
+		  
 		  if (!cppReader_isTraditional (pfile))
 		    {
 		      cpp_setLocation (pfile);
 
 		      setLine (long_toInt (start_line));
 		      setColumn (long_toInt (start_column));
-
+		      
 		      if (pfile->multiline_string_line != long_toInt (start_line)
 			  && pfile->multiline_string_line != 0)
 			{
@@ -6157,59 +6176,66 @@ get_next:
 			     message ("Unterminated string or character constant"));
 			}
 		    }
-		  /*@loopbreak@*/ break;
-		}
-	      DPRINTF (("putting char: %c", cc));
-	      cppReader_putChar (pfile, cc);
-	      switch (cc)
+		  /*@loopbreak@*/ break;		  
+		} 
+	      else
 		{
-		case '\n':
-		  /* Traditionally, end of line ends a string constant with
-		     no error.  So exit the loop and record the new line.  */
-		  if (cppReader_isTraditional (pfile))
-		    goto while2end;
-		  if (c == '\'')
+		  int cc = cppReader_getC (pfile); 
+		  DPRINTF (("cc: %c [%d] [%d]", cc, cc, EOF));
+		  DPRINTF (("putting char: %c", cc));
+		  cppReader_putChar (pfile, cc);
+		  switch (cc)
 		    {
-		      goto while2end;
+		    case '\n':
+		      /* Traditionally, end of line ends a string constant with
+			 no error.  So exit the loop and record the new line.  */
+		      if (cppReader_isTraditional (pfile))
+			goto while2end;
+		      if (c == '\'')
+			{
+			  goto while2end;
+			}
+		      if (cppReader_isPedantic (pfile)
+			  && pfile->multiline_string_line == 0)
+			{
+			  cppReader_pedwarnWithLine
+			    (pfile, long_toInt (start_line),
+			     long_toInt (start_column),
+			     cstring_makeLiteral ("String constant runs past end of line"));
+			}
+		      if (pfile->multiline_string_line == 0)
+			{
+			  pfile->multiline_string_line = start_line;
+			}
+		      
+		      /*@switchbreak@*/ break;
+		      
+		    case '\\':
+		      cc = cppReader_getC (pfile);
+		      if (cc == '\n')
+			{
+			  /* Backslash newline is replaced by nothing at all.  */
+			  pfile->lineno++; /* 2003-11-03: AMiller suggested adding this, but
+					      its not clear why it is needed. */
+			  cppReader_adjustWritten (pfile, -1);
+			  pfile->lineno++;
+			}
+		      else
+			{
+			  /* ANSI stupidly requires that in \\ the second \
+			     is *not* prevented from combining with a newline.  */
+			  NEWLINE_FIX1(cc);
+			  if (cc != EOF)
+			    cppReader_putChar (pfile, cc);
+			}
+		      /*@switchbreak@*/ break;
+		      
+		    case '\"':
+		    case '\'':
+		      if (cc == c)
+			goto while2end;
+		      /*@switchbreak@*/ break;
 		    }
-		  if (cppReader_isPedantic (pfile)
-		      && pfile->multiline_string_line == 0)
-		    {
-		      cppReader_pedwarnWithLine
-			(pfile, long_toInt (start_line),
-			 long_toInt (start_column),
-			 cstring_makeLiteral ("String constant runs past end of line"));
-		    }
-		  if (pfile->multiline_string_line == 0)
-		    {
-		      pfile->multiline_string_line = start_line;
-		    }
-
-		  /*@switchbreak@*/ break;
-
-		case '\\':
-		  cc = cppReader_getC (pfile);
-		  if (cc == '\n')
-		    {
-		      /* Backslash newline is replaced by nothing at all.  */
-		      cppReader_adjustWritten (pfile, -1);
-		      pfile->lineno++;
-		    }
-		  else
-		    {
-		      /* ANSI stupidly requires that in \\ the second \
-			 is *not* prevented from combining with a newline.  */
-		      NEWLINE_FIX1(cc);
-		      if (cc != EOF)
-			cppReader_putChar (pfile, cc);
-		    }
-		  /*@switchbreak@*/ break;
-
-		case '\"':
-		case '\'':
-		  if (cc == c)
-		    goto while2end;
-		  /*@switchbreak@*/ break;
 		}
 	    }
 	while2end:
@@ -6377,10 +6403,20 @@ get_next:
 	op2:
 	  token = CPP_OTHER;
 	  pfile->only_seen_white = 0;
-        op2any:
+        op2any: /* jumped to for \ continuations */
 	  cpplib_reserve(pfile, 3);
 	  cppReader_putCharQ (pfile, c);
-	  cppReader_putCharQ (pfile, cppReader_getC (pfile));
+
+	  /* evans 2003-08-24: This is a hack to fix line output for \
+	     continuations.  Someday I really should get a decent pre-processor! 
+	  */
+
+	  if (c == '\\') {
+	    (void) cppReader_getC (pfile); /* skip the newline to avoid extra lines */
+	  } else {
+	    cppReader_putCharQ (pfile, cppReader_getC (pfile)); 
+	  }
+
 	  cppReader_nullTerminateQ (pfile);
 	  return token;
 
@@ -6646,6 +6682,8 @@ get_next:
 
         case '\\':
 	  c2 = cppReader_peekC (pfile);
+	  /* allow other stuff here if a flag is set? */
+	  DPRINTF (("Got continuation!"));
 	  if (c2 != '\n')
 	    goto randomchar;
 	  token = CPP_HSPACE;
@@ -7038,7 +7076,7 @@ finclude (cppReader *pfile, int f,
 	  bool system_header_p,
 	  /*@dependent@*/ struct file_name_list *dirptr)
 {
-  mode_t st_mode;
+  mode_t st_mode; /* was __mode_t */
   size_t st_size;
   long i;
   int length = 0;
@@ -7248,12 +7286,16 @@ file_size_and_mode (int fd, mode_t *mode_pointer, size_t *size_pointer)
   if (fstat (fd, &sbuf) < 0) {
     *mode_pointer = 0;
     *size_pointer = 0;
+    /*@-compdestroy@*/ /* possibly spurious warnings here (or memory leak) */
     return (-1);
+    /*@=compdestroy@*/
   }
 
   if (mode_pointer != NULL)
     {
+      /*@-type@*/ /* confusion between __mode_t and mode_t types */
       *mode_pointer = sbuf.st_mode;
+      /*@=type@*/
     }
 
   if (size_pointer != NULL)
@@ -7261,7 +7303,9 @@ file_size_and_mode (int fd, mode_t *mode_pointer, size_t *size_pointer)
       *size_pointer = (size_t) sbuf.st_size;
     }
 
+  /*@-compdestroy@*/ /* possibly spurious warnings here (or memory leak) */
   return 0;
+  /*@=compdestroy@*/
 }
 
 /* Read LEN bytes at PTR from descriptor DESC, for file FILENAME,

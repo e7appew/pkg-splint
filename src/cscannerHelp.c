@@ -724,11 +724,15 @@ bool cscannerHelp_handleSpecial (char *yyt)
 
 	  cstring_free (exname);
 	}
+
+      (void) cscannerHelp_handleNewLine (); /* evans 2003-10-27: pragment increments line */
     }
   else if (cstring_equalPrefixLit (olc, "ident"))
     {
       /* Some pre-processors will leave these in the code.  Ignore rest of line */
+      (void) cscannerHelp_handleNewLine (); /* evans 2003-10-27: ident increments line */
     }
+
   /*
   ** Yuk...Win32 filenames can have spaces in them...we need to read
   ** to the matching end quote.
@@ -835,6 +839,7 @@ bool cscannerHelp_handleSpecial (char *yyt)
 	** We handle a plain # in the input file, by echoing it, and ignoring it in the post-pp-file.
 	*/
 	mstring_free (ol);
+	(void) cscannerHelp_handleNewLine (); /* evans 2003-10-27: increments line */
 	return FALSE;
       } else {
 	voptgenerror
@@ -842,6 +847,7 @@ bool cscannerHelp_handleSpecial (char *yyt)
 	   message ("Unrecognized pre-processor directive: #%s", 
 		    cstring_fromChars (ol)),
 	   g_currentloc);
+	(void) cscannerHelp_handleNewLine (); /* evans 2003-10-27: increments line */
       }
       
       sfree (ol);
@@ -2320,10 +2326,10 @@ bool cscannerHelp_processMacro (void)
 			  else if (!fileloc_withinLines (oloc, loc, 2))
 			    { /* bogus!  will give errors if there is too much whitespace */
 			      voptgenerror
-				(FLG_SYNTAX,
+				(FLG_MACROCONSTDIST,
 				 message 
-				 ("Macro constant name %s does not match name in "
-				  "previous constant declaration.  This constant "
+				 ("Macro constant name %s matches name in "
+				  "distant constant declaration.  This constant "
 				  "is declared at %q", fname, 
 				  fileloc_unparse (oloc)),
 				 loc);
@@ -2682,7 +2688,12 @@ void cscannerHelp_advanceLine (void)
 
 int cscannerHelp_returnToken (int t)
 {
-  yylval.tok = lltok_create (t, fileloc_decColumn (g_currentloc, s_tokLength)); 
+  if (s_tokLength > fileloc_column (g_currentloc)) {
+    yylval.tok = lltok_create (t, fileloc_copy (g_currentloc));
+  } else {
+    yylval.tok = lltok_create (t, fileloc_decColumn (g_currentloc, s_tokLength)); 
+  }
+
   s_tokLength = 0; 
   s_lastWasString = FALSE; 
   return (t); 

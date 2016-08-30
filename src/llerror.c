@@ -721,25 +721,27 @@ llgentypeerroraux (char *srcFile, int srcLine,
     }
   else if (ctype_isArbitraryIntegral (ctype_realType (ut1)))
     {
+      DPRINTF (("HERE: %s", ctype_unparse (ctype_realType (ut2))));
+
       if (ctype_isArbitraryIntegral (ctype_realType (ut2)))
 	{
 	  hcode = FLG_MATCHANYINTEGRAL;
 	}
-      else if (ctype_match (ut2, ctype_ulint))
+      else if (ctype_equal (ut2, ctype_ulint))
 	{
 	  hcode = FLG_LONGUNSIGNEDINTEGRAL;
 	}
-      else if (ctype_match (ut2, ctype_lint))
+      else if (ctype_equal (ut2, ctype_lint))
 	{
 	  hcode = FLG_LONGINTEGRAL;
 	}
       else if (ctype_isInt (ut2))
 	{
 	  hcode = FLG_MATCHANYINTEGRAL;
-	}
+	}	  
       else
 	{
-	  ;
+	  hcode = FLG_TYPE;
 	}
     }
   else if (ctype_isArbitraryIntegral (ctype_realType (ut2)))
@@ -1485,6 +1487,8 @@ void llbugaux (cstring file, int line, /*@only@*/ cstring s)
   /*@unchecked@*/
   static int numbugs = 0;
   static bool inbug = FALSE;
+
+  context_recordBug ();
 
   if (inbug)
     {

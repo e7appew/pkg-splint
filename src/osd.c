@@ -301,7 +301,7 @@ osd_fileExists (cstring filespec)
 {
 # ifdef UNIX
   struct stat buf;
-  return (stat (cstring_toCharsSafe (filespec), &buf) == 0);
+  /*@i3@*/ return (stat (cstring_toCharsSafe (filespec), &buf) == 0); /* spurious */
 # else
 # if defined (WIN32) || defined (OS2)
   FILE *test = fileTable_openReadFile (context_fileTable (), filespec);
@@ -338,13 +338,15 @@ osd_fileExists (cstring filespec)
 bool
 osd_executableFileExists (/*@unused@*/ char *filespec)
 {
+  /*@-compdestroy@*/ /* possible memory leaks here? */
 # ifdef UNIX
   struct stat buf;
   if (stat (filespec, &buf) == 0)
     { 
       /* mask by file type */
-      /*@-unrecog@*/ /* S_IFMT is not defined */
-      if ((buf.st_mode & S_IFMT) != S_IFDIR /*@=unrecog@*/) /* not a directory */
+      /*@-type@*/ /* confusion about __mode_t and mode_t types */
+      if ((buf.st_mode & S_IFMT) != S_IFDIR) /* not a directory */ 
+	/*@=type@*/
 	{
 	  /* as long as it is an executable file */
 # if defined(__IBMC__) && defined(OS2)
@@ -359,13 +361,13 @@ osd_executableFileExists (/*@unused@*/ char *filespec)
 		   | (buf.st_mode & S_IXGRP) |
 		   (buf.st_mode & S_IXOTH)
 # endif
-		   ) != 0);
+		   ) != 0); /* spurious */
 # endif
 	}
     }
 # endif
-  return (FALSE);
-
+  return (FALSE); 
+  /*@=compdestroy@*/
 }
 
 /*
@@ -452,7 +454,7 @@ nextdir (d_char *current_dir, d_char *dir, size_t *len)
 # endif
 }
 
-# ifdef WIN32
+# if defined (WIN32) || defined (OS2) && defined (__IBMC__)
 extern /*@external@*/ int _flushall (void) /*@modifies fileSystem@*/ ;
 # endif
 
@@ -463,7 +465,7 @@ int osd_system (cstring cmd)
 {
   int res;
     /* system ("printenv"); */
-# ifdef WIN32
+# if defined (WIN32) || defined (OS2) && defined (__IBMC__)
   (void) _flushall (); 
 # endif
 
@@ -514,7 +516,7 @@ osd_getPid ()
 # if defined (WIN32) || defined (OS2) && defined (__IBMC__)
   int pid = _getpid ();
 # else
-  pid_t pid = getpid ();
+  __pid_t pid = getpid ();
 # endif
 
   return (int) pid;

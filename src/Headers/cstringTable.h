@@ -39,8 +39,8 @@ typedef /*@only@*/ hbucket o_hbucket;
 
 struct s_cstringTable
 {
-  int size;
-  int nentries;
+  unsigned long size;
+  unsigned long nentries;
   /*@only@*/ o_hbucket *buckets;
 } ;
 
@@ -54,7 +54,7 @@ extern /*@falsewhennull@*/ bool cstringTable_isDefined(cstringTable) /*@*/ ;
 extern /*@nullwhentrue@*/ /*@unused@*/ bool cstringTable_isUndefined(cstringTable) /*@*/ ;
 # define cstringTable_isUndefined(p_h) ((p_h) == cstringTable_undefined)
 
-extern /*@only@*/ cstringTable cstringTable_create(int p_size) /*@*/ ;
+extern /*@only@*/ cstringTable cstringTable_create(unsigned long p_size) /*@*/ ;
 extern void cstringTable_insert (cstringTable p_h, 
 				 /*@only@*/ cstring p_key, 
 				 int p_value) /*@modifies p_h@*/ ;

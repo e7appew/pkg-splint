@@ -1111,11 +1111,11 @@ nocheck:
 
 .PHONY: test
 test:
-	${MAKE} ; cd ../test; ${MAKE} --no-print-directory
+	cd ../test; ${MAKE} --no-print-directory
 
 .PHONY: libs
 libs:
-	${MAKE} ; cd ../lib; ${MAKE} --no-print-directory
+	cd ../lib; ${MAKE} --no-print-directory
 
 ### Automake generates wrong tags
 .PHONY: etags
@@ -1126,6 +1126,9 @@ lintnew: splintme
 
 splintme: 
 	./splint $(DEFAULT_INCLUDES) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) +singleinclude  $(OVERFLOWCHSRC) $(LINTSRC) $(LCLSRC) -dump lclint +forcehints -misplacedsharequal +showsourceloc -fcnuse -incondefs -exportlocal -constuse -mts file -mts filerw -mts tainted
+
+splintmebounds: 
+	./splint $(DEFAULT_INCLUDES) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) +singleinclude  $(OVERFLOWCHSRC) $(LINTSRC) $(LCLSRC) -dump lclint +forcehints -misplacedsharequal +showsourceloc -fcnuse -incondefs -exportlocal -constuse -mts file -mts filerw -mts tainted +bounds +impboundsconstraints
 
 splintmesupcounts: 
 	./splint $(DEFAULT_INCLUDES) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) +singleinclude  $(OVERFLOWCHSRC) $(LINTSRC) $(LCLSRC) -dump lclint +forcehints -misplacedsharequal +showsourceloc -unrecogcomments  -fcnuse -incondefs -exportlocal -supcounts -constuse -mts file -mts filerw 
