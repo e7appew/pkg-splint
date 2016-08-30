@@ -4,6 +4,7 @@ splint (3.1.2.dfsg1-3) UNRELEASED; urgency=medium
   * Switch to a git packaging repository (instead of SVN).
   * Simplify debian/rules by using "dh". Thus indirectly
     implement the build-arch/build-indep target. Closes: #822024
+  * Clean up dependencies.
 
  -- Raphaël Hertzog <hertzog@debian.org>  Tue, 30 Aug 2016 13:39:23 +0200
 
