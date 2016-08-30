@@ -4,10 +4,9 @@
 ## echo the command used during compilation
 
 @DPATCH@
-diff -urNad splint-3.1.2.dfsg~/Makefile.in splint-3.1.2.dfsg/Makefile.in
---- splint-3.1.2.dfsg~/Makefile.in	2007-12-19 10:13:19.000000000 +0530
-+++ splint-3.1.2.dfsg/Makefile.in	2007-12-19 10:13:28.000000000 +0530
-@@ -114,7 +114,7 @@
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -114,7 +114,7 @@ subdir = .
  ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
  mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
  CONFIG_HEADER = config.h
@@ -16,10 +15,9 @@ diff -urNad splint-3.1.2.dfsg~/Makefile.in splint-3.1.2.dfsg/Makefile.in
  DIST_SOURCES =
  
  RECURSIVE_TARGETS = info-recursive dvi-recursive install-info-recursive \
-diff -urNad splint-3.1.2.dfsg~/src/Makefile.in splint-3.1.2.dfsg/src/Makefile.in
---- splint-3.1.2.dfsg~/src/Makefile.in	2007-12-19 10:13:19.000000000 +0530
-+++ splint-3.1.2.dfsg/src/Makefile.in	2007-12-19 10:15:06.000000000 +0530
-@@ -377,7 +377,7 @@
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -377,7 +377,7 @@ CHECKS = $(subst .c,.check,$(splint_SOUR
  
  binDir = bin
  
@@ -28,7 +26,7 @@ diff -urNad splint-3.1.2.dfsg~/src/Makefile.in splint-3.1.2.dfsg/src/Makefile.in
  subdir = src
  mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
  CONFIG_HEADER = $(top_builddir)/config.h
-@@ -1148,7 +1148,7 @@
+@@ -1148,7 +1148,7 @@ splintsome:
  splinttest: 
  	./splint $(DEFAULT_INCLUDES) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) +singleinclude test.c +forcehints -misplacedsharequal +showsourceloc -unrecogcomments -fcnuse -incondefs -exportlocal -constuse -mts file -mts filerw +keep +supcounts +partial -null
  
@@ -37,7 +35,7 @@ diff -urNad splint-3.1.2.dfsg~/src/Makefile.in splint-3.1.2.dfsg/src/Makefile.in
  
  ../$(top_builddir)/$(binDir)/splint$(EXEEXT):  splint$(EXEEXT)
  	-$(RM) -f $(top_builddir)/$(binDir)/splint$(EXEEXT)
-@@ -1159,8 +1159,8 @@
+@@ -1159,8 +1159,8 @@ up:
  	$(MAKE) clean
  
  .c.o:
@@ -48,10 +46,9 @@ diff -urNad splint-3.1.2.dfsg~/src/Makefile.in splint-3.1.2.dfsg/src/Makefile.in
  	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' \
  	$(CCDEPMODE) $(depcomp) \
  	$(COMPILE) -c `test -f $< || echo '$(srcdir)/'`$<
-diff -urNad splint-3.1.2.dfsg~/test/Makefile.in splint-3.1.2.dfsg/test/Makefile.in
---- splint-3.1.2.dfsg~/test/Makefile.in	2007-12-19 10:13:19.000000000 +0530
-+++ splint-3.1.2.dfsg/test/Makefile.in	2007-12-19 10:13:28.000000000 +0530
-@@ -158,7 +158,8 @@
+--- a/test/Makefile.in
++++ b/test/Makefile.in
+@@ -158,7 +158,8 @@ SPLINTTESTS = $(UNITTESTS) $(SUBDIRTESTS
  
  QUICKTESTS = db3
  
@@ -61,7 +58,7 @@ diff -urNad splint-3.1.2.dfsg~/test/Makefile.in splint-3.1.2.dfsg/test/Makefile.
  
  
  #drl 12/07/2002 These rules for .c and .expect files don't make sense
-@@ -945,9 +946,12 @@
+@@ -945,9 +946,12 @@ help:
  
  .PHONY: clean-local
  clean-local:
@@ -75,20 +72,18 @@ diff -urNad splint-3.1.2.dfsg~/test/Makefile.in splint-3.1.2.dfsg/test/Makefile.
  	-cd db1; $(MAKE) clean
  	-cd db2; $(MAKE) clean
  	-cd db3; $(MAKE) clean
-diff -urNad splint-3.1.2.dfsg~/test/tests2.2/Makefile splint-3.1.2.dfsg/test/tests2.2/Makefile
---- splint-3.1.2.dfsg~/test/tests2.2/Makefile	2007-12-19 10:13:19.000000000 +0530
-+++ splint-3.1.2.dfsg/test/tests2.2/Makefile	2007-12-19 10:13:28.000000000 +0530
-@@ -48,3 +48,6 @@
+--- a/test/tests2.2/Makefile
++++ b/test/tests2.2/Makefile
+@@ -48,3 +48,6 @@ rex:
  
  struct:
  	-$(SPLINT) struct.c -expect 1
 +
 +clean:
 +	rm -f bool.lcs
-diff -urNad splint-3.1.2.dfsg~/test/tests2.4/Makefile splint-3.1.2.dfsg/test/tests2.4/Makefile
---- splint-3.1.2.dfsg~/test/tests2.4/Makefile	2007-12-19 10:13:19.000000000 +0530
-+++ splint-3.1.2.dfsg/test/tests2.4/Makefile	2007-12-19 10:13:28.000000000 +0530
-@@ -78,11 +78,5 @@
+--- a/test/tests2.4/Makefile
++++ b/test/tests2.4/Makefile
+@@ -78,11 +78,5 @@ alignof:
  source:
  	$(SPLINT) -D DBL_MANT_DIG=25 source.c -expect 1
  
@@ -102,13 +97,91 @@ diff -urNad splint-3.1.2.dfsg~/test/tests2.4/Makefile splint-3.1.2.dfsg/test/tes
 -
 +clean:
 +	rm -f subdir/main.lcs
-diff -urNad splint-3.1.2.dfsg~/test/tests2.5/Makefile splint-3.1.2.dfsg/test/tests2.5/Makefile
---- splint-3.1.2.dfsg~/test/tests2.5/Makefile	2007-12-19 10:13:19.000000000 +0530
-+++ splint-3.1.2.dfsg/test/tests2.5/Makefile	2007-12-19 10:13:28.000000000 +0530
-@@ -44,3 +44,6 @@
+--- a/test/tests2.5/Makefile
++++ b/test/tests2.5/Makefile
+@@ -44,3 +44,6 @@ immutable:
  
  impabsmodule:
  	-${SPLINT} +impabstract impabsmodule.c -expect 2
 +
 +clean:
 +	rm -f newlint.lcd
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -28,6 +28,8 @@
+ 
+ AUTOMAKE_OPTIONS = 1.5 foreign
+ 
++CONFIG_CLEAN_FILES = bin/Makefile
++
+ binaryfixscript = ./fixBinaryDist.sh
+ SUBDIRS =   src lib imports test doc
+ 
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -423,7 +423,7 @@ splinttest:
+ 
+ binDir = bin
+ 
+-all: splint$(EXEEXT) ../$(top_builddir)/$(binDir)/splint$(EXEEXT)
++all: splint$(EXEEXT)
+ 
+ ../$(top_builddir)/$(binDir)/splint$(EXEEXT):  splint$(EXEEXT)
+ 	-$(RM) -f $(top_builddir)/$(binDir)/splint$(EXEEXT)
+@@ -433,11 +433,11 @@ up:
+ 	-rm cgrammar.c llgrammar.c mtgrammar.c signature.c cscanner.c
+ 	$(MAKE) clean
+ 
+-CLEANFILES = splint$(EXEEXT)  ../$(top_builddir)/$(binDir)/splint$(EXEEXT)
++CLEANFILES = splint$(EXEEXT)  ../$(top_builddir)/$(binDir)/splint$(EXEEXT) Headers/flag_codes.gen
+ 
+ .c.o:
+-	@echo "Compiling "$<"..."; \
+-	source='$<' object='$@' libtool=no \
++	@echo "$(CCDEPMODE) $(depcomp) $(COMPILE) -c `test -f $< || echo '$(srcdir)/'`$<"
++	@source='$<' object='$@' libtool=no \
+ 	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' \
+ 	$(CCDEPMODE) $(depcomp) \
+ 	$(COMPILE) -c `test -f $< || echo '$(srcdir)/'`$<
+--- a/test/Makefile.am
++++ b/test/Makefile.am
+@@ -100,9 +100,12 @@ help:
+ 
+ .PHONY: clean-local
+ clean-local:
+-	-rm -f *~ #*# *.o *.lcs a.out
++	-rm -f *~ \#*\# *.o *.lcs a.out
+ 	-rm -f *.out
+ 	-rm  *.lcd *.lh
++	-cd tests2.2; $(MAKE) clean
++	-cd tests2.4; $(MAKE) clean
++	-cd tests2.5; $(MAKE) clean
+ 	-cd db1; $(MAKE) clean
+ 	-cd db2; $(MAKE) clean
+ 	-cd db3; $(MAKE) clean
+@@ -122,7 +125,7 @@ $(SPLINT):
+ ## The tests should really be re-done as shell-scripts or something... maybe
+ ##  autotest could be used once it's finished.
+ 
+-CLEANOUTPUT = $(GREP) -v "Splint 3." | $(GREP) -v "$(SPLINT)" | $(GREP) -v "^make.*\[[1-9]*\]:" | $(GREP) -v "^gmake.*\[[1-9]*\]:" |   $(GREP) -v "^gmake -e" |  $(GREP) -v "^make -e" |$(GREP) -v "config.status: creating test/Makefile" | $(GREP) -v "cd .. && " | $(GREP) -v "CONFIG_HEADERS=" | $(GREP) -v "CONFIG_FILES="
++CLEANOUTPUT = $(GREP) -v "Splint 3." | $(GREP) -v "$(SPLINT)" | $(GREP) -v "^make.*\[[1-9]*\]:" | $(GREP) -v "^gmake.*\[[1-9]*\]:" |   $(GREP) -v "^gmake -e" |  $(GREP) -v "^make -e" |$(GREP) -v "config.status: creating test/Makefile" | $(GREP) -v "cd .. && " | $(GREP) -v "CONFIG_HEADERS=" | $(GREP) -v "CONFIG_FILES=" | $(GREP) -v "^/usr/bin/make.*\[[1-9]*\]:" | $(GREP) -v "^/usr/bin/gmake.*\[[1-9]*\]:" |   $(GREP) -v "^/usr/bin/gmake -e" |  $(GREP) -v "^/usr/bin/make -e"
+ 
+ #drl 12/07/2002 These rules for .c and .expect files don't make sense
+ # and they are confusing make dist so I'm taking them out.
+@@ -1596,5 +1599,3 @@ EXTRA_DIST =  ./abst_t.lcl \
+                   divzero.c parentype.c \
+ stringliteral.expect  stringliteral.c \
+   numabstract.c sizesigns.c typeof.c   nullassign.expect 
+-
+-#		sizesigns.c sizesigns.expect \
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -17,7 +17,7 @@ splintlib_DATA = \
+   unix.h unix.lcd unixstrict.lcd CTrait.syms CTraitGen.lcl bool.h \
+   file.mts file.xh filerw.mts filerw.xh \
+   lclinit.lci linux.h lslinit.lsi tainted.mts tainted.xh \
+-  stdio.h stdlib.h $(UnixHeaders)
++  $(UnixHeaders)
+ 
+ ## Include them in the distribution
+ EXTRA_DIST = $(splintlib_DATA)
