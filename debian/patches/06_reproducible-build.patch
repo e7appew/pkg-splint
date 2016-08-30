@@ -2,14 +2,13 @@ Description: Make the build reproducible
 Author: Chris Lamb <lamby@debian.org>
 Bug-Debian: https://bugs.debian.org/797254
 
---- a/configure	2015-08-28 22:32:57.307021901 +0100
---- b/configure	2015-08-28 22:38:47.655293324 +0100
-@@ -3948,9 +3948,16 @@
+--- a/configure
++++ b/configure
+@@ -3948,9 +3948,15 @@ _ACEOF
  # These used to be in herald.h
  LCL_PARSE_VERSION="Splint 3.1.2"
  
-+if [ -n "${SOURCE_DATE_EPOCH}" ]
-+then
++if [ -n "${SOURCE_DATE_EPOCH}" ]; then
 +cat >>confdefs.h <<_ACEOF
 +#define SPLINT_VERSION "$LCL_PARSE_VERSION --- `LC_ALL=C date --utc --date="@${SOURCE_DATE_EPOCH}" +"%d %b %Y"`"
 +_ACEOF
@@ -21,3 +20,21 @@ Bug-Debian: https://bugs.debian.org/797254
  
  
  cat >>confdefs.h <<_ACEOF
+--- a/configure.ac
++++ b/configure.ac
+@@ -157,9 +157,15 @@ AC_DEFINE_UNQUOTED(DEFAULT_LCLIMPORTDIR,
+ 
+ # These used to be in herald.h
+ LCL_PARSE_VERSION="AC_PACKAGE_NAME AC_PACKAGE_VERSION"
++if [ -n "${SOURCE_DATE_EPOCH}" ]; then
++AC_DEFINE_UNQUOTED(SPLINT_VERSION,
++                   "$LCL_PARSE_VERSION --- `LC_ALL=C date --utc --date="@${SOURCE_DATE_EPOCH}" +"%d %b %Y"`",
++                   [Splint's version number and configure/build date])
++else
+ AC_DEFINE_UNQUOTED(SPLINT_VERSION,
+                    "$LCL_PARSE_VERSION --- `date +"%d %b %Y"`",
+                    [Splint's version number and configure/build date])
++fi
+ AC_DEFINE_UNQUOTED(LCL_PARSE_VERSION, "$LCL_PARSE_VERSION",
+                    [Splint's version number])
+ AC_DEFINE_UNQUOTED(LCL_COMPILE,
