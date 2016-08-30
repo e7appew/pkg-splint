@@ -1,10 +1,5 @@
 #!/usr/bin/make -f
 
-include /usr/share/dpatch/dpatch.make
-
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
-
 PKG_NAME=splint
 PKG_VERS=3.1.2
 DFSG_VERS=dfsg1
@@ -14,99 +9,15 @@ UPSTR_FILE=$(UPSTR_DIR).src.tgz
 DFSG_ORIG_DIR=$(UPSTR_DIR).$(DFSG_VERS)
 DFSG_ORIG_TAR=$(PKG_NAME)_$(PKG_VERS).$(DFSG_VERS).orig.tar
 
-# These are used for cross-compiling and for saving the configure script
-# from having to guess our platform (since we know it already)
-DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
-DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+%:
+	dh $@
 
-CFLAGS=-Wall -g
-
-ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS += -O0
-else
-	CFLAGS += -O2
-endif
-
-config.status: patch configure-stamp
-configure-stamp:
-	dh_testdir
-ifneq "$(wildcard /usr/share/misc/config.sub)" ""
-	[ ! -f config/config.sub ] || mv -f config/config.sub config/config.sub.ups
-	cp -f /usr/share/misc/config.sub config/config.sub
-endif
-ifneq "$(wildcard /usr/share/misc/config.guess)" ""
-	[ ! -f config/config.guess ] || mv -f config/config.guess config/config.guess.ups
-	cp -f /usr/share/misc/config.guess config/config.guess
-endif
-	[ ! -f lib/posix.lcd ] || mv -f lib/posix.lcd lib/posix.lcd.ups
-	[ ! -f lib/posixstrict.lcd ] || mv -f lib/posixstrict.lcd lib/posixstrict.lcd.ups
-	[ ! -f lib/standard.lcd ] || mv -f lib/standard.lcd lib/standard.lcd.ups
-	[ ! -f lib/standardstrict.lcd ] || mv -f lib/standardstrict.lcd lib/standardstrict.lcd.ups
-	[ ! -f lib/unix.lcd ] || mv -f lib/unix.lcd lib/unix.lcd.ups
-	[ ! -f lib/unixstrict.lcd ] || mv -f lib/unixstrict.lcd lib/unixstrict.lcd.ups
-	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs"
-	touch $@
-
-build: build-stamp
-
-build-stamp: patch-stamp config.status
-	dh_testdir
-	$(MAKE)
-	touch $@
-
-clean: clean-patched unpatch
-clean-patched:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp configure-stamp
-	[ ! -f Makefile ] || $(MAKE) distclean
-	[ ! -f lib/unixstrict.lcd.ups ] || mv -f lib/unixstrict.lcd.ups lib/unixstrict.lcd
-	[ ! -f lib/unix.lcd.ups ] || mv -f lib/unix.lcd.ups lib/unix.lcd
-	[ ! -f lib/standardstrict.lcd.ups ] || mv -f lib/standardstrict.lcd.ups lib/standardstrict.lcd
-	[ ! -f lib/standard.lcd.ups ] || mv -f lib/standard.lcd.ups lib/standard.lcd
-	[ ! -f lib/posixstrict.lcd.ups ] || mv -f lib/posixstrict.lcd.ups lib/posixstrict.lcd
-	[ ! -f lib/posix.lcd.ups ] || mv -f lib/posix.lcd.ups lib/posix.lcd
-	[ ! -f config/config.guess.ups ] || mv -f config/config.guess.ups config/config.guess
-	[ ! -f config/config.sub.ups ] || mv -f config/config.sub.ups config/config.sub
-	dh_clean
-
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
+override_dh_auto_install:
 	$(MAKE) DESTDIR=$(CURDIR)/debian/splint-data install-data
 	$(MAKE) DESTDIR=$(CURDIR)/debian/splint install-exec
-	dh_install
-	dh_lintian
 
-# Build architecture-independent files here.
-binary-indep: build install
-	dh_testdir -i
-	dh_testroot -i
-	dh_installchangelogs -i
-	dh_installdocs -i -p splint-doc-html
-	dh_compress -i
-	dh_fixperms -i
-	dh_installdeb -i
-	dh_gencontrol -i
-	dh_md5sums -i
-	dh_builddeb -i
-
-# Build architecture-dependent files here.
-binary-arch: build install
-	dh_testdir -a
-	dh_testroot -a
-	dh_installchangelogs -a doc/changes.html
-	dh_installdocs -a -p splint
-	dh_installexamples
-	dh_strip -a
-	dh_compress -a
-	dh_fixperms -a
-	dh_installdeb -a
-	dh_shlibdeps -a
-	dh_gencontrol -a
-	dh_md5sums -a
-	dh_builddeb -a
+override_dh_installchangelogs:
+	dh_installchangelogs doc/changes.html
 
 get-orig-source:
 	wget -q $(UPSTR_SITE)/downloads/$(UPSTR_FILE)
@@ -128,5 +39,4 @@ get-orig-source:
 	@echo "Re-packaged source file: $(DFSG_ORIG_TAR).gz"
 	@ls -l $(DFSG_ORIG_TAR).gz
 
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install patch unpatch get-orig-source
+.PHONY: get-orig-source
