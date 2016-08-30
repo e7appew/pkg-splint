@@ -1,6 +1,7 @@
 splint (3.1.2.dfsg1-3) UNRELEASED; urgency=medium
 
   * Orphan the package since the maintainer is MIA.
+  * Switch to a git packaging repository (instead of SVN).
 
  -- Raphaël Hertzog <hertzog@debian.org>  Tue, 30 Aug 2016 13:39:23 +0200
 
