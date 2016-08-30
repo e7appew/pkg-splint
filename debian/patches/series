@@ -1,0 +1,6 @@
+01_build.patch
+02_manpage.patch
+03_359894_VA_ARGS.patch
+04_bug_report.patch
+05_html_docs_css.patch
+06_reproducible-build.patch
