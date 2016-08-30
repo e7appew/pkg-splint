@@ -1,7 +1,7 @@
 Source: splint
 Section: devel
 Priority: optional
-Maintainer: Y Giridhar Appaji Nag <appaji@debian.org>
+Maintainer: Debian QA Group <packages@qa.debian.org>
 Build-Depends: debhelper (>= 6.0.7~), autotools-dev, dpatch, flex
 Build-Conflicts: bison, bison++, splint (<= 3.1.1-6)
 Standards-Version: 3.8.0

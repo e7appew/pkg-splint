@@ -1,3 +1,9 @@
+splint (3.1.2.dfsg1-3) UNRELEASED; urgency=medium
+
+  * Orphan the package since the maintainer is MIA.
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Tue, 30 Aug 2016 13:39:23 +0200
+
 splint (3.1.2.dfsg1-2) unstable; urgency=low
 
   * Add README.source to be compliant with policy 3.8.0
