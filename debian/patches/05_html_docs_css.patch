@@ -119,3 +119,14 @@
  <title>Splint Manual</title>
  <style type="text/css">
  <!--
+--- a/doc/html/footer.html
++++ b/doc/html/footer.html
+@@ -67,7 +67,7 @@ href="http://www.splint.org/bugs.html">R
+ Bugs</a> -
+ <a
+ href="http://www.splint.org/lists.html">Mailing
+-Lists</a> &nbsp;&nbsp;<IMG src="http://sourceforge.net/sflogo.php?group_id=9538" width="0" height="0" alt="">
++Lists</a> 
+ 
+ &nbsp;&nbsp;
+ <a
