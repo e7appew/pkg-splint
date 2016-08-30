@@ -1,11 +1,8 @@
-#! /bin/sh /usr/share/dpatch/dpatch-run
-## 03_359894_VA_ARGS.dpatch by Y Giridhar Appaji Nag <giridhar@appaji.net>
+## 03_359894_VA_ARGS.patch by Y Giridhar Appaji Nag <giridhar@appaji.net>
 ##
-## All lines beginning with `## DP:' are a description of the patch.
-## DP: Support for variadic macros __VA_ARGS__, based on a patch from
-## DP: "Bernhard R. Link" <brlink@debian.org> for #359894
+## Support for variadic macros __VA_ARGS__, based on a patch from
+## "Bernhard R. Link" <brlink@debian.org> for #359894
 
-@DPATCH@
 diff -urNad splint-3.1.2.dfsg~/src/cpplib.c splint-3.1.2.dfsg/src/cpplib.c
 --- splint-3.1.2.dfsg~/src/cpplib.c	2007-07-14 03:47:48.000000000 +0530
 +++ splint-3.1.2.dfsg/src/cpplib.c	2008-01-15 13:01:49.000000000 +0530

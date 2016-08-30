@@ -1,10 +1,7 @@
-#! /bin/sh /usr/share/dpatch/dpatch-run
-## 05_html_docs_css.dpatch by Y Giridhar Appaji Nag <giridhar@appaji.net>
+## 05_html_docs_css.patch by Y Giridhar Appaji Nag <giridhar@appaji.net>
 ##
-## All lines beginning with `## DP:' are a description of the patch.
-## DP: Remove google trackers and adjust css to look like online splint docs
+## Remove google trackers and adjust css to look like online splint docs
 
-@DPATCH@
 diff -urNad splint-3.1.2.dfsg1~/doc/bugs.html splint-3.1.2.dfsg1/doc/bugs.html
 --- splint-3.1.2.dfsg1~/doc/bugs.html	2008-08-15 17:11:09.000000000 +0530
 +++ splint-3.1.2.dfsg1/doc/bugs.html	2008-08-15 17:28:46.000000000 +0530

@@ -6,6 +6,7 @@ splint (3.1.2.dfsg1-3) UNRELEASED; urgency=medium
     implement the build-arch/build-indep target. Closes: #822024
   * Clean up dependencies.
   * Switch to 3.0 (quilt) source format and update patches accordingly.
+  * Add Chris Lamb's patch to make the build reproducible. Closes: #797254
 
  -- Raphaël Hertzog <hertzog@debian.org>  Tue, 30 Aug 2016 13:39:23 +0200
 

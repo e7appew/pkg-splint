@@ -1,3 +1,7 @@
+Description: Make the build reproducible
+Author: Chris Lamb <lamby@debian.org>
+Bug-Debian: https://bugs.debian.org/797254
+
 --- a/configure	2015-08-28 22:32:57.307021901 +0100
 --- b/configure	2015-08-28 22:38:47.655293324 +0100
 @@ -3948,9 +3948,16 @@
