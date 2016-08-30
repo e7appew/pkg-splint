@@ -1,4 +1,4 @@
-splint (3.1.2.dfsg1-3) UNRELEASED; urgency=medium
+splint (3.1.2.dfsg1-3) unstable; urgency=medium
 
   * Orphan the package since the maintainer is MIA.
   * Switch to a git packaging repository (instead of SVN).
@@ -11,7 +11,7 @@ splint (3.1.2.dfsg1-3) UNRELEASED; urgency=medium
   * Update 05_html_docs_css.patch to drop sourceforge logo link too.
   * Update Standards-Version to 3.9.8.
 
- -- Raphaël Hertzog <hertzog@debian.org>  Tue, 30 Aug 2016 13:39:23 +0200
+ -- Raphaël Hertzog <hertzog@debian.org>  Tue, 30 Aug 2016 15:09:09 +0200
 
 splint (3.1.2.dfsg1-2) unstable; urgency=low
 
