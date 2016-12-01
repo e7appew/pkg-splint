@@ -1,3 +1,11 @@
+splint (3.1.2.dfsg1-4) unstable; urgency=medium
+
+  * QA upload.
+  * Add libfl-dev to Build-Depends. (Closes: #846448)
+  * Mark split-{data,doc-html} Multi-Arch: foreign.
+
+ -- Helmut Grohne <helmut@subdivi.de>  Thu, 01 Dec 2016 14:19:06 +0100
+
 splint (3.1.2.dfsg1-3) unstable; urgency=medium
 
   * Orphan the package since the maintainer is MIA.
