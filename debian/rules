@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
 PKG_NAME=splint
 PKG_VERS=3.1.2
 DFSG_VERS=dfsg1
