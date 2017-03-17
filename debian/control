@@ -2,7 +2,7 @@ Source: splint
 Section: devel
 Priority: optional
 Maintainer: Debian QA Group <packages@qa.debian.org>
-Build-Depends: debhelper (>= 9), dh-autoreconf, flex, libfl-dev
+Build-Depends: autotools-dev, debhelper (>= 10), libfl-dev
 Build-Conflicts: bison, bison++
 Standards-Version: 3.9.8
 Homepage: http://www.splint.org/
