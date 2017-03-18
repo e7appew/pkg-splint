@@ -1,0 +1,39 @@
+From: Carlos Maddela <e7appew@gmail.com>
+Date: Sun, 19 Mar 2017 02:38:39 +1100
+Subject: Fix autoconf and automake warnings.
+
+Description: Fix autoconf and automake warnings.
+Author: Carlos Maddela <e7appew@gmail.com>
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ bin/Makefile.am | 2 --
+ configure.ac    | 2 +-
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/bin/Makefile.am b/bin/Makefile.am
+index 624e9eb..770e691 100644
+--- a/bin/Makefile.am
++++ b/bin/Makefile.am
+@@ -13,8 +13,6 @@ bin_PROGRAMS = splint
+ 
+ EXTRA_DIST = splint
+ 
+-DIST_SOURCES =
+-
+ #chessy hack so it doesn't try to build splint
+ splint$(EXEEXT): ;
+ 
+diff --git a/configure.ac b/configure.ac
+index e17fa8d..4863523 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -13,7 +13,7 @@ dnl Deduce host
+ AC_CANONICAL_SYSTEM
+ 
+ dnl Set up automake & the configuration header
+-AM_INIT_AUTOMAKE(AC_PACKAGE_TARNAME, AC_PACKAGE_VERSION, AC_PACKAGE_BUGREPORT)
++AM_INIT_AUTOMAKE
+ AM_CONFIG_HEADER([config.h:config.hin])
+ 
+ dnl Prepare for Splint processing of config.h
