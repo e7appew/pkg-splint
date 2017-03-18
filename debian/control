@@ -38,7 +38,7 @@ Package: splint-data
 Architecture: all
 Multi-Arch: foreign
 Depends: ${misc:Depends}
-Conflicts: splint (<< 3.1.2.dfsg-1)
+Breaks: splint (<< 3.1.2.dfsg-1)
 Replaces: splint (<< 3.1.2.dfsg-1)
 Description: tool for statically checking C programs for bugs - data files
  splint is an annotation-assisted lightweight static checker.  It is a tool for
