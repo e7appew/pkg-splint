@@ -11,8 +11,10 @@ UPSTR_FILE=$(UPSTR_DIR).src.tgz
 DFSG_ORIG_DIR=$(UPSTR_DIR).$(DFSG_VERS)
 DFSG_ORIG_TAR=$(PKG_NAME)_$(PKG_VERS).$(DFSG_VERS).orig.tar
 
+# Force non-parallel builds, as splint
+# sometimes fails to build in parallel.
 %:
-	dh $@
+	dh $@ --no-parallel
 
 override_dh_auto_install:
 	$(MAKE) DESTDIR=$(CURDIR)/debian/splint-data install-data
