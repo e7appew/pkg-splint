@@ -1,0 +1,29 @@
+From: Carlos Maddela <e7appew@gmail.com>
+Date: Sun, 19 Mar 2017 00:45:54 +1100
+Subject: Fix clean up rule in test/db3/Makefile.
+
+Description: Fix clean up rule in test/db3/Makefile.
+Author: Carlos Maddela <e7appew@gmail.com>
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ test/db3/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/test/db3/Makefile b/test/db3/Makefile
+index ec310ff..9c4b187 100644
+--- a/test/db3/Makefile
++++ b/test/db3/Makefile
+@@ -51,10 +51,10 @@ check: $(LCSFILES)
+ ###
+ 
+ clean: tidy
+-	-@rm -f *.c.html *.lcl.html *.h.html *.lh.html *.lcs *.lh >& /dev/null
++	-@rm -f *.c.html *.lcl.html *.h.html *.lh.html *.lcs *.lh 1> /dev/null
+ 
+ tidy:
+-	-@rm -f ,* .,* *.CKP *.BAK .emacs_[0-9]* core a.out *.*~ *~ *.o drive >& /dev/null
++	-@rm -f ,* .,* *.CKP *.BAK .emacs_[0-9]* core a.out *.*~ *~ *.o drive 1> /dev/null
+ 
+ ### The following dependencies ensure that imported LCL specs 
+ ### are checked before the specs that import them.
