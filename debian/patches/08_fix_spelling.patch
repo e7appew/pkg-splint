@@ -1,0 +1,647 @@
+From: Carlos Maddela <e7appew@gmail.com>
+Date: Sun, 19 Mar 2017 01:39:31 +1100
+Subject: Fix spelling mistakes in source and documentation.
+
+Description: Fix spelling mistakes in source and documentation.
+Author: Carlos Maddela <e7appew@gmail.com>
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ doc/html/manual.htm          |  6 +++---
+ src/Headers/constraintList.h |  2 +-
+ src/Headers/sRef.h           |  2 +-
+ src/Headers/varKinds.h       |  6 +++---
+ src/clabstract.c             |  2 +-
+ src/constraintGeneration.c   |  2 +-
+ src/constraintList.c         |  6 +++---
+ src/constraintResolve.c      |  4 ++--
+ src/exprChecks.c             |  2 +-
+ src/exprNode.c               | 16 ++++++++--------
+ src/fileTable.c              |  2 +-
+ src/flags.c                  |  2 +-
+ src/flags.def                |  8 ++++----
+ src/nameChecks.c             |  4 ++--
+ src/sRef.c                   | 36 ++++++++++++++++++------------------
+ src/stateInfo.c              |  2 +-
+ src/transferChecks.c         | 22 +++++++++++-----------
+ src/uentry.c                 |  4 ++--
+ src/usymtab.c                |  2 +-
+ src/varKinds.c               |  2 +-
+ test/merge.c                 |  2 +-
+ 21 files changed, 67 insertions(+), 67 deletions(-)
+
+diff --git a/doc/html/manual.htm b/doc/html/manual.htm
+index a00de52..f001728 100644
+--- a/doc/html/manual.htm
++++ b/doc/html/manual.htm
+@@ -9809,7 +9809,7 @@ another options file.</p>
+ 'font-size:10.0pt'>i</span></span> <span class=
+       "Flag"><span style='font-size:10.0pt'><i>&lt;file&gt;</i></span></span></p>
+ <p class="MsoNormal" style='margin-left:13.5pt'>Set LCL
+-initilization file.</p>
++initialization file.</p>
+ <p class="TextFontCX"><span class="Flag"><span style=
+ 'font-size:10.0pt'>nof</span></span></p>
+ <p class="IndentText">Prevents the default options files
+@@ -10400,7 +10400,7 @@ Produce comma-separated values (CSV) warnings output file.
+ "Flag"><span style=
+ 'font-size:10.0pt'></span></span></p>
+ <p class="IndentText">
+-Overwrite exisiting CVS output file Show location information for load files. 
++Overwrite existing CVS output file Show location information for load files.
+ </p>
+ 
+ 
+@@ -17298,7 +17298,7 @@ Set maximum number of bugs detected before giving up.
+ debugfcnconstraint
+ </span></span></p>
+ <p class="IndentText">
+-Perform buffer overflow checking even if the errors would be surpressed. 
++Perform buffer overflow checking even if the errors would be suppressed.
+ </p>
+ 
+ 
+diff --git a/src/Headers/constraintList.h b/src/Headers/constraintList.h
+index 5c826c9..e8dd55a 100644
+--- a/src/Headers/constraintList.h
++++ b/src/Headers/constraintList.h
+@@ -89,7 +89,7 @@ extern constraintList constraintList_sort (/*@returned@*/ constraintList p_ret)
+ extern void constraintList_dump (/*@observer@*/ constraintList p_c,  FILE * p_f);
+ 
+ /*@only@*/ constraintList constraintList_undump (FILE * p_f);
+-/*@only@*/ constraintList constraintList_removeSurpressed (/*@only@*/ constraintList p_s);
++/*@only@*/ constraintList constraintList_removeSuppressed (/*@only@*/ constraintList p_s);
+ 
+ /*drl 1/6/2001: I didn't think these functions were solid enough to include in the   stable  release of splint.*/
+ /*drl added 12/30/01 */
+diff --git a/src/Headers/sRef.h b/src/Headers/sRef.h
+index 80c079a..e52ee00 100644
+--- a/src/Headers/sRef.h
++++ b/src/Headers/sRef.h
+@@ -446,7 +446,7 @@ extern /*@falsewhennull@*/ bool sRef_isDeadStorage (sRef p_s) /*@*/ ;
+ extern bool sRef_isStateLive (sRef p_s) /*@*/ ;
+ extern /*@falsewhennull@*/ bool sRef_isPossiblyDead (sRef p_s) /*@*/ ;
+ extern /*@nullwhentrue@*/ bool sRef_isStateUndefined (sRef p_s) /*@*/ ;
+-extern bool sRef_isUnuseable (sRef p_s) /*@*/ ;
++extern bool sRef_isUnusable (sRef p_s) /*@*/ ;
+ 
+ extern /*@exposed@*/ sRef sRef_constructDeref (sRef p_t) 
+    /*@modifies p_t@*/ ;
+diff --git a/src/Headers/varKinds.h b/src/Headers/varKinds.h
+index 3a0981d..c617cb0 100644
+--- a/src/Headers/varKinds.h
++++ b/src/Headers/varKinds.h
+@@ -11,15 +11,15 @@
+ 
+ typedef enum { 
+   SS_UNKNOWN, 
+-  SS_UNUSEABLE, /* cannot use (unallocated pointer reference) */
++  SS_UNUSABLE, /* cannot use (unallocated pointer reference) */
+   SS_UNDEFINED, /* cannot use value (e.g., unbound variable) */
+   SS_MUNDEFINED,/* maybe undefined */
+   SS_ALLOCATED, /* allocated pointer */
+   SS_PDEFINED,  /* partially defined: must check reachable values */
+   SS_DEFINED,   /* completely defined: can use value and all reachable values */
+   SS_PARTIAL,   /* defined, but can be bashed without error (partial structure returned) */
+-  SS_DEAD,      /* cannot use (after giving aways as only) 
+-		 * same meaning as UNUSEABLE, except that we 
++  SS_DEAD,      /* cannot use (after giving aways as only)
++		 * same meaning as UNUSABLE, except that we
+ 		 * want to generate better error messages. */
+   SS_HOFFA,     /* "probably dead" */
+   SS_FIXED,     /* cannot modify */
+diff --git a/src/clabstract.c b/src/clabstract.c
+index 3bf4168..e630e40 100644
+--- a/src/clabstract.c
++++ b/src/clabstract.c
+@@ -2220,7 +2220,7 @@ sRef checkbufferConstraintClausesId (uentry ue)
+   if (sRef_isInvalid (sr))
+     {
+       llfatalerrorLoc (cstring_makeLiteral ("Macro defined constants can not be used in function "
+-					    "constraints unless they are specifed with the constant "
++					    "constraints unless they are specified with the constant "
+ 					    "annotation. To use a macro defined constant include an "
+ 					    "annotation of the form /*@constant <type> <name>=<value>@*/ "
+ 					    "somewhere before the function constraint. This restriction "
+diff --git a/src/constraintGeneration.c b/src/constraintGeneration.c
+index 9be223e..ac420eb 100644
+--- a/src/constraintGeneration.c
++++ b/src/constraintGeneration.c
+@@ -1572,7 +1572,7 @@ void exprNode_exprTraverse (/*@dependent@*/ exprNode e,
+   e->ensuresConstraints = constraintList_preserveOrig (e->ensuresConstraints);
+   e->requiresConstraints = constraintList_addGeneratingExpr (e->requiresConstraints, e);
+   e->ensuresConstraints = constraintList_addGeneratingExpr (e->ensuresConstraints, e);
+-  e->requiresConstraints = constraintList_removeSurpressed (e->requiresConstraints);
++  e->requiresConstraints = constraintList_removeSuppressed (e->requiresConstraints);
+   
+   DPRINTF (("ensures constraints for %s are %s", 
+ 	    exprNode_unparse(e), constraintList_unparseDetailed (e->ensuresConstraints)));
+diff --git a/src/constraintList.c b/src/constraintList.c
+index ea27121..660677e 100644
+--- a/src/constraintList.c
++++ b/src/constraintList.c
+@@ -161,7 +161,7 @@ constraintList constraintList_addListFree (/*@returned@*/ constraintList s, /*@o
+   return s;
+ }
+ 
+-constraintList constraintList_removeSurpressed (/*@only@*/ constraintList s)
++constraintList constraintList_removeSuppressed (/*@only@*/ constraintList s)
+ {
+   constraintList ret;
+   fileloc loc;
+@@ -179,13 +179,13 @@ constraintList constraintList_removeSurpressed (/*@only@*/ constraintList s)
+ 	}
+       else if (context_suppressFlagMsg(FLG_BOUNDSWRITE, loc) )
+ 	{
+-	  DPRINTF ((message ("constraintList_removeSurpressed getting rid of surpressed constraint %q", 
++	  DPRINTF ((message ("constraintList_removeSuppressed getting rid of suppressed constraint %q",
+ 			     constraint_unparse(elem))));
+ 	  constraint_free(elem);
+ 	}
+       else if (!constraint_hasMaxSet(elem) && context_suppressFlagMsg(FLG_BOUNDSREAD, loc))
+ 	{
+-	  DPRINTF ((message("constraintList_removeSurpressed getting rid of surpressed constraint %q", 
++	  DPRINTF ((message("constraintList_removeSuppressed getting rid of suppressed constraint %q",
+ 			    constraint_unparse(elem))));
+ 	  constraint_free(elem);
+ 	}
+diff --git a/src/constraintResolve.c b/src/constraintResolve.c
+index 331db19..c271f55 100644
+--- a/src/constraintResolve.c
++++ b/src/constraintResolve.c
+@@ -420,7 +420,7 @@ static /*@only@*/ constraint doResolve (/*@only@*/ constraint c, constraintList
+ 			{
+ 			  /* drl added 8/28/2002*/
+ 			  /*make sure that the information from
+-			    a post condition like i = i + 1 is transfered
++			    a post condition like i = i + 1 is transferred
+ 			  */
+ 			  constraint tempSub;
+ 			  tempSub = constraint_substitute (temp2, post1);
+@@ -445,7 +445,7 @@ static /*@only@*/ constraint doResolve (/*@only@*/ constraint c, constraintList
+ 			{
+ 			 /* drl added 8/28/2002*/
+ 			  /*make sure that the information from
+-			    a post condition like i = i + 1 is transfered
++			    a post condition like i = i + 1 is transferred
+ 			  */
+ 			  constraint tempSub;
+ 			  
+diff --git a/src/exprChecks.c b/src/exprChecks.c
+index 219387b..cd1fc6d 100644
+--- a/src/exprChecks.c
++++ b/src/exprChecks.c
+@@ -915,7 +915,7 @@ void exprNode_checkFunctionBody (exprNode body)
+ 		{
+ 		  voptgenerror 
+ 		    (FLG_NORETURN,
+-		     cstring_makeLiteral ("Path with no return in function declared to implicity return int"), 
++		     cstring_makeLiteral ("Path with no return in function declared to implicitly return int"),
+ 		     g_currentloc);
+ 		}
+ 	      else
+diff --git a/src/exprNode.c b/src/exprNode.c
+index d62c966..6ad9ea6 100644
+--- a/src/exprNode.c
++++ b/src/exprNode.c
+@@ -783,7 +783,7 @@ exprNode_combineLiterals (exprNode e, exprNode rest)
+     {
+       voptgenerror 
+ 	(FLG_SYNTAX,
+-	 message ("Constant concatentation is ungrammatical: %s %s", exprNode_unparse (e), 
++	 message ("Constant concatenation is ungrammatical: %s %s", exprNode_unparse (e),
+ 		  exprNode_unparse (rest)),
+ 	 e->loc);
+       exprNode_free (rest);
+@@ -794,7 +794,7 @@ exprNode_combineLiterals (exprNode e, exprNode rest)
+     {
+       voptgenerror 
+ 	(FLG_SYNTAX,
+-	 message ("Constant concatentation is ungrammatical: %s %s", exprNode_unparse (e), exprNode_unparse (rest)),
++	 message ("Constant concatenation is ungrammatical: %s %s", exprNode_unparse (e), exprNode_unparse (rest)),
+ 	 rest->loc);
+   
+       exprNode_free (rest);
+@@ -10179,7 +10179,7 @@ exprNode_checkUse (exprNode e, /*@exposed@*/ sRef s, fileloc loc)
+ 	  sRef errorRef = sRef_undefined;
+ 	  sRef lastRef  = sRef_undefined;
+ 	  bool deadRef = FALSE;
+-	  bool unuseable = FALSE;
++	  bool unusable = FALSE;
+ 	  bool errorMaybe = FALSE;
+ 	  
+ 	  while (sRef_isValid (s) && sRef_isKnown (s))
+@@ -10197,7 +10197,7 @@ exprNode_checkUse (exprNode e, /*@exposed@*/ sRef s, fileloc loc)
+ 		      errorRef = s;
+ 		      DPRINTF (("Setting ERROR: %s", sRef_unparseFull (s)));
+ 		      deadRef = sRef_isPossiblyDead (errorRef);
+-		      unuseable = sRef_isUnuseable (errorRef);
++		      unusable = sRef_isUnusable (errorRef);
+ 		      errorMaybe = TRUE;
+ 		    }
+ 		  else
+@@ -10206,7 +10206,7 @@ exprNode_checkUse (exprNode e, /*@exposed@*/ sRef s, fileloc loc)
+ 		      errorRef = s;
+ 		      DPRINTF (("Setting ERROR: %s", sRef_unparseFull (s)));
+ 		      deadRef = sRef_isDead (errorRef);
+-		      unuseable = sRef_isUnuseable (errorRef);
++		      unusable = sRef_isUnusable (errorRef);
+ 		      errorMaybe = FALSE;
+ 		    }
+ 
+@@ -10273,7 +10273,7 @@ exprNode_checkUse (exprNode e, /*@exposed@*/ sRef s, fileloc loc)
+ 			}
+ 		    }
+ 		}
+-	      else if (unuseable)
++	      else if (unusable)
+ 		{
+ 		  if (optgenerror
+ 		      (FLG_USEDEF,
+@@ -10352,7 +10352,7 @@ exprNode_checkSet (exprNode e, /*@exposed@*/ sRef s)
+       if (!ynm_toBoolStrict (sRef_isWriteable (s)))
+ 	{
+ 	  voptgenerror (FLG_USEDEF,
+-			message ("Attempt to set unuseable storage: %q", 
++			message ("Attempt to set unusable storage: %q",
+ 				 sRef_unparse (s)),
+ 			exprNode_loc (e));
+ 	}
+@@ -10452,7 +10452,7 @@ exprNode_checkMSet (exprNode e, /*@exposed@*/ sRef s)
+       if (!ynm_toBoolStrict (sRef_isWriteable (s)))
+ 	{
+ 	  voptgenerror (FLG_USEDEF,
+-			message ("Attempt to set unuseable storage: %q", sRef_unparse (s)),
++			message ("Attempt to set unusable storage: %q", sRef_unparse (s)),
+ 			exprNode_loc (e));
+ 	}
+       
+diff --git a/src/fileTable.c b/src/fileTable.c
+index 0b23d1b..953a426 100644
+--- a/src/fileTable.c
++++ b/src/fileTable.c
+@@ -581,7 +581,7 @@ fileTable_addltemp (fileTable ft)
+ 	{
+ 	  lldiagmsg
+ 	    (message
+-	     ("Operating system generates tmp filename containing invalid charater: %s",
++	     ("Operating system generates tmp filename containing invalid character: %s",
+ 	      newname));
+ 	  lldiagmsg (cstring_makeLiteral 
+ 		     ("Try cleaning up the tmp directory.  Attempting to continue."));
+diff --git a/src/flags.c b/src/flags.c
+index c26a6c6..d983681 100644
+--- a/src/flags.c
++++ b/src/flags.c
+@@ -64,7 +64,7 @@ static flagcatinfo categories[] =
+   { FK_DEBUG, "debug", "flags for debugging splint" } ,
+   { FK_DECL, "declarations", "consistency of declarations" } ,
+   { FK_DEF, "definition", "undefined storage errors" } ,
+-  { FK_DIRECT, "directories", "set directores" } ,
++  { FK_DIRECT, "directories", "set directories" } ,
+   { FK_DISPLAY, "display", "control what is displayed" } ,
+   { FK_EFFECT, "effect", "statements with no effects" } ,
+   { FK_ERRORS, "errors", "control expected errors, summary reporting" } ,
+diff --git a/src/flags.def b/src/flags.def
+index c33470b..3191157 100644
+--- a/src/flags.def
++++ b/src/flags.def
+@@ -2057,7 +2057,7 @@ static flaglist flags =
+     FK_EXTENSIBLE, FK_MEMORY, modeFlag,
+     "statetransfer",
+     FLG_STATETRANSFER,
+-    "storage has been transfered with invalid state",
++    "storage has been transferred with invalid state",
+     "Transfer violates user-defined state rules.",
+     0, 0
+   },
+@@ -3405,7 +3405,7 @@ static flaglist flags =
+     FK_FORMAT, FK_DISPLAY, plainFlag,
+     "csvoverwrite",
+     FLG_CSVOVERWRITE,
+-    "overwrite exisiting CVS output file",
++    "overwrite existing CVS output file",
+     NULL, 0, 0
+   },
+   {
+@@ -3542,7 +3542,7 @@ static flaglist flags =
+     FK_INIT, FK_FILES, globalFileFlag,
+     "i",
+     FLG_INIT,
+-    "set LCL initilization file",
++    "set LCL initialization file",
+     NULL, 0, 0
+   },
+   {
+@@ -4408,7 +4408,7 @@ static flaglist flags =
+     "debugfcnconstraint",
+     FLG_DEBUGFUNCTIONCONSTRAINT,
+     "debug function constraints",
+-    "Perform buffer overflow checking even if the errors would be surpressed.",
++    "Perform buffer overflow checking even if the errors would be suppressed.",
+     0, 0
+   },
+   {
+diff --git a/src/nameChecks.c b/src/nameChecks.c
+index 5566114..34c413a 100644
+--- a/src/nameChecks.c
++++ b/src/nameChecks.c
+@@ -553,7 +553,7 @@ checkNationalName (uentry ue)
+ 		      (FLG_CZECHOSLOVAKTYPES, FLG_NAMECHECKS,
+ 		       message ("%s %q name violates Czechoslovak naming "
+ 				"convention.  Czechoslovak datatype names "
+-				"should not use the _ charater.",
++				"should not use the _ character.",
+ 				uentry_ekindName (ue),
+ 				uentry_getName (ue)),
+ 		       uentry_whereLast (ue)))
+@@ -612,7 +612,7 @@ static bool checkCzechName (uentry ue, flagcode czechflag, bool report)
+ 		      (FLG_CZECHTYPES, FLG_NAMECHECKS,
+ 		       message 
+ 		       ("%s %q name violates Czech naming convention.  "
+-			"Czech datatype names should not use the _ charater.",
++			"Czech datatype names should not use the _ character.",
+ 			uentry_ekindName (ue),
+ 			uentry_getName (ue)),
+ 		       uentry_whereLast (ue)))
+diff --git a/src/sRef.c b/src/sRef.c
+index 15f4b6d..af5afa2 100644
+--- a/src/sRef.c
++++ b/src/sRef.c
+@@ -3835,12 +3835,12 @@ sRef_mergeStateAux (/*@notnull@*/ sRef res, /*@notnull@*/ sRef other,
+       if (other->defstate == SS_DEAD 
+ 	  && ((sRef_isOnly (res) && sRef_definitelyNull (res))
+ 	      || (res->defstate == SS_UNDEFINED
+-		  || res->defstate == SS_UNUSEABLE)))
++		  || res->defstate == SS_UNUSABLE)))
+ 	{
+ 	  if (res->defstate == SS_UNDEFINED
+-	      || res->defstate == SS_UNUSEABLE)
++	      || res->defstate == SS_UNUSABLE)
+ 	    {
+-	      res->defstate = SS_UNUSEABLE;
++	      res->defstate = SS_UNUSABLE;
+ 	    }
+ 	  else
+ 	    {
+@@ -3854,12 +3854,12 @@ sRef_mergeStateAux (/*@notnull@*/ sRef res, /*@notnull@*/ sRef other,
+       else if (res->defstate == SS_DEAD 
+ 	       && ((sRef_isOnly (other) && sRef_definitelyNull (other))
+ 		   || (other->defstate == SS_UNDEFINED
+-		       || other->defstate == SS_UNUSEABLE)))
++		       || other->defstate == SS_UNUSABLE)))
+ 	{
+ 	  if (other->defstate == SS_UNDEFINED
+-	      || other->defstate == SS_UNUSEABLE)
++	      || other->defstate == SS_UNUSABLE)
+ 	    {
+-	      res->defstate = SS_UNUSEABLE;
++	      res->defstate = SS_UNUSABLE;
+ 	    }
+ 	  else
+ 	    {
+@@ -4668,7 +4668,7 @@ bool sRef_isNotUndefined (sRef s)
+ {
+   return (sRef_isInvalid (s)
+ 	  || (s->defstate != SS_UNDEFINED
+-	      && s->defstate != SS_UNUSEABLE
++	      && s->defstate != SS_UNUSABLE
+ 	      && s->defstate != SS_DEAD));
+ }
+ 
+@@ -4696,7 +4696,7 @@ ynm sRef_isWriteable (sRef s)
+ 	}
+     }
+ 
+-  return (ynm_fromBool (s->defstate != SS_UNUSEABLE));
++  return (ynm_fromBool (s->defstate != SS_UNUSABLE));
+ }
+ 
+ bool sRef_hasNoStorage (sRef s)
+@@ -4792,7 +4792,7 @@ static /*@exposed@*/ sRef whatUndefined (/*@exposed@*/ sRef fref, int depth)
+       return sRef_undefined;
+     }
+ 
+-  if (sRef_isUnuseable (fref) || sRef_isStateUndefined (fref))
++  if (sRef_isUnusable (fref) || sRef_isStateUndefined (fref))
+     {
+       return fref;
+     }
+@@ -6469,7 +6469,7 @@ void sRef_setArrayFetchState (/*@notnull@*/ /*@exposed@*/ sRef s,
+ 	{
+ 	  if (arr->defstate == SS_UNDEFINED)
+ 	    {
+-	      s->defstate = SS_UNUSEABLE;
++	      s->defstate = SS_UNUSABLE;
+ 	    }
+ 	  else if ((arr->defstate == SS_ALLOCATED) && !ctype_isSU (s->type))
+ 	    {
+@@ -6945,7 +6945,7 @@ sRef_constructPointerAux (/*@notnull@*/ /*@exposed@*/ sRef t)
+ 
+   if (t->defstate == SS_UNDEFINED)
+     {
+-      s->defstate = SS_UNUSEABLE;
++      s->defstate = SS_UNUSABLE;
+       s->definfo = stateInfo_copy (t->definfo);
+     }
+   else if ((t->defstate == SS_ALLOCATED) && !ctype_isSU (st))
+@@ -8071,7 +8071,7 @@ sRef_isDeadStorage (sRef s)
+   if (sRef_isReasonable (s))
+     {
+       if (s->defstate == SS_DEAD
+-	  || s->defstate == SS_UNUSEABLE
++	  || s->defstate == SS_UNUSABLE
+ 	  || s->defstate == SS_UNDEFINED
+ 	  || s->defstate == SS_UNKNOWN)
+ 	{
+@@ -8102,7 +8102,7 @@ bool sRef_isStateLive (sRef s)
+ 
+       return (!(ds == SS_UNDEFINED 
+ 		|| ds == SS_DEAD
+-		|| ds == SS_UNUSEABLE
++		|| ds == SS_UNUSABLE
+ 		|| ds == SS_HOFFA));
+     }
+   else
+@@ -8123,7 +8123,7 @@ bool sRef_isJustAllocated (sRef s)
+     {
+       sRefSet_allElements (s->deriv, el)
+ 	{
+-	  if (!(sRef_isStateUndefined (el) || sRef_isUnuseable (el)))
++	  if (!(sRef_isStateUndefined (el) || sRef_isUnusable (el)))
+ 	    {
+ 	      return FALSE;
+ 	    }
+@@ -8149,9 +8149,9 @@ sRef_isAllocatedStorage (sRef s)
+ }
+ 
+ bool
+-sRef_isUnuseable (sRef s)
++sRef_isUnusable (sRef s)
+ {
+-  return ((sRef_isValid(s)) && ((s)->defstate == SS_UNUSEABLE));
++  return ((sRef_isValid(s)) && ((s)->defstate == SS_UNUSABLE));
+ }
+ 
+ bool
+@@ -9124,8 +9124,8 @@ static void sRef_combineDefState (/*@notnull@*/ sRef res,
+ 	  break;
+ 	case SS_HOFFA:
+ 	case SS_RELDEF:
+-	case SS_UNUSEABLE: 
+-	case SS_UNDEFINED: 
++	case SS_UNUSABLE:
++	case SS_UNDEFINED:
+ 	case SS_PARTIAL:
+ 	case SS_UNDEFGLOB:
+ 	case SS_KILLED:
+diff --git a/src/stateInfo.c b/src/stateInfo.c
+index cf5246a..61702b5 100644
+--- a/src/stateInfo.c
++++ b/src/stateInfo.c
+@@ -389,7 +389,7 @@ stateAction stateAction_fromSState (sstate ss)
+   switch (ss) 
+     {
+     case SS_UNKNOWN: return SA_DECLARED;
+-    case SS_UNUSEABLE: return SA_KILLED;
++    case SS_UNUSABLE: return SA_KILLED;
+     case SS_UNDEFINED: return SA_UNDEFINED;
+     case SS_MUNDEFINED: return SA_MUNDEFINED;
+     case SS_ALLOCATED: return SA_ALLOCATED;
+diff --git a/src/transferChecks.c b/src/transferChecks.c
+index 4fe2247..6805c0b 100644
+--- a/src/transferChecks.c
++++ b/src/transferChecks.c
+@@ -1441,7 +1441,7 @@ checkCompletelyDestroyed (exprNode fexp, sRef fref, bool topLevel, bool isField,
+ 	  
+ 	  DPRINTF (("Here: %s", ctype_unparse (ct)));
+ 	  if (sRef_isDead (fref) 
+-	      || sRef_isUnuseable (fref)
++	      || sRef_isUnusable (fref)
+ 	      || sRef_definitelyNull (fref)
+ 	      || sRef_isObserver (fref) 
+ 	      || sRef_isExposed (fref))
+@@ -1933,7 +1933,7 @@ transferChecks_passParam (exprNode fexp, uentry arg, bool isSpec,
+ 	      sRef_setAllocated (fref, exprNode_loc (fexp));
+ 	    }
+ 	  else if (sRef_aliasCheckSimplePred (sRef_isStateUndefined, fref) 
+-		   || sRef_aliasCheckSimplePred (sRef_isUnuseable, fref))
++		   || sRef_aliasCheckSimplePred (sRef_isUnusable, fref))
+ 	    {
+ 	      voptgenerror
+ 		(FLG_USEDEF,
+@@ -1961,7 +1961,7 @@ transferChecks_passParam (exprNode fexp, uentry arg, bool isSpec,
+       DPRINTF (("Here we are!"));
+ 
+       if (ctype_isRealAP (ct)
+-	  && (sRef_isStateUndefined (fref) || sRef_isUnuseable (fref)))
++	  && (sRef_isStateUndefined (fref) || sRef_isUnusable (fref)))
+ 	{
+ 	  voptgenerror
+ 	    (FLG_USEDEF,
+@@ -2010,7 +2010,7 @@ transferChecks_passParam (exprNode fexp, uentry arg, bool isSpec,
+   else if (uentry_isPartial (arg))
+     {
+       if (ctype_isRealAP (ct) 
+-	  && (sRef_isStateUndefined (fref) || sRef_isUnuseable (fref)))
++	  && (sRef_isStateUndefined (fref) || sRef_isUnusable (fref)))
+ 	{
+ 	  voptgenerror 
+ 	    (FLG_USEDEF,
+@@ -2060,7 +2060,7 @@ transferChecks_passParam (exprNode fexp, uentry arg, bool isSpec,
+       uentry ue = exprNode_getUentry (fcn);
+ 
+       if (ctype_isRealAP (ct) 
+-	  && (sRef_isStateUndefined (fref) || sRef_isUnuseable (fref)))
++	  && (sRef_isStateUndefined (fref) || sRef_isUnusable (fref)))
+ 	{
+ 	  voptgenerror 
+ 	    (FLG_USEDEF,
+@@ -2127,7 +2127,7 @@ transferChecks_passParam (exprNode fexp, uentry arg, bool isSpec,
+ 	    {
+ 	      if (sRef_isAddress (fref))
+ 		{
+-		  if (sRef_isStateUndefined (fref) || sRef_isUnuseable (fref))
++		  if (sRef_isStateUndefined (fref) || sRef_isUnusable (fref))
+ 		    {
+ 		      voptgenerror 
+ 			(FLG_USEDEF,
+@@ -2618,12 +2618,12 @@ checkTransferAssignAux (sRef fref, exprNode fexp, /*@unused@*/ bool ffix,
+   
+   if ((alkind_isOnly (tkind) || alkind_isFresh (tkind) 
+        || alkind_isNewRef (tkind) || alkind_isOwned (tkind))
+-      && !(sRef_isDead (tref) 
+-	   || sRef_isStateUndefined (tref) 
+-	   || sRef_isUnuseable (tref) 
++      && !(sRef_isDead (tref)
++	   || sRef_isStateUndefined (tref)
++	   || sRef_isUnusable (tref)
+ 	   || sRef_isPartial (tref)
+-	   || sRef_definitelyNull (tref) 
+-	   || sRef_isStackAllocated (tref) 
++	   || sRef_definitelyNull (tref)
++	   || sRef_isStackAllocated (tref)
+ 	   || sRef_isAllocIndexRef (tref))
+       && !(sRef_same (fref, tref)) /* okay to assign to self (returned params) */
+       && !(usymtab_isDefinitelyNull (tref))) 
+diff --git a/src/uentry.c b/src/uentry.c
+index 7de5a8f..5df7b54 100644
+--- a/src/uentry.c
++++ b/src/uentry.c
+@@ -10316,7 +10316,7 @@ uentry_mergeAliasStates (/*@notnull@*/ uentry res, /*@notnull@*/ uentry other,
+ 			    }
+ 			  else
+ 			    {
+-			      sRef_setDefState (rs, SS_UNUSEABLE, loc);
++			      sRef_setDefState (rs, SS_UNUSABLE, loc);
+ 			    }
+ 			}
+ 		      else 
+@@ -10348,7 +10348,7 @@ uentry_mergeAliasStates (/*@notnull@*/ uentry res, /*@notnull@*/ uentry other,
+ 			    }
+ 			  else
+ 			    {
+-			      sRef_setDefState (rs, SS_UNUSEABLE, loc);
++			      sRef_setDefState (rs, SS_UNUSABLE, loc);
+ 			    }
+ 			}
+ 		      else
+diff --git a/src/usymtab.c b/src/usymtab.c
+index 1d26d49..65cd4ee 100644
+--- a/src/usymtab.c
++++ b/src/usymtab.c
+@@ -3747,7 +3747,7 @@ checkGlobalReturn (uentry glob, sRef orig)
+       if (sRef_isKilledGlob (orig))
+ 	{
+ 	  if (sRef_isStateUndefined (sr)
+-	      || sRef_isUnuseable (sr)
++	      || sRef_isUnusable (sr)
+ 	      || sRef_isStateUnknown (sr)
+ 	      || sRef_isDead (sr))
+ 	    {
+diff --git a/src/varKinds.c b/src/varKinds.c
+index bf1bb08..9830968 100644
+--- a/src/varKinds.c
++++ b/src/varKinds.c
+@@ -73,7 +73,7 @@ cstring sstate_unparse (sstate s)
+   switch (s)
+     {
+     case SS_UNKNOWN:   return cstring_makeLiteralTemp ("unknown");
+-    case SS_UNUSEABLE: return cstring_makeLiteralTemp ("unuseable");
++    case SS_UNUSABLE: return cstring_makeLiteralTemp ("unusable");
+     case SS_UNDEFINED: return cstring_makeLiteralTemp ("undefined");
+     case SS_MUNDEFINED:return cstring_makeLiteralTemp ("possibly undefined");
+     case SS_ALLOCATED: return cstring_makeLiteralTemp ("allocated");
+diff --git a/test/merge.c b/test/merge.c
+index a6a5e4b..eecc17e 100644
+--- a/test/merge.c
++++ b/test/merge.c
+@@ -13,7 +13,7 @@ void f1 (void)
+       x = NULL;
+       if (y != NULL) free (y);
+     }
+-  /* y is unuseable...but no error yet */
++  /* y is unusable...but no error yet */
+ }
+ 
+ void f2 (void)
