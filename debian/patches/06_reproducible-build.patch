@@ -9,39 +9,18 @@ Forwarded: not-needed
 ---
 This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
 ---
- configure    | 6 ++++++
  configure.ac | 6 ++++++
- 2 files changed, 12 insertions(+)
+ 1 file changed, 6 insertions(+)
 
-diff --git a/configure b/configure
-index d55ce55..ba4f04c 100755
---- a/configure
-+++ b/configure
-@@ -3948,9 +3948,15 @@ _ACEOF
- # These used to be in herald.h
- LCL_PARSE_VERSION="Splint 3.1.2"
- 
-+if [ -n "${SOURCE_DATE_EPOCH}" ]; then
-+cat >>confdefs.h <<_ACEOF
-+#define SPLINT_VERSION "$LCL_PARSE_VERSION --- `LC_ALL=C date --utc --date="@${SOURCE_DATE_EPOCH}" +"%d %b %Y"`"
-+_ACEOF
-+else
- cat >>confdefs.h <<_ACEOF
- #define SPLINT_VERSION "$LCL_PARSE_VERSION --- `date +"%d %b %Y"`"
- _ACEOF
-+fi
- 
- 
- cat >>confdefs.h <<_ACEOF
 diff --git a/configure.ac b/configure.ac
-index c11448f..b586a4a 100644
+index c11448f..e17fa8d 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -157,9 +157,15 @@ AC_DEFINE_UNQUOTED(DEFAULT_LCLIMPORTDIR, ".$PATH_SEPARATOR$myprefix/share/splint
  
  # These used to be in herald.h
  LCL_PARSE_VERSION="AC_PACKAGE_NAME AC_PACKAGE_VERSION"
-+if [ -n "${SOURCE_DATE_EPOCH}" ]; then
++if [[ -n "${SOURCE_DATE_EPOCH}" ]]; then
 +AC_DEFINE_UNQUOTED(SPLINT_VERSION,
 +                   "$LCL_PARSE_VERSION --- `LC_ALL=C date --utc --date="@${SOURCE_DATE_EPOCH}" +"%d %b %Y"`",
 +                   [Splint's version number and configure/build date])

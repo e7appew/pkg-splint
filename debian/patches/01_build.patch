@@ -9,16 +9,13 @@ Author: Y Giridhar Appaji Nag <giridhar@appaji.net>
 This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
 ---
  Makefile.am            |  2 ++
- Makefile.in            |  2 +-
  lib/Makefile.am        |  2 +-
  src/Makefile.am        |  8 ++++----
- src/Makefile.in        |  8 ++++----
  test/Makefile.am       |  9 +++++----
- test/Makefile.in       |  8 ++++++--
  test/tests2.2/Makefile |  3 +++
  test/tests2.4/Makefile | 10 ++--------
  test/tests2.5/Makefile |  3 +++
- 10 files changed, 31 insertions(+), 24 deletions(-)
+ 7 files changed, 20 insertions(+), 17 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
 index 04deb17..22f78a7 100644
@@ -33,19 +30,6 @@ index 04deb17..22f78a7 100644
  binaryfixscript = ./fixBinaryDist.sh
  SUBDIRS =   src lib imports test doc
  
-diff --git a/Makefile.in b/Makefile.in
-index 9476c78..172fec6 100644
---- a/Makefile.in
-+++ b/Makefile.in
-@@ -114,7 +114,7 @@ subdir = .
- ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
- mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
- CONFIG_HEADER = config.h
--CONFIG_CLEAN_FILES =
-+CONFIG_CLEAN_FILES = bin/Makefile
- DIST_SOURCES =
- 
- RECURSIVE_TARGETS = info-recursive dvi-recursive install-info-recursive \
 diff --git a/lib/Makefile.am b/lib/Makefile.am
 index 39e216e..90d7fd7 100644
 --- a/lib/Makefile.am
@@ -78,39 +62,6 @@ index 86f467f..50bce91 100644
  
 -CLEANFILES = splint$(EXEEXT)  ../$(top_builddir)/$(binDir)/splint$(EXEEXT)
 +CLEANFILES = splint$(EXEEXT)  ../$(top_builddir)/$(binDir)/splint$(EXEEXT) Headers/flag_codes.gen
- 
- .c.o:
--	@echo "Compiling "$<"..."; \
--	source='$<' object='$@' libtool=no \
-+	@echo "$(CCDEPMODE) $(depcomp) $(COMPILE) -c `test -f $< || echo '$(srcdir)/'`$<"
-+	@source='$<' object='$@' libtool=no \
- 	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' \
- 	$(CCDEPMODE) $(depcomp) \
- 	$(COMPILE) -c `test -f $< || echo '$(srcdir)/'`$<
-diff --git a/src/Makefile.in b/src/Makefile.in
-index 7615e79..4ed1449 100644
---- a/src/Makefile.in
-+++ b/src/Makefile.in
-@@ -377,7 +377,7 @@ CHECKS = $(subst .c,.check,$(splint_SOURCES))
- 
- binDir = bin
- 
--CLEANFILES = splint$(EXEEXT)  ../$(top_builddir)/$(binDir)/splint$(EXEEXT)
-+CLEANFILES = splint$(EXEEXT)  ../$(top_builddir)/$(binDir)/splint$(EXEEXT) Headers/flag_codes.gen
- subdir = src
- mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
- CONFIG_HEADER = $(top_builddir)/config.h
-@@ -1148,7 +1148,7 @@ splintsome:
- splinttest: 
- 	./splint $(DEFAULT_INCLUDES) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) +singleinclude test.c +forcehints -misplacedsharequal +showsourceloc -unrecogcomments -fcnuse -incondefs -exportlocal -constuse -mts file -mts filerw +keep +supcounts +partial -null
- 
--all: splint$(EXEEXT) ../$(top_builddir)/$(binDir)/splint$(EXEEXT)
-+all: splint$(EXEEXT)
- 
- ../$(top_builddir)/$(binDir)/splint$(EXEEXT):  splint$(EXEEXT)
- 	-$(RM) -f $(top_builddir)/$(binDir)/splint$(EXEEXT)
-@@ -1159,8 +1159,8 @@ up:
- 	$(MAKE) clean
  
  .c.o:
 -	@echo "Compiling "$<"..."; \
@@ -153,34 +104,6 @@ index d2a751a..b9716fe 100644
    numabstract.c sizesigns.c typeof.c   nullassign.expect 
 -
 -#		sizesigns.c sizesigns.expect \
-diff --git a/test/Makefile.in b/test/Makefile.in
-index b5da589..b62f0c4 100644
---- a/test/Makefile.in
-+++ b/test/Makefile.in
-@@ -158,7 +158,8 @@ SPLINTTESTS = $(UNITTESTS) $(SUBDIRTESTS)
- 
- QUICKTESTS = db3
- 
--CLEANOUTPUT = $(GREP) -v "Splint 3." | $(GREP) -v "$(SPLINT)" | $(GREP) -v "^make.*\[[1-9]*\]:" | $(GREP) -v "^gmake.*\[[1-9]*\]:" |   $(GREP) -v "^gmake -e" |  $(GREP) -v "^make -e" |$(GREP) -v "config.status: creating test/Makefile" | $(GREP) -v "cd .. && " | $(GREP) -v "CONFIG_HEADERS=" | $(GREP) -v "CONFIG_FILES="
-+CLEANOUTPUT = $(GREP) -v "Splint 3." | $(GREP) -v "$(SPLINT)" | $(GREP) -v "^make.*\[[1-9]*\]:" | $(GREP) -v "^gmake.*\[[1-9]*\]:" |   $(GREP) -v "^gmake -e" |  $(GREP) -v "^make -e" |$(GREP) -v "config.status: creating test/Makefile" | $(GREP) -v "cd .. && " | $(GREP) -v "CONFIG_HEADERS=" | $(GREP) -v "CONFIG_FILES=" | \
-+$(GREP) -v "^/usr/bin/make.*\[[1-9]*\]:" | $(GREP) -v "^/usr/bin/gmake.*\[[1-9]*\]:" |   $(GREP) -v "^/usr/bin/gmake -e" |  $(GREP) -v "^/usr/bin/make -e"
- 
- 
- #drl 12/07/2002 These rules for .c and .expect files don't make sense
-@@ -945,9 +946,12 @@ help:
- 
- .PHONY: clean-local
- clean-local:
--	-rm -f *~ #*# *.o *.lcs a.out
-+	-rm -f *~ \#*\# *.o *.lcs a.out
- 	-rm -f *.out
- 	-rm  *.lcd *.lh
-+	-cd tests2.2; $(MAKE) clean
-+	-cd tests2.4; $(MAKE) clean
-+	-cd tests2.5; $(MAKE) clean
- 	-cd db1; $(MAKE) clean
- 	-cd db2; $(MAKE) clean
- 	-cd db3; $(MAKE) clean
 diff --git a/test/tests2.2/Makefile b/test/tests2.2/Makefile
 index 5573a81..5dd3056 100644
 --- a/test/tests2.2/Makefile
