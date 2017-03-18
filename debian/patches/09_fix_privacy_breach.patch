@@ -1,0 +1,76 @@
+From: Carlos Maddela <e7appew@gmail.com>
+Date: Sun, 19 Mar 2017 01:56:51 +1100
+Subject: Fix possible privacy breach issues in documentation.
+
+Description: Fix possible privacy breach issues in documentation.
+Author: Carlos Maddela <e7appew@gmail.com>
+Forwarded: not-needed
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ doc/bugs.html        | 4 ++--
+ doc/changes.html     | 2 +-
+ doc/html/faq.html    | 2 +-
+ doc/html/footer.html | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/doc/bugs.html b/doc/bugs.html
+index 7e90f56..870949d 100644
+--- a/doc/bugs.html
++++ b/doc/bugs.html
+@@ -1,6 +1,6 @@
+ <html>
+ <head>
+-<link rel="stylesheet" type="text/css" href="http://www.splint.org/splint.css" title="style1">
++<link rel="stylesheet" type="text/css" href="file:///usr/share/doc/splint-doc-html/html/splint.css" title="style1">
+ <title>Splint - Bugs</title>
+ </head>
+ <body>
+@@ -566,7 +566,7 @@ recommend not using the <tt>-j</tt> option to make.
+ </tr>
+ <tr valign=top>
+ <td width=135 >
+-<a href="http://www.splint.org"><img src="http://www.splint.org/glowingwall-narrows.jpg"
++<a href="http://www.splint.org"><img src="file:///usr/share/doc/splint-doc-html/html/glowingwall-narrows.jpg"
+ width=132 height=65 border=0 alt=""></a>
+ </td>
+ <td>
+diff --git a/doc/changes.html b/doc/changes.html
+index eda91ae..c1c5055 100644
+--- a/doc/changes.html
++++ b/doc/changes.html
+@@ -707,7 +707,7 @@ Started change log.
+ </tr>
+ <tr valign=top>
+ <td width=135 >
+-<a href="http://www.splint.org"><img src="http://www.splint.org/glowingwall-narrows.jpg"
++<a href="http://www.splint.org"><img src="glowingwall-narrows.jpg"
+ width=132 height=65 border=0 alt=""></a>
+ </td>
+ <td>
+diff --git a/doc/html/faq.html b/doc/html/faq.html
+index 0508141..a342621 100644
+--- a/doc/html/faq.html
++++ b/doc/html/faq.html
+@@ -505,7 +505,7 @@ The semantics of <tt>realloc</tt> cannot be describe precisely with
+ </tr>
+ <tr valign=top>
+ <td width=135 >
+-<a href="http://www.splint.org"><img src="http://www.splint.org/glowingwall-narrows.jpg"
++<a href="http://www.splint.org"><img src="glowingwall-narrows.jpg"
+ width=132 height=65 border=0 alt=""></a>
+ </td>
+ <td>
+diff --git a/doc/html/footer.html b/doc/html/footer.html
+index a5c0398..bba5054 100755
+--- a/doc/html/footer.html
++++ b/doc/html/footer.html
+@@ -11,7 +11,7 @@
+ </tr>
+ <tr valign=top>
+ <td width=135 >
+-<a href="http://www.splint.org"><img src="http://www.splint.org/glowingwall-narrows.jpg"
++<a href="http://www.splint.org"><img src="glowingwall-narrows.jpg"
+ width=132 height=65 border=0 alt=""></a>
+ </td>
+ <td>
