@@ -1,7 +1,20 @@
-## 04_bug_report.patch by Y Giridhar Appaji Nag <giridhar@appaji.net>
-##
-## DP: Change the bug reporting ID to submit@bugs.debian.org
+From: Y Giridhar Appaji Nag <giridhar@appaji.net>
+Date: Sun, 27 Jan 2008 01:51:00 +0530
+Subject: Change the bug reporting ID to submit@bugs.debian.org
 
+Description: Change the bug reporting ID to submit@bugs.debian.org
+Author: Y Giridhar Appaji Nag <giridhar@appaji.net>
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ configure             | 2 +-
+ configure.ac          | 2 +-
+ src/Headers/version.h | 5 ++++-
+ src/help.c            | 2 +-
+ 4 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/configure b/configure
+index a092ae6..d55ce55 100755
 --- a/configure
 +++ b/configure
 @@ -271,7 +271,7 @@ PACKAGE_NAME='Splint'
@@ -13,6 +26,21 @@
  
  ac_unique_file="src/lclinit.c"
  ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA PACKAGE VERSION ACLOCAL AUTOCONF AUTOMAKE AUTOHEADER MAKEINFO AMTAR install_sh STRIP ac_ct_STRIP INSTALL_STRIP_PROGRAM AWK SET_MAKE CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT DEPDIR am__include am__quote AMDEP_TRUE AMDEP_FALSE AMDEPBACKSLASH CCDEPMODE CPP LEX LEXLIB LEX_OUTPUT_ROOT LN_S BISON GREP DIFF CAT RM MV CP SED LCLOBJ LIBOBJS LTLIBOBJS'
+diff --git a/configure.ac b/configure.ac
+index 515e60c..c11448f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,7 +1,7 @@
+ dnl Process with autoconf to create a configure script  -*- Autoconf -*-
+ AC_PREREQ(2.50)
+ 
+-AC_INIT([Splint], [3.1.2], [splint-bug@splint.org], [splint])
++AC_INIT([Splint], [3.1.2], [submit@bugs.debian.org (via reportbug)], [splint])
+ 
+ dnl This MUST precede any other macro
+ AC_CONFIG_AUX_DIR([config])
+diff --git a/src/Headers/version.h b/src/Headers/version.h
+index c7c6cd7..7c9cabf 100644
 --- a/src/Headers/version.h
 +++ b/src/Headers/version.h
 @@ -17,7 +17,10 @@
@@ -27,6 +55,8 @@
  
  # else
  # error "Multiple include"
+diff --git a/src/help.c b/src/help.c
+index d27602b..0487b62 100644
 --- a/src/help.c
 +++ b/src/help.c
 @@ -274,7 +274,7 @@ printFlags (void)
@@ -38,14 +68,3 @@
    llmsglit (LCL_COMPILE);
  }
  
---- a/configure.ac
-+++ b/configure.ac
-@@ -1,7 +1,7 @@
- dnl Process with autoconf to create a configure script  -*- Autoconf -*-
- AC_PREREQ(2.50)
- 
--AC_INIT([Splint], [3.1.2], [splint-bug@splint.org], [splint])
-+AC_INIT([Splint], [3.1.2], [submit@bugs.debian.org (via reportbug)], [splint])
- 
- dnl This MUST precede any other macro
- AC_CONFIG_AUX_DIR([config])

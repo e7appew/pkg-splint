@@ -1,10 +1,27 @@
-## 05_html_docs_css.patch by Y Giridhar Appaji Nag <giridhar@appaji.net>
-##
-## Remove google trackers and adjust css to look like online splint docs
+From: Y Giridhar Appaji Nag <giridhar@appaji.net>
+Date: Tue, 15 Jan 2008 13:01:49 +0530
+Subject: Remove google trackers and adjust css to look like online splint
+ docs.
 
+Description: Remove google trackers and adjust css to look like online
+ splint docs.
+Author: Y Giridhar Appaji Nag <giridhar@appaji.net>
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ doc/bugs.html        | 12 +-----------
+ doc/changes.html     | 12 +-----------
+ doc/html/faq.html    | 14 ++------------
+ doc/html/footer.html |  2 +-
+ doc/html/manual.css  |  4 ++--
+ doc/html/manual.htm  |  2 +-
+ 6 files changed, 8 insertions(+), 38 deletions(-)
+
+diff --git a/doc/bugs.html b/doc/bugs.html
+index ae0357c..7e90f56 100644
 --- a/doc/bugs.html
 +++ b/doc/bugs.html
-@@ -622,7 +622,7 @@ href="http://www.splint.org/bugs.html">R
+@@ -622,7 +622,7 @@ href="http://www.splint.org/bugs.html">Reporting
  Bugs</a> -
  <a
  href="http://www.splint.org/lists.html">Mailing
@@ -13,7 +30,7 @@
  
  &nbsp;&nbsp;
  <a
-@@ -640,16 +640,6 @@ href="http://www.splint.org/credits.html
+@@ -640,16 +640,6 @@ href="http://www.splint.org/credits.html">Credits</a>
  </tr>
  </table>
  
@@ -30,9 +47,11 @@
  </body>
  </html>
  
+diff --git a/doc/changes.html b/doc/changes.html
+index 78e8a46..eda91ae 100644
 --- a/doc/changes.html
 +++ b/doc/changes.html
-@@ -763,7 +763,7 @@ href="http://www.splint.org/bugs.html">R
+@@ -763,7 +763,7 @@ href="http://www.splint.org/bugs.html">Reporting
  Bugs</a> -
  <a
  href="http://www.splint.org/lists.html">Mailing
@@ -41,7 +60,7 @@
  
  &nbsp;&nbsp;
  <a
-@@ -781,16 +781,6 @@ href="http://www.splint.org/credits.html
+@@ -781,16 +781,6 @@ href="http://www.splint.org/credits.html">Credits</a>
  </tr>
  </table>
  
@@ -58,6 +77,8 @@
  </body>
  </html>
  
+diff --git a/doc/html/faq.html b/doc/html/faq.html
+index 19994c7..0508141 100644
 --- a/doc/html/faq.html
 +++ b/doc/html/faq.html
 @@ -4,7 +4,7 @@
@@ -69,7 +90,7 @@
      title="style1" />
      <title>Splint FAQ</title>
    </head>
-@@ -561,7 +561,7 @@ href="http://www.splint.org/bugs.html">R
+@@ -561,7 +561,7 @@ href="http://www.splint.org/bugs.html">Reporting
  Bugs</a> -
  <a
  href="http://www.splint.org/lists.html">Mailing
@@ -78,7 +99,7 @@
  
  &nbsp;&nbsp;
  <a
-@@ -579,16 +579,6 @@ href="http://www.splint.org/credits.html
+@@ -579,16 +579,6 @@ href="http://www.splint.org/credits.html">Credits</a>
  </tr>
  </table>
  
@@ -95,9 +116,24 @@
  </body>
  </html>
  
+diff --git a/doc/html/footer.html b/doc/html/footer.html
+index 9bdcb62..a5c0398 100755
+--- a/doc/html/footer.html
++++ b/doc/html/footer.html
+@@ -67,7 +67,7 @@ href="http://www.splint.org/bugs.html">Reporting
+ Bugs</a> -
+ <a
+ href="http://www.splint.org/lists.html">Mailing
+-Lists</a> &nbsp;&nbsp;<IMG src="http://sourceforge.net/sflogo.php?group_id=9538" width="0" height="0" alt="">
++Lists</a> 
+ 
+ &nbsp;&nbsp;
+ <a
+diff --git a/doc/html/manual.css b/doc/html/manual.css
+index bc176a4..2cb1e21 100755
 --- a/doc/html/manual.css
 +++ b/doc/html/manual.css
-@@ -10,8 +10,8 @@ title { font-family: Ariel, helvetica, s
+@@ -10,8 +10,8 @@ title { font-family: Ariel, helvetica, sans-serif; color: darkblue }
  A:link { color: blue }
  A:visited { color: darkblue }
  A:active { color: green }
@@ -108,6 +144,8 @@
  h4 { margin-left: 0%; margin-right: 0% }
  h3 { margin-left: 0%; margin-right: 0% }
  h2 { margin-left: 0%; margin-right: 0% }
+diff --git a/doc/html/manual.htm b/doc/html/manual.htm
+index 11e6386..a00de52 100644
 --- a/doc/html/manual.htm
 +++ b/doc/html/manual.htm
 @@ -4,7 +4,7 @@
@@ -119,14 +157,3 @@
  <title>Splint Manual</title>
  <style type="text/css">
  <!--
---- a/doc/html/footer.html
-+++ b/doc/html/footer.html
-@@ -67,7 +67,7 @@ href="http://www.splint.org/bugs.html">R
- Bugs</a> -
- <a
- href="http://www.splint.org/lists.html">Mailing
--Lists</a> &nbsp;&nbsp;<IMG src="http://sourceforge.net/sflogo.php?group_id=9538" width="0" height="0" alt="">
-+Lists</a> 
- 
- &nbsp;&nbsp;
- <a

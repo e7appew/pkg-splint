@@ -1,12 +1,21 @@
-## 03_359894_VA_ARGS.patch by Y Giridhar Appaji Nag <giridhar@appaji.net>
-##
-## Support for variadic macros __VA_ARGS__, based on a patch from
-## "Bernhard R. Link" <brlink@debian.org> for #359894
+From: Y Giridhar Appaji Nag <giridhar@appaji.net>
+Date: Tue, 15 Jan 2008 13:01:49 +0530
+Subject: Support for variadic macros __VA_ARGS__
 
-diff -urNad splint-3.1.2.dfsg~/src/cpplib.c splint-3.1.2.dfsg/src/cpplib.c
---- splint-3.1.2.dfsg~/src/cpplib.c	2007-07-14 03:47:48.000000000 +0530
-+++ splint-3.1.2.dfsg/src/cpplib.c	2008-01-15 13:01:49.000000000 +0530
-@@ -2202,6 +2202,13 @@
+Description: Support for variadic macros __VA_ARGS__,
+ based on a patch from "Bernhard R. Link" <brlink@debian.org> for #359894
+Author: Y Giridhar Appaji Nag <giridhar@appaji.net>
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ src/cpplib.c | 51 ++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 34 insertions(+), 17 deletions(-)
+
+diff --git a/src/cpplib.c b/src/cpplib.c
+index b054f61..2e97592 100644
+--- a/src/cpplib.c
++++ b/src/cpplib.c
+@@ -2202,6 +2202,13 @@ static char rest_extension[] = "...";
  /*@notfunction@*/
  #define REST_EXTENSION_LENGTH	(sizeof (rest_extension) - 1)
  
@@ -20,7 +29,7 @@ diff -urNad splint-3.1.2.dfsg~/src/cpplib.c splint-3.1.2.dfsg/src/cpplib.c
  /* Create a DEFINITION node from a #define directive.  Arguments are
     as for do_define.  */
  
-@@ -2272,28 +2279,38 @@
+@@ -2272,28 +2279,38 @@ create_definition (/*@exposed@*/ char *buf, char *limit,
  				  cstring_fromChars (rest_extension)));
  	  }
  

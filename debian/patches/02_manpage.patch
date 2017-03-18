@@ -1,10 +1,19 @@
-## 02_manpage.patch by Y Giridhar Appaji Nag <giridhar@appaji.net>
-##
-## Remove references to lint, invalid header/footer.  Correct typos.
+From: Y Giridhar Appaji Nag <giridhar@appaji.net>
+Date: Mon, 17 Dec 2007 14:43:33 +0530
+Subject: Remove references to lint, invalid header/footer. Correct typos.
 
-diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
---- splint-3.1.2.dfsg~/doc/splint.1	2008-03-06 12:09:29.000000000 +0530
-+++ splint-3.1.2.dfsg/doc/splint.1	2008-04-17 23:10:08.000000000 +0530
+Description: Remove references to lint, invalid header/footer. Correct typos.
+Author: Y Giridhar Appaji Nag <giridhar@appaji.net>
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ doc/splint.1 | 56 ++++++++++++++++++++++++++------------------------------
+ 1 file changed, 26 insertions(+), 30 deletions(-)
+
+diff --git a/doc/splint.1 b/doc/splint.1
+index 51495c6..e93ceaa 100644
+--- a/doc/splint.1
++++ b/doc/splint.1
 @@ -1,5 +1,4 @@
 - .\" $Id: splint.1,v 1.2 2003/03/31 18:19:38 drl7x Exp $
 -.TH splint 1 "A tool for statically checking C programs"
@@ -12,7 +21,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  
  .SH NAME
  splint \- A tool for statically checking C programs
-@@ -9,14 +8,14 @@
+@@ -9,14 +8,14 @@ splint \- A tool for statically checking C programs
  [options]
  
  .SH DESCRIPTION
@@ -33,7 +42,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  
  .SH OPTIONS
  
-@@ -27,7 +26,7 @@
+@@ -27,7 +26,7 @@ Shows help
  .PP
  .B Initialization
  
@@ -42,7 +51,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  command line or in an options file, but may not be used as control comments in the
  source code. Except where noted. they have the same meaning preceded by \- or +. 
  
-@@ -52,19 +51,19 @@
+@@ -52,19 +51,19 @@ not loaded. This flag may be used in an options file to load in another options
  .TP 6
  .B \-nof 
  Prevents the default options files (./.splintrc and ~/.splintrc) from being loaded. (Setting
@@ -65,7 +74,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  
  .TP 6
  .BI \-D " initializer"
-@@ -84,10 +83,10 @@
+@@ -84,10 +83,10 @@ Save state in <file> for loading. The default extension .lcd is added if <file>
  
  .TP 6
  .BI \-load " file"
@@ -78,7 +87,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  loaded, one of the following flags may be used to select a different standard library. Precede the flag by + to
  load the described library (or prevent a library from being loaded using nolib). See Apppendix F for
  information on the provided libraries. 
-@@ -123,12 +122,14 @@
+@@ -123,12 +122,14 @@ Use the strict version of the UNIX standard library.
  .PP
  .B Output
  
@@ -95,7 +104,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  
  .TP 6
  .B \-showsummary 
-@@ -139,7 +140,7 @@
+@@ -139,7 +140,7 @@ reported.
  
  .TP 6
  .B \-showscan 
@@ -104,7 +113,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  
  .TP 6
  .B \-showalluses 
-@@ -155,7 +156,7 @@
+@@ -155,7 +156,7 @@ Display distribution of where checking time is spent.
  
  .TP 6
  .B \-quiet 
@@ -113,7 +122,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  information before checking begins, and a line summarizing the total number of errors reported.) 
  
  .TP 6
-@@ -170,14 +171,14 @@
+@@ -170,14 +171,14 @@ message showing the number of suppressed messages is printed.
  .PP
  .B Expected Errors
  
@@ -130,7 +139,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  <number> code errors are detected. 
  
  .TP 6
-@@ -216,7 +217,7 @@
+@@ -216,7 +217,7 @@ class. Default: -
  
  .TP 6
  .BI \-linelen " number"
@@ -139,7 +148,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  than <number> characters long into multiple lines. Default: 80 
  
  .PP
-@@ -229,7 +230,7 @@
+@@ -229,7 +230,7 @@ command line flag settings. A warning is produced if a mode flag is used after a
  set. 
  
  These are brief descriptions to give a general idea of what each mode does. To see the complete flag settings
@@ -148,7 +157,7 @@ diff -urNad splint-3.1.2.dfsg~/doc/splint.1 splint-3.1.2.dfsg/doc/splint.1
  
  .TP 6
  .B \-weak 
-@@ -258,13 +259,8 @@
+@@ -258,13 +259,8 @@ reward will be presented to the first person to produce a real program that prod
  strict checking. 
  
  .SH AUTHOR

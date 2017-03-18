@@ -1,9 +1,40 @@
-## 01_build.patch by Y Giridhar Appaji Nag <giridhar@appaji.net>
-##
-## Remove bin/* and the generated lcs files in the clean target.
-## echo the command used during compilation
+From: Y Giridhar Appaji Nag <giridhar@appaji.net>
+Date: Fri, 14 Dec 2007 12:10:29 +0530
+Subject: Remove bin/* and the generated lcs files in the clean target.
 
-@DPATCH@
+Description: Remove bin/* and the generated lcs files in the clean target.
+ echo the command used during compilation
+Author: Y Giridhar Appaji Nag <giridhar@appaji.net>
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ Makefile.am            |  2 ++
+ Makefile.in            |  2 +-
+ lib/Makefile.am        |  2 +-
+ src/Makefile.am        |  8 ++++----
+ src/Makefile.in        |  8 ++++----
+ test/Makefile.am       |  9 +++++----
+ test/Makefile.in       |  8 ++++++--
+ test/tests2.2/Makefile |  3 +++
+ test/tests2.4/Makefile | 10 ++--------
+ test/tests2.5/Makefile |  3 +++
+ 10 files changed, 31 insertions(+), 24 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 04deb17..22f78a7 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -28,6 +28,8 @@
+ 
+ AUTOMAKE_OPTIONS = 1.5 foreign
+ 
++CONFIG_CLEAN_FILES = bin/Makefile
++
+ binaryfixscript = ./fixBinaryDist.sh
+ SUBDIRS =   src lib imports test doc
+ 
+diff --git a/Makefile.in b/Makefile.in
+index 9476c78..172fec6 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -114,7 +114,7 @@ subdir = .
@@ -15,9 +46,52 @@
  DIST_SOURCES =
  
  RECURSIVE_TARGETS = info-recursive dvi-recursive install-info-recursive \
+diff --git a/lib/Makefile.am b/lib/Makefile.am
+index 39e216e..90d7fd7 100644
+--- a/lib/Makefile.am
++++ b/lib/Makefile.am
+@@ -17,7 +17,7 @@ splintlib_DATA = \
+   unix.h unix.lcd unixstrict.lcd CTrait.syms CTraitGen.lcl bool.h \
+   file.mts file.xh filerw.mts filerw.xh \
+   lclinit.lci linux.h lslinit.lsi tainted.mts tainted.xh \
+-  stdio.h stdlib.h $(UnixHeaders)
++  $(UnixHeaders)
+ 
+ ## Include them in the distribution
+ EXTRA_DIST = $(splintlib_DATA)
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 86f467f..50bce91 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -423,7 +423,7 @@ splinttest:
+ 
+ binDir = bin
+ 
+-all: splint$(EXEEXT) ../$(top_builddir)/$(binDir)/splint$(EXEEXT)
++all: splint$(EXEEXT)
+ 
+ ../$(top_builddir)/$(binDir)/splint$(EXEEXT):  splint$(EXEEXT)
+ 	-$(RM) -f $(top_builddir)/$(binDir)/splint$(EXEEXT)
+@@ -433,11 +433,11 @@ up:
+ 	-rm cgrammar.c llgrammar.c mtgrammar.c signature.c cscanner.c
+ 	$(MAKE) clean
+ 
+-CLEANFILES = splint$(EXEEXT)  ../$(top_builddir)/$(binDir)/splint$(EXEEXT)
++CLEANFILES = splint$(EXEEXT)  ../$(top_builddir)/$(binDir)/splint$(EXEEXT) Headers/flag_codes.gen
+ 
+ .c.o:
+-	@echo "Compiling "$<"..."; \
+-	source='$<' object='$@' libtool=no \
++	@echo "$(CCDEPMODE) $(depcomp) $(COMPILE) -c `test -f $< || echo '$(srcdir)/'`$<"
++	@source='$<' object='$@' libtool=no \
+ 	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' \
+ 	$(CCDEPMODE) $(depcomp) \
+ 	$(COMPILE) -c `test -f $< || echo '$(srcdir)/'`$<
+diff --git a/src/Makefile.in b/src/Makefile.in
+index 7615e79..4ed1449 100644
 --- a/src/Makefile.in
 +++ b/src/Makefile.in
-@@ -377,7 +377,7 @@ CHECKS = $(subst .c,.check,$(splint_SOUR
+@@ -377,7 +377,7 @@ CHECKS = $(subst .c,.check,$(splint_SOURCES))
  
  binDir = bin
  
@@ -46,103 +120,8 @@
  	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' \
  	$(CCDEPMODE) $(depcomp) \
  	$(COMPILE) -c `test -f $< || echo '$(srcdir)/'`$<
---- a/test/Makefile.in
-+++ b/test/Makefile.in
-@@ -158,7 +158,8 @@ SPLINTTESTS = $(UNITTESTS) $(SUBDIRTESTS
- 
- QUICKTESTS = db3
- 
--CLEANOUTPUT = $(GREP) -v "Splint 3." | $(GREP) -v "$(SPLINT)" | $(GREP) -v "^make.*\[[1-9]*\]:" | $(GREP) -v "^gmake.*\[[1-9]*\]:" |   $(GREP) -v "^gmake -e" |  $(GREP) -v "^make -e" |$(GREP) -v "config.status: creating test/Makefile" | $(GREP) -v "cd .. && " | $(GREP) -v "CONFIG_HEADERS=" | $(GREP) -v "CONFIG_FILES="
-+CLEANOUTPUT = $(GREP) -v "Splint 3." | $(GREP) -v "$(SPLINT)" | $(GREP) -v "^make.*\[[1-9]*\]:" | $(GREP) -v "^gmake.*\[[1-9]*\]:" |   $(GREP) -v "^gmake -e" |  $(GREP) -v "^make -e" |$(GREP) -v "config.status: creating test/Makefile" | $(GREP) -v "cd .. && " | $(GREP) -v "CONFIG_HEADERS=" | $(GREP) -v "CONFIG_FILES=" | \
-+$(GREP) -v "^/usr/bin/make.*\[[1-9]*\]:" | $(GREP) -v "^/usr/bin/gmake.*\[[1-9]*\]:" |   $(GREP) -v "^/usr/bin/gmake -e" |  $(GREP) -v "^/usr/bin/make -e"
- 
- 
- #drl 12/07/2002 These rules for .c and .expect files don't make sense
-@@ -945,9 +946,12 @@ help:
- 
- .PHONY: clean-local
- clean-local:
--	-rm -f *~ #*# *.o *.lcs a.out
-+	-rm -f *~ \#*\# *.o *.lcs a.out
- 	-rm -f *.out
- 	-rm  *.lcd *.lh
-+	-cd tests2.2; $(MAKE) clean
-+	-cd tests2.4; $(MAKE) clean
-+	-cd tests2.5; $(MAKE) clean
- 	-cd db1; $(MAKE) clean
- 	-cd db2; $(MAKE) clean
- 	-cd db3; $(MAKE) clean
---- a/test/tests2.2/Makefile
-+++ b/test/tests2.2/Makefile
-@@ -48,3 +48,6 @@ rex:
- 
- struct:
- 	-$(SPLINT) struct.c -expect 1
-+
-+clean:
-+	rm -f bool.lcs
---- a/test/tests2.4/Makefile
-+++ b/test/tests2.4/Makefile
-@@ -78,11 +78,5 @@ alignof:
- source:
- 	$(SPLINT) -D DBL_MANT_DIG=25 source.c -expect 1
- 
--
--
--
--
--
--
--
--
-+clean:
-+	rm -f subdir/main.lcs
---- a/test/tests2.5/Makefile
-+++ b/test/tests2.5/Makefile
-@@ -44,3 +44,6 @@ immutable:
- 
- impabsmodule:
- 	-${SPLINT} +impabstract impabsmodule.c -expect 2
-+
-+clean:
-+	rm -f newlint.lcd
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -28,6 +28,8 @@
- 
- AUTOMAKE_OPTIONS = 1.5 foreign
- 
-+CONFIG_CLEAN_FILES = bin/Makefile
-+
- binaryfixscript = ./fixBinaryDist.sh
- SUBDIRS =   src lib imports test doc
- 
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -423,7 +423,7 @@ splinttest:
- 
- binDir = bin
- 
--all: splint$(EXEEXT) ../$(top_builddir)/$(binDir)/splint$(EXEEXT)
-+all: splint$(EXEEXT)
- 
- ../$(top_builddir)/$(binDir)/splint$(EXEEXT):  splint$(EXEEXT)
- 	-$(RM) -f $(top_builddir)/$(binDir)/splint$(EXEEXT)
-@@ -433,11 +433,11 @@ up:
- 	-rm cgrammar.c llgrammar.c mtgrammar.c signature.c cscanner.c
- 	$(MAKE) clean
- 
--CLEANFILES = splint$(EXEEXT)  ../$(top_builddir)/$(binDir)/splint$(EXEEXT)
-+CLEANFILES = splint$(EXEEXT)  ../$(top_builddir)/$(binDir)/splint$(EXEEXT) Headers/flag_codes.gen
- 
- .c.o:
--	@echo "Compiling "$<"..."; \
--	source='$<' object='$@' libtool=no \
-+	@echo "$(CCDEPMODE) $(depcomp) $(COMPILE) -c `test -f $< || echo '$(srcdir)/'`$<"
-+	@source='$<' object='$@' libtool=no \
- 	depfile='$(DEPDIR)/$*.Po' tmpdepfile='$(DEPDIR)/$*.TPo' \
- 	$(CCDEPMODE) $(depcomp) \
- 	$(COMPILE) -c `test -f $< || echo '$(srcdir)/'`$<
+diff --git a/test/Makefile.am b/test/Makefile.am
+index d2a751a..b9716fe 100644
 --- a/test/Makefile.am
 +++ b/test/Makefile.am
 @@ -100,9 +100,12 @@ help:
@@ -174,14 +153,71 @@
    numabstract.c sizesigns.c typeof.c   nullassign.expect 
 -
 -#		sizesigns.c sizesigns.expect \
---- a/lib/Makefile.am
-+++ b/lib/Makefile.am
-@@ -17,7 +17,7 @@ splintlib_DATA = \
-   unix.h unix.lcd unixstrict.lcd CTrait.syms CTraitGen.lcl bool.h \
-   file.mts file.xh filerw.mts filerw.xh \
-   lclinit.lci linux.h lslinit.lsi tainted.mts tainted.xh \
--  stdio.h stdlib.h $(UnixHeaders)
-+  $(UnixHeaders)
+diff --git a/test/Makefile.in b/test/Makefile.in
+index b5da589..b62f0c4 100644
+--- a/test/Makefile.in
++++ b/test/Makefile.in
+@@ -158,7 +158,8 @@ SPLINTTESTS = $(UNITTESTS) $(SUBDIRTESTS)
  
- ## Include them in the distribution
- EXTRA_DIST = $(splintlib_DATA)
+ QUICKTESTS = db3
+ 
+-CLEANOUTPUT = $(GREP) -v "Splint 3." | $(GREP) -v "$(SPLINT)" | $(GREP) -v "^make.*\[[1-9]*\]:" | $(GREP) -v "^gmake.*\[[1-9]*\]:" |   $(GREP) -v "^gmake -e" |  $(GREP) -v "^make -e" |$(GREP) -v "config.status: creating test/Makefile" | $(GREP) -v "cd .. && " | $(GREP) -v "CONFIG_HEADERS=" | $(GREP) -v "CONFIG_FILES="
++CLEANOUTPUT = $(GREP) -v "Splint 3." | $(GREP) -v "$(SPLINT)" | $(GREP) -v "^make.*\[[1-9]*\]:" | $(GREP) -v "^gmake.*\[[1-9]*\]:" |   $(GREP) -v "^gmake -e" |  $(GREP) -v "^make -e" |$(GREP) -v "config.status: creating test/Makefile" | $(GREP) -v "cd .. && " | $(GREP) -v "CONFIG_HEADERS=" | $(GREP) -v "CONFIG_FILES=" | \
++$(GREP) -v "^/usr/bin/make.*\[[1-9]*\]:" | $(GREP) -v "^/usr/bin/gmake.*\[[1-9]*\]:" |   $(GREP) -v "^/usr/bin/gmake -e" |  $(GREP) -v "^/usr/bin/make -e"
+ 
+ 
+ #drl 12/07/2002 These rules for .c and .expect files don't make sense
+@@ -945,9 +946,12 @@ help:
+ 
+ .PHONY: clean-local
+ clean-local:
+-	-rm -f *~ #*# *.o *.lcs a.out
++	-rm -f *~ \#*\# *.o *.lcs a.out
+ 	-rm -f *.out
+ 	-rm  *.lcd *.lh
++	-cd tests2.2; $(MAKE) clean
++	-cd tests2.4; $(MAKE) clean
++	-cd tests2.5; $(MAKE) clean
+ 	-cd db1; $(MAKE) clean
+ 	-cd db2; $(MAKE) clean
+ 	-cd db3; $(MAKE) clean
+diff --git a/test/tests2.2/Makefile b/test/tests2.2/Makefile
+index 5573a81..5dd3056 100644
+--- a/test/tests2.2/Makefile
++++ b/test/tests2.2/Makefile
+@@ -48,3 +48,6 @@ rex:
+ 
+ struct:
+ 	-$(SPLINT) struct.c -expect 1
++
++clean:
++	rm -f bool.lcs
+diff --git a/test/tests2.4/Makefile b/test/tests2.4/Makefile
+index 109c80e..f45371f 100644
+--- a/test/tests2.4/Makefile
++++ b/test/tests2.4/Makefile
+@@ -78,11 +78,5 @@ alignof:
+ source:
+ 	$(SPLINT) -D DBL_MANT_DIG=25 source.c -expect 1
+ 
+-
+-
+-
+-
+-
+-
+-
+-
++clean:
++	rm -f subdir/main.lcs
+diff --git a/test/tests2.5/Makefile b/test/tests2.5/Makefile
+index cc2de35..768e010 100644
+--- a/test/tests2.5/Makefile
++++ b/test/tests2.5/Makefile
+@@ -44,3 +44,6 @@ immutable:
+ 
+ impabsmodule:
+ 	-${SPLINT} +impabstract impabsmodule.c -expect 2
++
++clean:
++	rm -f newlint.lcd

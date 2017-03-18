@@ -1,7 +1,20 @@
-Description: Make the build reproducible
+From: Chris Lamb <lamby@debian.org>
+Date: Fri, 28 Aug 2015 22:38:47 +0100
+Subject: Make the build reproducible.
+
+Description: Make the build reproducible.
 Author: Chris Lamb <lamby@debian.org>
 Bug-Debian: https://bugs.debian.org/797254
+Forwarded: not-needed
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ configure    | 6 ++++++
+ configure.ac | 6 ++++++
+ 2 files changed, 12 insertions(+)
 
+diff --git a/configure b/configure
+index d55ce55..ba4f04c 100755
 --- a/configure
 +++ b/configure
 @@ -3948,9 +3948,15 @@ _ACEOF
@@ -20,9 +33,11 @@ Bug-Debian: https://bugs.debian.org/797254
  
  
  cat >>confdefs.h <<_ACEOF
+diff --git a/configure.ac b/configure.ac
+index c11448f..b586a4a 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -157,9 +157,15 @@ AC_DEFINE_UNQUOTED(DEFAULT_LCLIMPORTDIR,
+@@ -157,9 +157,15 @@ AC_DEFINE_UNQUOTED(DEFAULT_LCLIMPORTDIR, ".$PATH_SEPARATOR$myprefix/share/splint
  
  # These used to be in herald.h
  LCL_PARSE_VERSION="AC_PACKAGE_NAME AC_PACKAGE_VERSION"
