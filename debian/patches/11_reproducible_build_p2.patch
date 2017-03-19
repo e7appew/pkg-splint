@@ -1,0 +1,43 @@
+From: Carlos Maddela <e7appew@gmail.com>
+Date: Sun, 19 Mar 2017 10:37:22 +1100
+Subject: Make builds reproducible (part 2).
+
+Description: Make builds reproducible (part 2).
+ Do not capture build path, host name or user name.
+Author: Carlos Maddela <e7appew@gmail.com>
+Forwarded: not-needed
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ configure.ac | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 4863523..b902e41 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -150,9 +150,9 @@ AC_DEFINE_UNQUOTED(GCC_INCLUDE_DIR2, "$myprefix/include",
+ AC_DEFINE_UNQUOTED(SYSTEM_LIBDIR, "$myprefix/include",
+                    [The system's main include directory])
+ AC_DEFINE_UNQUOTED(DEFAULT_LARCHPATH,
+-                   ".$PATH_SEPARATOR$myprefix/share/splint/lib$PATH_SEPARATOR`pwd`/lib$PATH_SEPARATOR",
++                   ".$PATH_SEPARATOR$myprefix/share/splint/lib",
+                    [The directory where Splint's library files live])
+-AC_DEFINE_UNQUOTED(DEFAULT_LCLIMPORTDIR, ".$PATH_SEPARATOR$myprefix/share/splint/imports$PATH_SEPARATOR`pwd`/imports",
++AC_DEFINE_UNQUOTED(DEFAULT_LCLIMPORTDIR, ".$PATH_SEPARATOR$myprefix/share/splint/imports",
+                    [Splint's imports directory])
+ 
+ # These used to be in herald.h
+@@ -168,9 +168,10 @@ AC_DEFINE_UNQUOTED(SPLINT_VERSION,
+ fi
+ AC_DEFINE_UNQUOTED(LCL_PARSE_VERSION, "$LCL_PARSE_VERSION",
+                    [Splint's version number])
++FILTERED_CFLAGS=`echo $CFLAGS | sed 's@-fdebug-prefix-map=[[^ ]]*[[ ]]*@@g'`
+ AC_DEFINE_UNQUOTED(LCL_COMPILE,
+-                   "Compiled using $CC $CFLAGS on `uname -a` by `whoami`",
+-                   [String describing who compiled this binary and how])
++                   "Compiled using $CC $FILTERED_CFLAGS",
++                   [String describing how this binary was compiled])
+ 
+ dnl TODO: Use result AC_CANONICAL_SYSTEM to figure out what to define 
+ 

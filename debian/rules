@@ -2,6 +2,10 @@
 
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
+# Set these variables for the test suite.
+export LARCH_PATH := .:$(CURDIR)/lib
+export LCLIMPORTDIR := .:$(CURDIR)/imports
+
 PKG_NAME=splint
 PKG_VERS=3.1.2
 DFSG_VERS=dfsg1
