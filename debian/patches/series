@@ -9,3 +9,4 @@
 09_fix_privacy_breach.patch
 10_fix_ac_and_am_warnings.patch
 11_reproducible_build_p2.patch
+12_remove_test_duplication.patch

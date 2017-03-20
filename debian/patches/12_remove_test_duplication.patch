@@ -1,0 +1,26 @@
+From: Carlos Maddela <e7appew@gmail.com>
+Date: Mon, 20 Mar 2017 20:00:00 +1100
+Subject: Remove superfluous duplication of tests.
+
+Description: Remove superfluous duplication of tests.
+ Only perform tests when "make check" is called.
+Author: Carlos Maddela <e7appew@gmail.com>
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ test/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/Makefile.am b/test/Makefile.am
+index b9716fe..e1fb9a2 100644
+--- a/test/Makefile.am
++++ b/test/Makefile.am
+@@ -73,7 +73,7 @@ SPLINTTESTS = $(UNITTESTS) $(SUBDIRTESTS)
+ QUICKTESTS = db3
+ 
+ .PHONY: all check
+-all check: fulltest
++check: fulltest
+ 
+ .PHONY: version
+ version:
