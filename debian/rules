@@ -22,6 +22,11 @@ override_dh_auto_install-arch:
 override_dh_auto_install-indep:
 	$(MAKE) DESTDIR=$(CURDIR)/debian/splint-data install-data
 
+override_dh_installdocs-indep:
+	dh_installdocs -i
+	( cd debian/splint-doc-html/usr/share/doc/splint-doc-html/html; \
+		mv manual.htm manual.html; mv realloc.htm realloc.html )
+
 override_dh_installchangelogs:
 	dh_installchangelogs doc/changes.html
 

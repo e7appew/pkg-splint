@@ -1,0 +1,9 @@
+Document: splint-doc-html
+Title: Splint Manual
+Author: David Evans & David Larochelle
+Abstract: This document is a guide to using Splint.
+Section: Programming
+
+Format: HTML
+Index: /usr/share/doc/splint-doc-html/html/manual.html
+Files: /usr/share/doc/splint-doc-html/html/*.html
