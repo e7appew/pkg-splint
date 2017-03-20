@@ -6,15 +6,6 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 export LARCH_PATH := .:$(CURDIR)/lib
 export LCLIMPORTDIR := .:$(CURDIR)/imports
 
-PKG_NAME=splint
-PKG_VERS=3.1.2
-DFSG_VERS=dfsg1
-UPSTR_SITE=http://www.$(PKG_NAME).org
-UPSTR_DIR=$(PKG_NAME)-$(PKG_VERS)
-UPSTR_FILE=$(UPSTR_DIR).src.tgz
-DFSG_ORIG_DIR=$(UPSTR_DIR).$(DFSG_VERS)
-DFSG_ORIG_TAR=$(PKG_NAME)_$(PKG_VERS).$(DFSG_VERS).orig.tar
-
 # Force non-parallel builds, as splint
 # sometimes fails to build in parallel.
 %:
@@ -28,23 +19,6 @@ override_dh_installchangelogs:
 	dh_installchangelogs doc/changes.html
 
 get-orig-source:
-	wget -q $(UPSTR_SITE)/downloads/$(UPSTR_FILE)
-	tar -zxf $(UPSTR_FILE)
-	mv $(UPSTR_DIR) $(DFSG_ORIG_DIR)
-	rm -f $(DFSG_ORIG_DIR)/doc/manual.pdf
-	mv -f $(DFSG_ORIG_DIR)/doc/manual.css $(DFSG_ORIG_DIR)/doc/html/
-	mkdir $(DFSG_ORIG_DIR)/doc/html/manual-301_files/
-	wget -q $(UPSTR_SITE)/manual/manual-301_files/image001.jpg -O $(DFSG_ORIG_DIR)/doc/html/manual-301_files/image001.jpg
-	wget -q $(UPSTR_SITE)/manual/manual-301_files/image002.gif -O $(DFSG_ORIG_DIR)/doc/html/manual-301_files/image002.gif
-	wget -q $(UPSTR_SITE)/manual/manual-301_files/image003.gif -O $(DFSG_ORIG_DIR)/doc/html/manual-301_files/image003.gif
-	wget -q $(UPSTR_SITE)/faq.html -O $(DFSG_ORIG_DIR)/doc/html/faq.html
-	wget -q $(UPSTR_SITE)/changes.html -O $(DFSG_ORIG_DIR)/doc/changes.html
-	wget -q $(UPSTR_SITE)/bugs.html -O $(DFSG_ORIG_DIR)/doc/bugs.html
-	wget -q $(UPSTR_SITE)/splint.css -O $(DFSG_ORIG_DIR)/doc/html/splint.css
-	tar -cf $(DFSG_ORIG_TAR) $(DFSG_ORIG_DIR)
-	gzip --best $(DFSG_ORIG_TAR)
-	rm -rf $(DFSG_ORIG_DIR) $(UPSTR_FILE)
-	@echo "Re-packaged source file: $(DFSG_ORIG_TAR).gz"
-	@ls -l $(DFSG_ORIG_TAR).gz
+	uscan --force
 
 .PHONY: get-orig-source

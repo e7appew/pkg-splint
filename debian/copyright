@@ -2,6 +2,26 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Contact: University of Virginia <info@splint.org>
 Upstream-Name: Splint
 Source: http://www.splint.org/download.html
+ The upstream pristine tarballs contain a PDF document for which no
+ source is available (apparently derived from an MS Word document),
+ so has been excluded from the DFSG tarballs.
+ .
+ So that Splint's HTML documentation can be packaged, the following
+ files have also been included, which are all available from the Splint
+ website:
+ .
+ doc/bugs.html
+ doc/changes.html
+ doc/html/faq.html
+ doc/html/glowingwall-narrows.jpg
+ doc/html/manual-301_files/image001.jpg
+ doc/html/manual-301_files/image002.gif
+ doc/html/manual-301_files/image003.gif
+ doc/html/splint.css
+ .
+ Please use uscan or the get-orig-source target in debian/rules to
+ create the DFSG tarballs.
+Files-Excluded: doc/manual.pdf
 
 Files: *
 Copyright: 1994–2007, University of Virginia <info@splint.org>
