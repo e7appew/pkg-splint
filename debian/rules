@@ -11,9 +11,16 @@ export LCLIMPORTDIR := .:$(CURDIR)/imports
 %:
 	dh $@ --no-parallel
 
-override_dh_auto_install:
-	$(MAKE) DESTDIR=$(CURDIR)/debian/splint-data install-data
+override_dh_auto_test-arch:
+	dh_auto_test -a -- -C test
+
+override_dh_auto_test-indep:
+
+override_dh_auto_install-arch:
 	$(MAKE) DESTDIR=$(CURDIR)/debian/splint install-exec
+
+override_dh_auto_install-indep:
+	$(MAKE) DESTDIR=$(CURDIR)/debian/splint-data install-data
 
 override_dh_installchangelogs:
 	dh_installchangelogs doc/changes.html
