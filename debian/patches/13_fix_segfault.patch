@@ -1,0 +1,44 @@
+From: Carlos Maddela <e7appew@gmail.com>
+Date: Wed, 22 Mar 2017 08:52:50 +1100
+Subject: Fix segmentation fault.
+
+Description: Fix segmentation fault.
+Author: Carlos Maddela <e7appew@gmail.com>
+Bug-Debian: https://bugs.debian.org/775917
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ src/exprNode.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
+
+diff --git a/src/exprNode.c b/src/exprNode.c
+index 6ad9ea6..b11b91c 100644
+--- a/src/exprNode.c
++++ b/src/exprNode.c
+@@ -862,11 +862,23 @@ exprNode_wideStringLiteral (/*@only@*/ cstring t, /*@only@*/ fileloc loc)
+ /*@only@*/ exprNode
+ exprNode_stringLiteral (/*@only@*/ cstring t, /*@only@*/ fileloc loc)
+ {
+-  size_t len = size_fromInt (size_toInt (cstring_length (t)) - 2);
++  size_t len = cstring_length (t);
+   char *ts = cstring_toCharsSafe (t);
+-  char *s = cstring_toCharsSafe (cstring_create (len + 1));
++  char *s;
++
++  if (len >= 2)
++    {
++      len = size_fromInt (size_toInt (len) - 2);
++      llassert (*ts == '\"' && *(ts + len + 1) == '\"');
++    }
++  else if (len == 1)
++    {
++      len = 0;
++      llassert (*ts == '\"');
++    }
++
++  s = cstring_toCharsSafe (cstring_create (len + 1));
+ 
+-  llassert (*ts == '\"' && *(ts + len + 1) == '\"');
+   strncpy (s, ts+1, len);
+   *(s + len) = '\0';
+   cstring_free (t);
