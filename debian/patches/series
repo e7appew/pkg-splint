@@ -11,3 +11,4 @@
 11_reproducible_build_p2.patch
 12_remove_test_duplication.patch
 13_fix_segfault.patch
+14_fix_unary_plus.patch
