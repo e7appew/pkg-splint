@@ -1,0 +1,57 @@
+From: Carlos Maddela <e7appew@gmail.com>
+Date: Thu, 23 Mar 2017 02:19:58 +1100
+Subject: Cherry-pick unreleased fix for "hh" printf modifier support.
+
+Description: Cherry-pick unreleased fix for "hh" printf modifier support.
+ Add support for the hh modifier in printf and scanf like functions.
+ Closes bugID 2487422
+Author: the_ikke <the_ikke>
+Origin: upstream, https://github.com/ravenexp/splint/commit/413493b3e7c5e06e5f46e170056230174f772eb3
+Bug: https://sourceforge.net/p/splint/bugs/8/
+Bug-Debian: https://bugs.debian.org/510821
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ src/exprNode.c | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/src/exprNode.c b/src/exprNode.c
+index b11b91c..42be7a0 100644
+--- a/src/exprNode.c
++++ b/src/exprNode.c
+@@ -1553,8 +1553,15 @@ checkPrintfArgs (/*@notnull@*/ /*@dependent@*/ exprNode f, uentry fcn,
+             {
+               modtype = ctype_sint;  /* short */
+               key = *(++code);
+-	      codetext = cstring_appendChar (codetext, key);
+-	      fileloc_incColumn (formatloc);
++	          codetext = cstring_appendChar (codetext, key);
++	          fileloc_incColumn (formatloc);
++	          if (key == 'h')
++	            {
++	              modtype = ctype_char;  /* char */
++	              key = *(++code);
++		          codetext = cstring_appendChar (codetext, key);
++		          fileloc_incColumn (formatloc);
++	            }
+             }
+           else if (key == 'l' || key == 'L') 
+             {
+@@ -1862,8 +1869,15 @@ checkScanfArgs (/*@notnull@*/ /*@dependent@*/ exprNode f, uentry fcn,
+             {
+               modtype = ctype_sint;  /* short */
+               key = *(++code);
+-	      codetext = cstring_appendChar (codetext, key);
+-	      fileloc_incColumn (formatloc);
++	          codetext = cstring_appendChar (codetext, key);
++	          fileloc_incColumn (formatloc);
++	          if (key == 'h')
++	            {
++	              modtype = ctype_char;  /* char */
++	              key = *(++code);
++		          codetext = cstring_appendChar (codetext, key);
++		          fileloc_incColumn (formatloc);
++	            }
+             }
+           else if (key == 'l' || key == 'L') 
+             {
