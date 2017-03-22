@@ -13,3 +13,4 @@
 13_fix_segfault.patch
 14_fix_unary_plus.patch
 15_hh_printf_modifier.patch
+16_handle_c99_mixing.patch
