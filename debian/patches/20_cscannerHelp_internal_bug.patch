@@ -1,0 +1,48 @@
+From: Carlos Maddela <e7appew@gmail.com>
+Date: Fri, 24 Mar 2017 05:23:16 +1100
+Subject: Fix Internal Bug at cscannerHelp.c:2428.
+
+Description: Fix Internal Bug at cscannerHelp.c:2428.
+ This bug is supposedly fixed upstream, however in actual fact, the
+ problem just doesn't manifest itself as long as the ./configure script is
+ executed with defaults. Only when ./configure is run with --prefix=/usr,
+ as is normally done in Debian, does it rear its ugly head.
+ .
+ Despite the bug not really being fixed, forcing SYSTEM_LIBDIR to be set
+ with the default value, at least, gets us the same behaviour as upstream.
+Author: Carlos Maddela <e7appew@gmail.com>
+Bug: https://sourceforge.net/p/splint/bugs/5/
+Bug-Debian: https://bugs.debian.org/473595
+ https://bugs.debian.org/476228
+ https://bugs.debian.org/498345
+ https://bugs.debian.org/548768
+ https://bugs.debian.org/569928
+ https://bugs.debian.org/601424
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ configure.ac | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index eed7218..f1a9708 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -147,7 +147,16 @@ AC_DEFINE_UNQUOTED(GCC_INCLUDE_DIR2, "$myprefix/include",
+                    [alternate include directory])
+ 
+ # These used to be in local_constants.h
+-AC_DEFINE_UNQUOTED(SYSTEM_LIBDIR, "$myprefix/include",
++#
++# Debian Bug #473595 (et al) is supposedly fixed upstream, however in actual
++# fact, the problem just doesn't manifest itself as long as the ./configure
++# script is executed with defaults. Only when ./configure is run with
++# --prefix=/usr, as is normally done in Debian, does it rear its ugly head.
++#
++# Despite the bug not really being fixed, forcing SYSTEM_LIBDIR to be set
++# with the default value, at least, gets us the same behaviour as upstream.
++# (This was previously set to "$myprefix/include".)
++AC_DEFINE_UNQUOTED(SYSTEM_LIBDIR, "$ac_default_prefix/include",
+                    [The system's main include directory])
+ AC_DEFINE_UNQUOTED(DEFAULT_LARCHPATH,
+                    ".$PATH_SEPARATOR$myprefix/share/splint/lib",
