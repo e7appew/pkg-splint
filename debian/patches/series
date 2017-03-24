@@ -14,3 +14,4 @@
 14_fix_unary_plus.patch
 15_hh_printf_modifier.patch
 16_handle_c99_mixing.patch
+17_cherry-pick_misc.patch

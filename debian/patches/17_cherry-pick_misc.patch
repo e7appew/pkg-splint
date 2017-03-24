@@ -1,0 +1,475 @@
+From: Carlos Maddela <e7appew@gmail.com>
+Date: Thu, 23 Mar 2017 05:52:59 +1100
+Subject: Cherry-pick other relevant unreleased upstream changes.
+
+Description: Cherry-pick other relevant unreleased upstream changes,
+ so that we're fully up-to-date with "CVS" upstream.
+ .
+ * Fixed the OS/2 specific files for the latest release.
+ * Removed if statement with constant results.
+ * Allow compile on apple platforms. osd.c Use pid_t instead of __pid_t
+   as per open group.
+ * Fix DPRINTF bit rot.
+ * Fix bit rot of DPRINTF calls.
+ * Changed makefile to include line information in generated yacc/bison
+   code (as I had already commited the 'der' variants.
+ * Convert some llassert() to llassertfatal(), as we should not continue
+   with null pointers.
+ * Fix debug.
+ * noexpand always false.
+ * Clean up for target 'lintme'.
+ * Remove ignore warnings for target 'lintnew'.
+ * Add extraneous semi-colon to work around parse errors. Introduced by
+   grammar extentions.  The errors are difficult to fix as previous
+   versions relied on shift/reduce, reduce/reduce behaviour.  The grammar
+   for \'notreached\' and others is *not* lalr and may not even be
+   un-ambigious.
+ * Fix memory leak introduced with var-args macro extentions.
+ * Handle \'unsigned long long' as well as 'long long'.
+Author: herbert <herbert>
+ Bill Pringlemeir <bpringle@sympatico.ca>
+Applied-Upstream: https://github.com/ravenexp/splint/commit/915c0875033c4c8e72330b3897ee840f897d35e1
+ https://github.com/ravenexp/splint/commit/3edc20b893f2b5c8e6db0d51d8097c19d06d137c
+ https://github.com/ravenexp/splint/commit/410be1cebeae229a4d4ccf5de004bdfa940210d8
+ https://github.com/ravenexp/splint/commit/dfd9da8f89deca2d271ab82f32f87cd24e96ad95
+ https://github.com/ravenexp/splint/commit/a9b42c3545de02b264e800480aa7c7d9ce98790f
+ https://github.com/ravenexp/splint/commit/ecf5c61526bddb5aeb86d0fe566352f6e49a69ed
+ https://github.com/ravenexp/splint/commit/1c7bf5edc20d32ff0a3c50671ed50923e7b464ab
+ https://github.com/ravenexp/splint/commit/d2972a27af04aceea40af1b0deba85a39efc53e7
+ https://github.com/ravenexp/splint/commit/8e24e8e3f1514e1ea5316b8b97d0629a6eea833b
+ https://github.com/ravenexp/splint/commit/b6946c926a7434dfe4ef93ebca74a7662e137ff8
+ https://github.com/ravenexp/splint/commit/15a1d704076c328a93300177967452750a851605
+ https://github.com/ravenexp/splint/commit/d9d5766a4d8842ad2f6b0159907fe9ed5ed92d29
+ https://github.com/ravenexp/splint/commit/a41c6040bad28deab1c0fdeccc94d213a980e9c9
+ https://github.com/ravenexp/splint/commit/68f25dc5426089263706a977ba1c5dd263aa6d6c
+ https://github.com/ravenexp/splint/commit/d8b2a2466a35bd225794e598df9c665ea6727dae
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ src/Headers/cpplib.h       |  4 ----
+ src/Makefile.am            |  2 +-
+ src/constraint.c           |  2 +-
+ src/constraintGeneration.c |  2 +-
+ src/constraintList.c       |  4 ++--
+ src/constraintResolve.c    | 17 +++++++++--------
+ src/constraintTerm.c       |  8 ++++----
+ src/cppexp.c               |  3 ++-
+ src/cpplib.c               | 17 +++--------------
+ src/ctype.c                |  4 ++++
+ src/loopHeuristics.c       | 10 +++++-----
+ src/osd.c                  | 17 +++++++++++++----
+ src/scan.c                 |  4 ++--
+ src/uentry.c               |  2 +-
+ src/usymtab.c              |  6 +-----
+ 15 files changed, 49 insertions(+), 53 deletions(-)
+
+diff --git a/src/Headers/cpplib.h b/src/Headers/cpplib.h
+index bc44c01..5df7ba9 100644
+--- a/src/Headers/cpplib.h
++++ b/src/Headers/cpplib.h
+@@ -214,10 +214,6 @@ extern size_t cpplib_getWritten (/*@sef@*/ cppReader *) /*@*/ ;
+ extern /*@exposed@*/ char *cpplib_getPWritten (cppReader *) /*@*/ ;
+ # define cpplib_getPWritten(PFILE) ((PFILE)->limit)
+ 
+-extern /*@null@*/ macroDef 
+-cpplib_createDefinition (/*@dependent@*/ cstring p_def, fileloc p_loc,
+-			 bool p_predefinition, bool p_noExpand) ;
+-  
+ /* Make sure PFILE->token_buffer has space for at least N more characters. */
+ 
+ extern void cpplib_reserve (/*@sef@*/ cppReader *, /*@sef@*/ size_t);
+diff --git a/src/Makefile.am b/src/Makefile.am
+index f431cbf..119ebef 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -10,7 +10,7 @@ CHECK = 1
+ # Some preferences
+ ### We use the no-lines option to prevent confusion with splint flag settings.
+ ### Should fix splint to avoid this...
+-YFLAGS = -v -t -d --debug
++YFLAGS = -v -t -d --debug --no-lines
+ LFLAGS = -L
+ 
+ BISON_SRC = cgrammar.y  llgrammar.y  mtgrammar.y  signature.y
+diff --git a/src/constraint.c b/src/constraint.c
+index ac18923..99c008b 100644
+--- a/src/constraint.c
++++ b/src/constraint.c
+@@ -994,7 +994,7 @@ constraint constraint_preserveOrig (/*@returned@*/ constraint c) /*@modifies c @
+ {
+   if (constraint_isDefined (c))
+     {
+-      DPRINTF (("Doing constraint_preserverOrig for %q", constraint_printDetailed (c)));
++      DPRINTF (("Doing constraint_preserverOrig for %q", constraint_printLocation (c)));
+       
+       if (c->orig == constraint_undefined)
+ 	{
+diff --git a/src/constraintGeneration.c b/src/constraintGeneration.c
+index 73fcd44..156d56e 100644
+--- a/src/constraintGeneration.c
++++ b/src/constraintGeneration.c
+@@ -849,7 +849,7 @@ void exprNode_multiStatement (/*@dependent@*/ exprNode e)
+   constraintList temp;
+ 
+   DPRINTF((message ("exprNode_multistatement Analysising %s %s at", exprNode_unparse(e),
+-		    fileloc_unparse(exprNode_getfileloc(e)))));
++		    fileloc_unparse(exprNode_getNextSequencePoint(e)))));
+   
+   if (exprNode_handleError (e))
+     {
+diff --git a/src/constraintList.c b/src/constraintList.c
+index 660677e..8dc1da2 100644
+--- a/src/constraintList.c
++++ b/src/constraintList.c
+@@ -69,7 +69,7 @@ constraintList_grow (constraintList s)
+   int i;
+   constraint *newelements; 
+ 
+-  llassert (constraintList_isDefined (s));
++  llassertfatal (constraintList_isDefined (s));
+ 
+   s->nspace += constraintListBASESIZE;
+   newelements = (constraint *) dmalloc (sizeof (*newelements)
+@@ -88,7 +88,7 @@ constraintList_grow (constraintList s)
+ constraintList 
+ constraintList_add (/*@returned@*/ constraintList s, /*@only@*/ constraint el)
+ {
+-  llassert (constraintList_isDefined (s));
++  llassertfatal (constraintList_isDefined (s));
+ 
+   /*drl7x */
+ 
+diff --git a/src/constraintResolve.c b/src/constraintResolve.c
+index c271f55..84a07d8 100644
+--- a/src/constraintResolve.c
++++ b/src/constraintResolve.c
+@@ -325,7 +325,7 @@ static constraint constraint_addOr (/*@returned@*/ constraint orig, /*@observer@
+ {
+   constraint c;
+ 
+-  llassert(constraint_isDefined(orig) );
++  llassertfatal(constraint_isDefined(orig) );
+   
+   c = orig;
+ 
+@@ -352,7 +352,7 @@ static bool resolveOr ( /*@temp@*/ constraint c, /*@observer@*/ /*@temp@*/ const
+ 
+   numberOr = 0;
+ 
+-    llassert(constraint_isDefined(c) );
++    llassertfatal(constraint_isDefined(c) );
+ 
+   DPRINTF(( message("resolveOr: constraint %s and list %s", constraint_unparseOr(c), constraintList_unparse(list) ) ));
+   
+@@ -509,7 +509,7 @@ static /*@only@*/ constraint doResolveOr (/*@observer@*/ /*@temp@*/ constraint c
+ 
+   *resolved = FALSE;
+   
+-  llassert(constraint_isDefined(c) );
++  llassertfatal(constraint_isDefined(c) );
+ 
+   ret = constraint_copy(c);
+ 
+@@ -688,11 +688,11 @@ static bool constraint_conflict (constraint c1, constraint c2)
+ 
+ static void constraint_fixConflict (/*@temp@*/ constraint good, /*@temp@*/ /*@observer@*/ constraint conflicting) /*@modifies good@*/
+ {
+-  llassert(constraint_isDefined(conflicting) );
++  llassertfatal(constraint_isDefined(conflicting) );
+   
+   if (conflicting->ar == EQ)
+     {
+-      llassert (constraint_isDefined(good));
++      llassertfatal (constraint_isDefined(good));
+       DPRINTF (("Replacing here!"));
+       good->expr = constraintExpr_searchandreplace (good->expr, conflicting->lexpr, conflicting->expr);
+       good = constraint_simplify (good);
+@@ -832,7 +832,8 @@ static bool sizeofBufComp(constraintExpr buf1, constraintExpr expr2)
+   exprNode e, t;
+   sRef s1, s2;
+ 
+-  llassert(constraintExpr_isDefined(buf1) && constraintExpr_isDefined(expr2) );
++  llassertfatal(constraintExpr_isDefined(buf1) &&
++                constraintExpr_isDefined(expr2) );
+ 
+   /*@access constraintExpr@*/
+   
+@@ -885,7 +886,7 @@ static bool sizeOfMaxSet( /*@observer@*/ /*@temp@*/ constraint c)
+   DPRINTF(( message("sizeOfMaxSet: checking %s ", constraint_unparse(c) )
+ 	    ));
+ 
+-  llassert (constraint_isDefined(c) );
++  llassertfatal (constraint_isDefined(c) );
+     
+   l = c->lexpr;
+   r = c->expr;
+@@ -1180,7 +1181,7 @@ static bool rangeCheck (arithType ar1, /*@observer@*/ constraintExpr expr1, arit
+ 
+ static constraint constraint_searchandreplace (/*@returned@*/ constraint c, constraintExpr old, constraintExpr newExpr)
+ {
+-  llassert (constraint_isDefined(c));
++  llassertfatal (constraint_isDefined(c));
+   
+   DPRINTF (("Starting replace lexpr [%p]: %s < %s ==> %s > in %s", c, 
+ 	    constraintExpr_unparse (c->lexpr), 
+diff --git a/src/constraintTerm.c b/src/constraintTerm.c
+index 60fe051..44d0487 100644
+--- a/src/constraintTerm.c
++++ b/src/constraintTerm.c
+@@ -467,7 +467,7 @@ bool constraintTerm_probSame (constraintTerm term1, constraintTerm term2)
+   llassert (term1 !=NULL && term2 !=NULL);
+      
+  DPRINTF ((message
+-	    ("Comparing srefs for %s and  %s ", constraintTerm_print(term1), constraintTerm_print(term2)
++	    ("Comparing srefs for %s and  %s ", constraintTerm_getName(term1), constraintTerm_getName(term2)
+ 	     )
+ 	    )
+ 	   );
+@@ -527,19 +527,19 @@ bool constraintTerm_similar (constraintTerm term1, constraintTerm term2)
+     }
+   
+   DPRINTF((message
+-	    ("Comparing srefs for %s and  %s ", constraintTerm_print(term1), constraintTerm_print(term2)
++	    ("Comparing srefs for %s and  %s ", constraintTerm_getName(term1), constraintTerm_getName(term2)
+ 	     )
+ 	    )
+ 	   );
+   
+   if (sRef_similarRelaxed(s1, s2)   || sRef_sameName (s1, s2) )
+     {
+-      DPRINTF ((message (" %s and %s are same", constraintTerm_print(term1), constraintTerm_print(term2)  )  ));
++      DPRINTF ((message (" %s and %s are same", constraintTerm_getName(term1), constraintTerm_getName(term2)  )  ));
+       return TRUE;
+     }
+   else
+     {
+-      DPRINTF ((message (" %s and %s are not same", constraintTerm_print(term1), constraintTerm_print(term2)  )  ));
++      DPRINTF ((message (" %s and %s are not same", constraintTerm_getName(term1), constraintTerm_getName(term2)  )  ));
+       return FALSE;
+     }       
+ }
+diff --git a/src/cppexp.c b/src/cppexp.c
+index 2cdc8a5..818747f 100644
+--- a/src/cppexp.c
++++ b/src/cppexp.c
+@@ -647,7 +647,8 @@ struct operation cppexp_lex (cppReader *pfile)
+   }
+ 
+   BADEXIT;
+-  /*@notreached@*/ 
++  /*@notreached@*/
++  ;
+ }
+ 
+ 
+diff --git a/src/cpplib.c b/src/cpplib.c
+index 682d7d4..37336aa 100644
+--- a/src/cpplib.c
++++ b/src/cpplib.c
+@@ -2293,6 +2293,7 @@ create_definition (/*@exposed@*/ char *buf, char *limit,
+                                   "without this warning"),
+                          loc);
+                 }
++              fileloc_free (loc);
+               rest_args = 1;
+               temp->rest_args = 1;
+               temp->name = rest_name;
+@@ -6746,6 +6747,7 @@ get_next:
+ 
+   BADBRANCH;
+   /*@notreached@*/
++  ;
+ }
+ 
+ /* Parse an identifier starting with C.  */
+@@ -7442,7 +7444,7 @@ parseMoveMark (struct parse_marker *pmark, cppReader *pfile)
+     }
+ 
+   pmark->position = pbuf->cur - pbuf->buf;
+-  DPRINTF (("move mark: %s", pmark->position));
++  DPRINTF (("move mark: %d", pmark->position));
+ }
+ 
+ void cpplib_initializeReader (cppReader *pfile) /* Must be done after library is loaded. */
+@@ -7895,7 +7897,6 @@ static bool cpp_shouldCheckMacro (cppReader *pfile, char *p) /*@modifies p*/
+ {
+   bool checkmacro = FALSE;
+   bool hasParams = FALSE;
+-  bool noexpand = FALSE;
+   cstring sname;
+   char c;
+ 
+@@ -7971,17 +7972,6 @@ static bool cpp_shouldCheckMacro (cppReader *pfile, char *p) /*@modifies p*/
+     }
+   else
+     {
+-      if (noexpand)
+-	{
+-	  checkmacro = TRUE;
+-
+-	  if (!expectenditer)
+-	    {
+-	      noexpand = FALSE;
+-	    }
+-	}
+-      else
+-	{
+ 	  if (usymtab_existsReal (sname))
+ 	    {
+ 	      uentry ue = usymtab_lookup (sname);
+@@ -8136,7 +8126,6 @@ static bool cpp_shouldCheckMacro (cppReader *pfile, char *p) /*@modifies p*/
+ 		  incLine ();
+ 		}
+ 	    }
+-	}
+     }
+ 
+   if (!checkmacro)
+diff --git a/src/ctype.c b/src/ctype.c
+index a03d657..6efdb07 100644
+--- a/src/ctype.c
++++ b/src/ctype.c
+@@ -2471,6 +2471,10 @@ ctype ctype_combine (ctype dominant, ctype modifier)
+ 	    {
+ 	      return ctype_llint;
+ 	    }
++	  if (dominant == ctype_uint)
++	    {
++	      return ctype_ullint;
++	    }
+ 	  
+ 	  voptgenerror (FLG_DUPLICATEQUALS, 
+ 			message ("Duplicate long qualifier on non-int"),
+diff --git a/src/loopHeuristics.c b/src/loopHeuristics.c
+index adb9510..58f6b83 100644
+--- a/src/loopHeuristics.c
++++ b/src/loopHeuristics.c
+@@ -212,7 +212,7 @@ static /*@only@*/ constraintExpr getForTimes (/*@notnull@*/ exprNode forPred, /*
+ 	
+ 	if ( (constraint_isDefined (el ) ) && ( increments (el2, el->lexpr) ) )
+ 	  {
+-	    DPRINTF (( message ("getForTimes: %s increments %s", constraint_print (el2), constraint_print (el) ) ));
++	    DPRINTF (( message ("getForTimes: %s increments %s", constraint_printLocation (el2), constraint_printLocation (el) ) ));
+ 	    ret =  constraintExpr_copy (el->expr);
+ 	    constraintList_free (ltCon);
+ 	    constraintList_free (incCon);
+@@ -222,7 +222,7 @@ static /*@only@*/ constraintExpr getForTimes (/*@notnull@*/ exprNode forPred, /*
+ 	else
+ 	  {
+ 	    ;
+-	    DPRINTF (( message ("getForTimes: %s doesn't increment %s", constraint_print (el2), constraint_print (el) )   ));
++	    DPRINTF (( message ("getForTimes: %s doesn't increment %s", constraint_printLocation (el2), constraint_printLocation (el) )   ));
+ 	  }
+       }
+       end_constraintList_elements;
+@@ -341,7 +341,7 @@ static constraint  constraint_searchAndAdd (/*@returned@*/ constraint c, /*@obse
+  
+   llassert (constraint_search (c, find)  );
+   DPRINTF (( message ("Doing constraint_searchAndAdd  %s %s %s ",
+-		     constraint_print (c), constraintExpr_unparse (find), constraintExpr_unparse (add) ) ) );
++		     constraint_printLocation (c), constraintExpr_unparse (find), constraintExpr_unparse (add) ) ) );
+   
+   c->lexpr = constraintExpr_searchAndAdd (c->lexpr, find, add);
+   c->expr =  constraintExpr_searchAndAdd (c->expr, find, add);
+@@ -369,7 +369,7 @@ static constraint  constraint_searchAndAdd (/*@returned@*/ constraint c, /*@obse
+ 	  newExpr = constraint_copy (el);
+ 
+ 	  newExpr = constraint_searchAndAdd (newExpr, find, add);
+-	  	  DPRINTF (( (message ("Adding constraint %s ", constraint_print (newExpr)) )  ));
++	  	  DPRINTF (( (message ("Adding constraint %s ", constraint_printLocation (newExpr)) )  ));
+ 	  newConstraints = constraintList_add (newConstraints, newExpr);
+ 	}
+ 
+@@ -391,7 +391,7 @@ static void doAdjust (/*@unused@*/ exprNode e, /*@unused@*/ exprNode forPred, /*
+       /* look for var = var + 1 */
+       if (constraint_isDefined (el) && incVar (el) )
+ 	{
+-	  DPRINTF ((message ("Found inc variable constraint : %s", constraint_print (el) )  ));
++	  DPRINTF ((message ("Found inc variable constraint : %s", constraint_printLocation (el) )  ));
+ 	  forBody->requiresConstraints = constraintList_searchAndAdd (forBody->requiresConstraints, el->lexpr, iterations);
+ 	}
+     }
+diff --git a/src/osd.c b/src/osd.c
+index ebe214a..e84259b 100644
+--- a/src/osd.c
++++ b/src/osd.c
+@@ -516,10 +516,10 @@ osd_getPid ()
+ # if defined (WIN32) || defined (OS2) && defined (__IBMC__)
+   int pid = _getpid ();
+ # else
+-  __pid_t pid = getpid ();
++  int pid = (int)getpid ();
+ # endif
+ 
+-  return (int) pid;
++  return pid;
+ }
+   
+ cstring osd_fixDefine (cstring x)
+@@ -859,10 +859,19 @@ static /*@only@*/ cstring osd_cwd = cstring_undefined;
+ 
+ static void osd_setWorkingDirectory (void)
+ {
+-# if defined (UNIX) || defined (OS2)
++# if defined (UNIX)
+   char *buf = dmalloc (sizeof (*buf) * MAXPATHLEN);
+   char *cwd = getcwd (buf, MAXPATHLEN);
+-
++#elif defined (OS2)
++  char *buf = dmalloc (sizeof (*buf) * MAXPATHLEN);
++  char *cwd = _getcwd2 (buf, MAXPATHLEN);
++  char *slash;
++  while ((slash = strchr (cwd, '/')) != NULL)
++    {
++      *slash = '\\';
++    }
++#endif
++# if defined (UNIX) || defined (OS2)
+   llassert (cstring_isUndefined (osd_cwd));
+ 
+   if (cwd == NULL)
+diff --git a/src/scan.c b/src/scan.c
+index cc50858..c535038 100644
+--- a/src/scan.c
++++ b/src/scan.c
+@@ -62,8 +62,8 @@ unsigned int lsllex (YYSTYPE *lval)
+ {
+   /* This is important!  Bison expects this */
+   /* splint doesn't know the type of YYSTYPE, so we need to ignore warnings here */
+-  /*@i1@*/ lval->ltok = LSLScanNextToken ();
+-  /*@i1@*/ return (ltoken_getCode (lval->ltok));
++  lval->ltok = LSLScanNextToken ();
++  return (ltoken_getCode (lval->ltok));
+ }
+ 
+ ltoken LSLScanNextToken (void)
+diff --git a/src/uentry.c b/src/uentry.c
+index 5df7b54..2b9efff 100644
+--- a/src/uentry.c
++++ b/src/uentry.c
+@@ -3077,7 +3077,7 @@ uentry_isSpecialFunction (uentry ue)
+   uentry ue = uentry_makeVariableSrefParam (idDecl_observeId (t), ct, loc, pref);
+ 
+   DPRINTF (("Make param: %s", uentry_unparseFull (ue)));
+-  DPRINTF (("Base: %s [%d]", ctype_unparse (base), ctype_isFixedArray (base)));
++  DPRINTF (("Base: %s [%d]", ctype_unparse (ct), ctype_isFixedArray (ct)));
+   uentry_reflectQualifiers (ue, idDecl_getQuals (t));
+   uentry_implicitParamAnnots (ue);
+ 
+diff --git a/src/usymtab.c b/src/usymtab.c
+index 65cd4ee..9434898 100644
+--- a/src/usymtab.c
++++ b/src/usymtab.c
+@@ -2009,11 +2009,7 @@ void usymtab_load (FILE *f)
+ 
+       while ((c = *s) != '\0' && (c !='\n'))
+ 	{
+-	  if (c != ' ' || c != '\t') 
+-	    {
+-	      llbuglit ("Junk in load file");
+-	    }
+-
++	  llbuglit ("Junk in load file");
+ 	  s++;
+ 	}
+ 
