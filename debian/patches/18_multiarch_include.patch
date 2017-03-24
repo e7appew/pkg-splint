@@ -1,0 +1,33 @@
+From: Carlos Maddela <e7appew@gmail.com>
+Date: Fri, 24 Mar 2017 19:01:57 +1100
+Subject: Add multiarch include path to standard include search paths.
+
+Description: Add multiarch include path to standard include search paths.
+Author: Carlos Maddela <e7appew@gmail.com>
+Bug-Debian: https://bugs.debian.org/675025
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b902e41..eed7218 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -133,13 +133,13 @@ if test x$GCC = xyes; then
+ 
+ # This breaks on gcc-3.0 on redhat fixing drl 11-15-2001
+ #  GCC_INCLUDE_DIR=`LANGUAGE= LANG= $CC -v 2>&1 | sed -e '/^gcc/ d' -e 's/.* \(.*\)specs/\1include/'`
+-GCC_INCLUDE_DIR=/usr/include
++GCC_INCLUDE_DIR=/usr/include/$DEB_HOST_GNU_TYPE
+ # was /usr/lib/gcc-lib/i386-linux/2.7.2.1/include
+ #  GCC_INCLUDE_DIR=`LANGUAGE= LANG= $CC -v 2>&1 | sed -n -e '/^gcc/ d' -e 's/.* \(.*\)specs/\1include/p'`
+   AC_DEFINE_UNQUOTED(GCC_INCLUDE_DIR, "$GCC_INCLUDE_DIR",
+                      [system include directory])
+ else
+-GCC_INCLUDE_DIR=/usr/include
++GCC_INCLUDE_DIR=/usr/include/$DEB_HOST_GNU_TYPE
+ AC_DEFINE_UNQUOTED(GCC_INCLUDE_DIR, "$GCC_INCLUDE_DIR", [system include directory])
+ fi
+ 
