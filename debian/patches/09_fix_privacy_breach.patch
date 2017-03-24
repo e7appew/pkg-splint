@@ -49,7 +49,7 @@ index eda91ae..c1c5055 100644
  </td>
  <td>
 diff --git a/doc/html/faq.html b/doc/html/faq.html
-index 0508141..a342621 100644
+index 38fbe51..e8b2706 100644
 --- a/doc/html/faq.html
 +++ b/doc/html/faq.html
 @@ -505,7 +505,7 @@ The semantics of <tt>realloc</tt> cannot be describe precisely with
