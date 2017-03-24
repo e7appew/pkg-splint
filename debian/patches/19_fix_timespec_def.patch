@@ -1,0 +1,28 @@
+From: Carlos Maddela <e7appew@gmail.com>
+Date: Sat, 25 Mar 2017 03:46:14 +1100
+Subject: Fix names of timespec members.
+
+Description: Fix names of timespec members.
+Author: Carlos Maddela <e7appew@gmail.com>
+Bug-Debian: https://bugs.debian.org/680121
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+---
+ lib/unix.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/unix.h b/lib/unix.h
+index 0cba8d8..4daac93 100644
+--- a/lib/unix.h
++++ b/lib/unix.h
+@@ -689,8 +689,8 @@ struct timeval {
+ } ;
+ 
+ struct timespec {
+-  long	ts_sec;
+-  long	ts_nsec;
++  long	tv_sec;
++  long	tv_nsec;
+ } ;
+ 
+ struct timezone {
