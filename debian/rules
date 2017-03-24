@@ -6,10 +6,24 @@ export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 export LARCH_PATH := .:$(CURDIR)/lib
 export LCLIMPORTDIR := .:$(CURDIR)/imports
 
+MUTABLE_FILES := src/cgrammar.c src/llgrammar.c src/signature.c
+
 # Force non-parallel builds, as splint
 # sometimes fails to build in parallel.
 %:
 	dh $@ --no-parallel
+
+override_dh_auto_configure:
+	for f in $(MUTABLE_FILES); do \
+		cp -an $$f $$f.orig; \
+	done
+	dh_auto_configure
+
+override_dh_clean:
+	dh_clean -X.orig
+	for f in $(MUTABLE_FILES); do \
+		test ! -f $$f.orig || mv -f $$f.orig $$f; \
+	done
 
 override_dh_auto_test-arch:
 	dh_auto_test -a -- -C test
