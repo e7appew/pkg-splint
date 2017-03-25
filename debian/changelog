@@ -1,3 +1,61 @@
+splint (1:3.1.2+dfsg-1) unstable; urgency=medium
+
+  * QA upload.
+  * Fix VCS URLs in debian/control file.
+  * Increment Debhelper compatibility level to 10.
+  * Suppress Lintian warning: debian-watch-may-check-gpg-signature.
+  * Remove obsolete file: debian/README.source.
+  * Build with all hardening flags set.
+  * debian/control: Fix splint-data's relationship to previous versions.
+  * Convert patch headers to DEP-3 format compatible with gbp.
+  * Update autoconf patches to work only on files not automatically generated.
+  * Do not automatically un-apply patches so that clean is done properly.
+  * Fix clean up rule in test/db3/Makefile.
+  * Perform wrap and sort on debian/control.
+  * Fix spelling mistakes in source and documentation.
+  * Fix possible privacy breach issues in documentation.
+  * Fix autoconf and automake warnings.
+  * Force non-parallel builds, since parallel builds don't complete
+    reliably.
+  * Do not capture build path, host name or user name to make
+    builds fully reproducible.
+  * Convert debian/copyright file to DEP-5 format and update.
+  * Update rules for creating DFSG upstream tarballs.
+    This is so that we can correct the package's versioning, by
+    replacing the appended .dfsg* with +dfsg* instead. The image file,
+    doc/html/glowingwall-narrows.jpg, has also been included for the
+    documentation package, and XZ compression is now used.
+  * Remove superfluous duplication of tests.
+  * Try to separate arch-specific and -independent rules.
+  * Add doc-base registration for HTML documentation.
+    In addition, standardise file extensions of all HTML files, and
+    provide convenience links to them from the main package. (Closes: #548122)
+  * Fix segmentation fault. (Closes: #775917)
+  * Cherry-pick unreleased fix for parsing unary plus. (Closes: #462375)
+  * Cherry-pick unreleased fix for "hh" printf modifier support.
+    (Closes: #510821)
+  * Cherry-pick unreleased upstream fix in order to handle C99-style
+    mixing of statements and declarations. (Closes: #369264)
+  * Update 03_359894_VA_ARGS.patch to the one applied upstream.
+    The patch applied upstream also adds a check for +gnuextensions.
+  * Cherry-pick other relevant unreleased upstream changes,
+    so that we're fully up-to-date with "CVS" upstream.
+  * Backup and restore mutable files for idempotent builds.
+  * Add multiarch include path to standard include search paths.
+    (Closes: #675025)
+  * Fix names of timespec members. (Closes: #680121)
+  * Fix Internal Bug at cscannerHelp.c:2428.
+    (Closes: #473595, #476228, #498345, #548768, #569928, #601424)
+  * debian/control: Fix splint-doc-html's relationship to prior versions
+    of splint.
+  * For build reproducibility, move *.lcd files to the main package
+    as they contain architecture-specific information.
+  * Move man page to main package to avoid Lintian warnings when
+    building architecture-specific package alone.
+  * Add LFS support to 32-bit architectures.
+
+ -- Carlos Maddela <e7appew@gmail.com>  Sun, 26 Mar 2017 08:28:41 +1100
+
 splint (3.1.2.dfsg1-4) unstable; urgency=medium
 
   * QA upload.
