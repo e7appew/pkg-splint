@@ -13,11 +13,13 @@ MUTABLE_FILES := src/cgrammar.c src/llgrammar.c src/signature.c
 %:
 	dh $@ --no-parallel
 
-override_dh_auto_configure:
+override_dh_auto_configure-arch:
 	for f in $(MUTABLE_FILES); do \
 		cp -an $$f $$f.orig; \
 	done
-	dh_auto_configure
+	dh_auto_configure -a
+
+override_dh_auto_configure-indep:
 
 override_dh_clean:
 	dh_clean -X.orig
@@ -25,16 +27,18 @@ override_dh_clean:
 		test ! -f $$f.orig || mv -f $$f.orig $$f; \
 	done
 
+override_dh_auto_build-indep:
+
 override_dh_auto_test-arch:
 	dh_auto_test -a -- -C test
 
 override_dh_auto_test-indep:
 
-override_dh_auto_install-arch:
-	$(MAKE) DESTDIR=$(CURDIR)/debian/splint install-exec
-
 override_dh_auto_install-indep:
-	$(MAKE) DESTDIR=$(CURDIR)/debian/splint-data install-data
+
+override_dh_install:
+	dh_install -psplint-data -X.lcd -XMakefile
+	dh_install --remaining-packages
 
 override_dh_installdocs-indep:
 	dh_installdocs -i
