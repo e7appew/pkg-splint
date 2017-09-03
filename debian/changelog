@@ -53,6 +53,7 @@ splint (1:3.1.2+dfsg-1) unstable; urgency=medium
   * Move man page to main package to avoid Lintian warnings when
     building architecture-specific package alone.
   * Add LFS support to 32-bit architectures.
+  * Indicate compliance with Debian Policy 4.1.0.
 
  -- Carlos Maddela <e7appew@gmail.com>  Sun, 26 Mar 2017 08:28:41 +1100
 

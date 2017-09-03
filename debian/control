@@ -2,9 +2,9 @@ Source: splint
 Section: devel
 Priority: optional
 Maintainer: Debian QA Group <packages@qa.debian.org>
-Build-Depends: autotools-dev, debhelper (>= 10), libfl-dev
+Build-Depends: debhelper (>= 10), libfl-dev
 Build-Conflicts: bison, bison++
-Standards-Version: 3.9.8
+Standards-Version: 4.1.0
 Homepage: http://www.splint.org/
 Vcs-Git: https://anonscm.debian.org/git/collab-maint/splint.git
 Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/splint.git
