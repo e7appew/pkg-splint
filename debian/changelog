@@ -11,7 +11,7 @@ splint (1:3.1.2+dfsg-1) unstable; urgency=medium
   * Update autoconf patches to work only on files not automatically generated.
   * Do not automatically un-apply patches so that clean is done properly.
   * Fix clean up rule in test/db3/Makefile.
-  * Perform wrap and sort on debian/control.
+  * Perform wrap and sort on all Debian control files.
   * Fix spelling mistakes in source and documentation.
   * Fix possible privacy breach issues in documentation.
   * Fix autoconf and automake warnings.

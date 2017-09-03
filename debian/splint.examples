@@ -1,4 +1,4 @@
 debian/external/dbacl.splintrc
+debian/external/linux-2.4.23.txt
 debian/external/rtai.splintrc
 debian/external/splint.splintrc
-debian/external/linux-2.4.23.txt
