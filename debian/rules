@@ -10,26 +10,34 @@ export DEB_CPPFLAGS_MAINT_APPEND = \
 export LARCH_PATH := .:$(CURDIR)/lib
 export LCLIMPORTDIR := .:$(CURDIR)/imports
 
-MUTABLE_FILES := src/cgrammar.c src/llgrammar.c src/signature.c
+MUTABLE_FILES := aclocal.m4 bin/Makefile.in config/depcomp config.hin \
+	config/install-sh config/missing config/mkinstalldirs configure \
+	doc/Makefile.in imports/Makefile.in lib/Makefile.in lib/posix.lcd \
+	lib/posixstrict.lcd lib/standard.lcd lib/standardstrict.lcd \
+	lib/unix.lcd lib/unixstrict.lcd Makefile.in src/cgrammar.c \
+	src/llgrammar.c src/Makefile.in src/signature.c test/Makefile.in
 
 # Force non-parallel builds, as splint
 # sometimes fails to build in parallel.
 %:
 	dh $@ --no-parallel
 
-override_dh_auto_configure-arch:
+override_dh_update_autotools_config:
+	dh_update_autotools_config
 	for f in $(MUTABLE_FILES); do \
 		cp -an $$f $$f.orig; \
 	done
-	dh_auto_configure -a
-
-override_dh_auto_configure-indep:
 
 override_dh_clean:
 	dh_clean -X.orig
 	for f in $(MUTABLE_FILES); do \
 		test ! -f $$f.orig || mv -f $$f.orig $$f; \
 	done
+
+override_dh_auto_configure-arch:
+	dh_auto_configure -a
+
+override_dh_auto_configure-indep:
 
 override_dh_auto_build-indep:
 
