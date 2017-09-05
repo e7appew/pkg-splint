@@ -55,7 +55,7 @@ splint (1:3.1.2+dfsg-1) unstable; urgency=medium
   * Add LFS support to 32-bit architectures.
   * Indicate compliance with Debian Policy 4.1.0.
 
- -- Carlos Maddela <e7appew@gmail.com>  Sun, 26 Mar 2017 08:28:41 +1100
+ -- Carlos Maddela <e7appew@gmail.com>  Tue, 05 Sep 2017 16:29:16 +1000
 
 splint (3.1.2.dfsg1-4) unstable; urgency=medium
 
